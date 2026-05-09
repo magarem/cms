@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": "6959b42a-cf49-4f6f-bd90-0ebedc9f16d7",
+      "username": "admin",
+      "passwordHash": "$2a$10$j1iShIBmoiVI9NKN0c1WYegPXT5ROobmaWQfHW.3n0wDeV2aJFNhC",
+      "role": "admin",
+      "sites": [
+        "*"
+      ]
+    },
+    {
+      "id": "785ae8b6-d191-4a98-b857-db719c010d17",
+      "username": "fidelis",
+      "passwordHash": "$2a$10$EId18WIiwWUvV4QoDcJGqek365FYXs3RPczpZGWsvA1/3/OLZpI7C",
+      "role": "editor",
+      "sites": [
+        "meu-site"
+      ]
+    }
+  ]
+}

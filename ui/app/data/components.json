@@ -1,0 +1,903 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-29",
+    "description": "Source of truth for the CMS block builder. Each component lists its props with field types so the CMS can render the correct input widget.",
+    "fieldTypes": {
+      "text":      "Single-line string input",
+      "textarea":  "Multi-line string input",
+      "markdown":  "Full markdown editor",
+      "number":    "Numeric input — only accepts numbers",
+      "boolean":   "Toggle switch (true/false)",
+      "select":    "Dropdown with fixed options list",
+      "url":       "URL string input with link validation",
+      "email":     "Email string input with format validation",
+      "image":     "Media picker — opens gallery, returns image path",
+      "video":     "Media picker — opens gallery, returns video path",
+      "media":     "Media picker — image OR video OR audio",
+      "icon":      "Icon picker — returns a PrimeIcons class string (e.g. pi-bolt)",
+      "date":      "Date picker — returns ISO date string",
+      "color":     "Color picker — returns hex string",
+      "path":      "CMS tree path picker — points to a page/folder inside data/",
+      "array":     "Repeatable list — each item uses itemSchema",
+      "object":    "Nested group of sub-fields"
+    }
+  },
+
+  "page_types": [
+    {
+      "name": "default",
+      "label": "Default Page",
+      "fields": [
+        { "name": "title",       "label": "Title",        "type": "text",     "required": true, "default": "" },
+        { "name": "layout",      "label": "Layout",       "type": "select",   "default": "default",
+          "options": [
+            { "value": "default",      "label": "Default" },
+            { "value": "post",         "label": "Post / Article" },
+            { "value": "topbar-glass", "label": "Glass Topbar" },
+            { "value": "landing",      "label": "Landing Page" }
+          ]
+        },
+        { "name": "description", "label": "Description",  "type": "textarea", "default": "" },
+        { "name": "image",       "label": "Cover Image",   "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left",  "label": "Left" }
+          ]
+        },
+        { "name": "date",        "label": "Date",         "type": "date",     "default": "" },
+        { "name": "seo",         "label": "SEO",          "type": "object",   "default": {},
+          "fields": [
+            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
+            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
+            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
+            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
+            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
+            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+              "options": [
+                { "value": "index, follow",     "label": "Index + Follow (default)" },
+                { "value": "noindex, follow",   "label": "No Index" },
+                { "value": "index, nofollow",   "label": "No Follow" },
+                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+              ]
+            },
+            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+              "options": [
+                { "value": "WebPage",       "label": "WebPage" },
+                { "value": "Article",       "label": "Article" },
+                { "value": "BlogPosting",   "label": "Blog Post" },
+                { "value": "AboutPage",     "label": "About Page" },
+                { "value": "ContactPage",   "label": "Contact Page" },
+                { "value": "FAQPage",       "label": "FAQ Page" },
+                { "value": "ProductPage",   "label": "Product Page" },
+                { "value": "ServicePage",   "label": "Service Page" },
+                { "value": "CollectionPage","label": "Collection Page" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "post",
+      "label": "Post / Article",
+      "fields": [
+        { "name": "title",       "label": "Title",            "type": "text",     "required": true, "default": "" },
+        { "name": "layout",      "label": "Layout",           "type": "select",   "default": "post",
+          "options": [
+            { "value": "default",      "label": "Default" },
+            { "value": "post",         "label": "Post / Article" },
+            { "value": "topbar-glass", "label": "Glass Topbar" },
+            { "value": "landing",      "label": "Landing Page" }
+          ]
+        },
+        { "name": "author",      "label": "Author",           "type": "text",     "default": "" },
+        { "name": "date",        "label": "Publication Date", "type": "date",     "default": "" },
+        { "name": "image",       "label": "Cover Image",      "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left",  "label": "Left" }
+          ]
+        },
+        { "name": "description", "label": "Description",      "type": "textarea", "default": "" },
+        { "name": "seo",         "label": "SEO",              "type": "object",   "default": {},
+          "fields": [
+            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
+            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
+            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
+            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
+            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
+            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+              "options": [
+                { "value": "index, follow",     "label": "Index + Follow (default)" },
+                { "value": "noindex, follow",   "label": "No Index" },
+                { "value": "index, nofollow",   "label": "No Follow" },
+                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+              ]
+            },
+            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "Article",
+              "options": [
+                { "value": "Article",     "label": "Article" },
+                { "value": "BlogPosting", "label": "Blog Post" },
+                { "value": "NewsArticle", "label": "News Article" },
+                { "value": "WebPage",     "label": "WebPage" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "topbar-glass",
+      "label": "Glass Topbar (Hero)",
+      "fields": [
+        { "name": "title",  "label": "Title",  "type": "text", "required": true, "default": "" },
+        { "name": "layout", "label": "Layout", "type": "select", "default": "topbar-glass",
+          "options": [
+            { "value": "default",      "label": "Default" },
+            { "value": "post",         "label": "Post / Article" },
+            { "value": "topbar-glass", "label": "Glass Topbar" },
+            { "value": "landing",      "label": "Landing Page" }
+          ]
+        },
+        { "name": "seo", "label": "SEO", "type": "object", "default": {},
+          "fields": [
+            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
+            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
+            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
+            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
+            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
+            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+              "options": [
+                { "value": "index, follow",     "label": "Index + Follow (default)" },
+                { "value": "noindex, follow",   "label": "No Index" },
+                { "value": "index, nofollow",   "label": "No Follow" },
+                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+              ]
+            },
+            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+              "options": [
+                { "value": "WebPage",   "label": "WebPage" },
+                { "value": "WebSite",   "label": "WebSite" },
+                { "value": "AboutPage", "label": "About Page" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "landing",
+      "label": "Landing Page",
+      "fields": [
+        { "name": "title",       "label": "Title",       "type": "text",     "required": true, "default": "" },
+        { "name": "layout",      "label": "Layout",      "type": "select",   "default": "landing",
+          "options": [
+            { "value": "default",      "label": "Default" },
+            { "value": "post",         "label": "Post / Article" },
+            { "value": "topbar-glass", "label": "Glass Topbar" },
+            { "value": "landing",      "label": "Landing Page" }
+          ]
+        },
+        { "name": "description", "label": "Description", "type": "textarea", "default": "" },
+        { "name": "image",       "label": "Cover Image",  "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
+        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left",  "label": "Left" }
+          ]
+        },
+        { "name": "seo", "label": "SEO", "type": "object", "default": {},
+          "fields": [
+            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
+            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
+            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
+            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
+            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
+            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+              "options": [
+                { "value": "index, follow",     "label": "Index + Follow (default)" },
+                { "value": "noindex, follow",   "label": "No Index" },
+                { "value": "index, nofollow",   "label": "No Follow" },
+                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+              ]
+            },
+            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+              "options": [
+                { "value": "WebPage",     "label": "WebPage" },
+                { "value": "WebSite",     "label": "WebSite" },
+                { "value": "ServicePage", "label": "Service Page" },
+                { "value": "AboutPage",   "label": "About Page" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "components": [
+
+    {
+      "name": "AppContainer",
+      "file": "components/AppContainer.vue",
+      "category": "layout",
+      "description": "Wrapper that controls the max-width of its content. Use it to wrap page sections.",
+      "props": [
+        {
+          "name": "size",
+          "label": "Content Width",
+          "type": "select",
+          "default": "content",
+          "options": [
+            { "value": "site",    "label": "Site — 1440px" },
+            { "value": "content", "label": "Content — 1200px" },
+            { "value": "copy",    "label": "Copy — 800px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "PageHeader",
+      "file": "components/PageHeader.vue",
+      "category": "block",
+      "description": "Page or section heading block with optional tag, highlighted word, and subtitle.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "highlight",
+          "label": "Highlighted Word (inside title)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtitle",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "tag",
+          "label": "Tag Label (small badge above title)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "tagIcon",
+          "label": "Tag Icon",
+          "type": "icon",
+          "default": ""
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "content",
+          "options": [
+            { "value": "site",    "label": "Site — 1440px" },
+            { "value": "content", "label": "Content — 1200px" },
+            { "value": "copy",    "label": "Copy — 800px" }
+          ]
+        },
+        {
+          "name": "BoxAlign",
+          "label": "Alignment",
+          "type": "select",
+          "default": "center",
+          "options": [
+            { "value": "left",   "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right",  "label": "Right" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "HeroSlideShow",
+      "file": "components/HeroSlideShow.vue",
+      "category": "block",
+      "description": "Full-screen hero section with auto-playing image/video slideshow and overlay text.",
+      "props": [
+        {
+          "name": "config",
+          "label": "Hero Configuration",
+          "type": "object",
+          "fields": [
+            { "name": "tag",            "label": "Tag Badge",          "type": "text",   "default": "" },
+            { "name": "tagIcon",        "label": "Tag Icon",           "type": "icon",   "default": "pi-sparkles" },
+            { "name": "titlePrefix",    "label": "Title — Normal Part","type": "text",   "default": "" },
+            { "name": "titleHighlight", "label": "Title — Highlighted","type": "text",   "default": "" },
+            { "name": "subtitle",       "label": "Subtitle",           "type": "textarea","default": "" },
+            {
+              "name": "slides",
+              "label": "Slides (images or videos)",
+              "type": "array",
+              "itemType": "media",
+              "default": []
+            },
+            { "name": "slideDuration", "label": "Slide Duration (ms)", "type": "number", "default": 5000 },
+            {
+              "name": "cWidth",
+              "label": "Content Width",
+              "type": "select",
+              "default": "content",
+              "options": [
+                { "value": "site",    "label": "Site — 1440px" },
+                { "value": "content", "label": "Content — 1200px" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "CallToAction",
+      "file": "components/CallToAction.vue",
+      "category": "block",
+      "description": "Call-to-action banner with title, subtitle, and a primary button.",
+      "props": [
+        {
+          "name": "config",
+          "label": "CTA Configuration",
+          "type": "object",
+          "fields": [
+            { "name": "title",      "label": "Title",       "type": "text",     "default": "Pronto para dar vida à tua ideia?" },
+            { "name": "subtitle",   "label": "Subtitle",    "type": "textarea", "default": "" },
+            { "name": "buttonText", "label": "Button Text", "type": "text",     "default": "Iniciar Projeto" },
+            { "name": "buttonLink", "label": "Button URL",  "type": "url",      "default": "/contact" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "CallToAction2",
+      "file": "components/CallToAction2.vue",
+      "category": "block",
+      "description": "Alternative CTA block — flat props version with same visual output.",
+      "props": [
+        { "name": "title",      "label": "Title",       "type": "text",     "default": "Pronto para inovar?" },
+        { "name": "subtitle",   "label": "Subtitle",    "type": "textarea", "default": "" },
+        { "name": "buttonText", "label": "Button Text", "type": "text",     "default": "Falar Connosco" },
+        { "name": "buttonLink", "label": "Button URL",  "type": "url",      "default": "/contactos" },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "cw-1",
+          "options": [
+            { "value": "cw-0", "label": "Full width" },
+            { "value": "cw-1", "label": "Wide — 900px" },
+            { "value": "cw-2", "label": "Medium — 800px" },
+            { "value": "cw-3", "label": "Narrow — 600px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "MultiImageBanner",
+      "file": "components/MultiImageBanner.vue",
+      "category": "block",
+      "description": "Photo mosaic banner — first image is the hero, up to 4 smaller images on the side. Opens a lightbox slideshow on click.",
+      "props": [
+        {
+          "name": "images",
+          "label": "Images (first = hero, up to 5 total)",
+          "type": "array",
+          "required": true,
+          "itemSchema": [
+            { "name": "url", "label": "Image", "type": "image", "required": true }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "content",
+          "options": [
+            { "value": "full",    "label": "Full bleed" },
+            { "value": "site",    "label": "Site — 1440px" },
+            { "value": "content", "label": "Content — 1200px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "CardGrid",
+      "file": "components/CardGrid.vue",
+      "category": "block",
+      "description": "Responsive grid of cards with image, tag, title, description, and lightbox.",
+      "props": [
+        {
+          "name": "items",
+          "label": "Cards",
+          "type": "array",
+          "required": true,
+          "itemSchema": [
+            { "name": "title",       "label": "Title",       "type": "text",     "required": true },
+            { "name": "description", "label": "Description", "type": "textarea", "default": "" },
+            { "name": "image",       "label": "Image",       "type": "image",    "default": "" },
+            { "name": "tag",         "label": "Tag Badge",   "type": "text",     "default": "" },
+            { "name": "path",        "label": "Link URL",    "type": "url",      "default": "" }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "cw-1",
+          "options": [
+            { "value": "cw-0", "label": "Full width" },
+            { "value": "cw-1", "label": "Wide — 900px" },
+            { "value": "cw-2", "label": "Medium — 800px" },
+            { "value": "cw-3", "label": "Narrow — 600px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ChildGrid",
+      "file": "components/ChildGrid.vue",
+      "category": "block",
+      "description": "Auto-populated grid that reads child folders from a CMS path and renders them as cards. No manual items needed.",
+      "props": [
+        {
+          "name": "parentPath",
+          "label": "CMS Folder Path",
+          "type": "path",
+          "required": true,
+          "description": "Points to a folder inside data/. All sub-folders become cards automatically."
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "w-full",
+          "options": [
+            { "value": "w-full", "label": "Full width" },
+            { "value": "cw-1",   "label": "Wide — 900px" },
+            { "value": "cw-2",   "label": "Medium — 800px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ContentMD",
+      "file": "components/ContentMD.vue",
+      "category": "block",
+      "description": "Renders a Markdown file from the CMS with optional top image and side images.",
+      "props": [
+        {
+          "name": "pagePath",
+          "label": "Page Path (folder)",
+          "type": "path",
+          "required": true,
+          "description": "The folder inside data/ that contains the markdown file, e.g. services/consultoria"
+        }
+      ]
+    },
+
+    {
+      "name": "QuickNavigation",
+      "file": "components/QuickNavigation.vue",
+      "category": "block",
+      "description": "Row of feature/navigation cards with icon, title, description, and CTA link.",
+      "props": [
+        {
+          "name": "links",
+          "label": "Navigation Cards",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "icon",        "label": "Icon",        "type": "icon",     "default": "pi-bolt" },
+            { "name": "title",       "label": "Title",       "type": "text",     "required": true },
+            { "name": "description", "label": "Description", "type": "textarea", "default": "" },
+            { "name": "ctaText",     "label": "Link Text",   "type": "text",     "default": "Saber Mais" },
+            { "name": "to",          "label": "Link URL",    "type": "url",      "default": "/" }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "w-full",
+          "options": [
+            { "value": "w-full", "label": "Full width" },
+            { "value": "cw-1",   "label": "Wide — 900px" },
+            { "value": "cw-2",   "label": "Medium — 800px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "SocialProof",
+      "file": "components/SocialProof.vue",
+      "category": "block",
+      "description": "Scrolling logo marquee strip for brand/client logos.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Section Title",
+          "type": "text",
+          "default": "Empresas que confiam em nós"
+        },
+        {
+          "name": "logos",
+          "label": "Logos",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "type",
+              "label": "Logo Type",
+              "type": "select",
+              "default": "text",
+              "options": [
+                { "value": "text",  "label": "Text (brand name)" },
+                { "value": "image", "label": "Image (logo file)" }
+              ]
+            },
+            { "name": "name", "label": "Brand Name (for text logos)", "type": "text",  "default": "" },
+            { "name": "url",  "label": "Logo Image (for image logos)", "type": "image", "default": "" }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "w-full",
+          "options": [
+            { "value": "w-full", "label": "Full width" },
+            { "value": "cw-1",   "label": "Wide — 900px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "Testimonials",
+      "file": "components/Testimonials.vue",
+      "category": "block",
+      "description": "Grid of customer review cards with rating, quote, name, role, and avatar.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Section Title",
+          "type": "text",
+          "default": "Histórias de Sucesso"
+        },
+        {
+          "name": "subtitle",
+          "label": "Section Subtitle",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "reviews",
+          "label": "Testimonials",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "name",   "label": "Name",           "type": "text",   "required": true },
+            { "name": "role",   "label": "Role / Company", "type": "text",   "default": "" },
+            { "name": "text",   "label": "Quote",          "type": "textarea","required": true },
+            { "name": "rating", "label": "Rating (1–5)",   "type": "number", "default": 5 },
+            { "name": "avatar", "label": "Avatar Photo",   "type": "image",  "default": "" }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "w-full",
+          "options": [
+            { "value": "w-full", "label": "Full width" },
+            { "value": "cw-1",   "label": "Wide — 900px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "Sirius-ContactModel1",
+      "file": "components/Sirius-ContactModel1.vue",
+      "category": "block",
+      "description": "Contact page layout with an info column and a dynamic form builder.",
+      "props": [
+        {
+          "name": "formTitle",
+          "label": "Form Title",
+          "type": "text",
+          "default": "Envia-nos uma mensagem"
+        },
+        {
+          "name": "contactInfo",
+          "label": "Contact Info Items",
+          "type": "array",
+          "required": true,
+          "itemSchema": [
+            { "name": "icon",  "label": "Icon",  "type": "icon",     "required": true },
+            { "name": "label", "label": "Label", "type": "text",     "required": true },
+            { "name": "value", "label": "Value", "type": "text",     "required": true },
+            { "name": "href",  "label": "Link",  "type": "url",      "default": "" }
+          ]
+        },
+        {
+          "name": "formSchema",
+          "label": "Form Fields",
+          "type": "array",
+          "required": true,
+          "itemSchema": [
+            { "name": "name",        "label": "Field Key (internal)",  "type": "text",     "required": true },
+            { "name": "label",       "label": "Field Label",           "type": "text",     "required": true },
+            {
+              "name": "type",
+              "label": "Field Type",
+              "type": "select",
+              "default": "text",
+              "options": [
+                { "value": "text",     "label": "Text" },
+                { "value": "email",    "label": "Email" },
+                { "value": "textarea", "label": "Textarea" },
+                { "value": "number",   "label": "Number" },
+                { "value": "tel",      "label": "Phone" }
+              ]
+            },
+            { "name": "placeholder", "label": "Placeholder",           "type": "text",    "default": "" },
+            { "name": "required",    "label": "Required",              "type": "boolean", "default": false }
+          ]
+        },
+        {
+          "name": "submitConfig",
+          "label": "Submit Button",
+          "type": "object",
+          "required": true,
+          "fields": [
+            { "name": "label", "label": "Button Label", "type": "text", "default": "Enviar" },
+            { "name": "icon",  "label": "Button Icon",  "type": "icon", "default": "" },
+            { "name": "terms", "label": "Terms Text",   "type": "text", "default": "" }
+          ]
+        },
+        {
+          "name": "successConfig",
+          "label": "Success Screen",
+          "type": "object",
+          "required": true,
+          "fields": [
+            { "name": "title",       "label": "Title",          "type": "text", "default": "Mensagem enviada!" },
+            { "name": "message",     "label": "Message",        "type": "textarea", "default": "" },
+            { "name": "icon",        "label": "Icon",           "type": "icon", "default": "pi-check" },
+            { "name": "buttonLabel", "label": "Back Button Text","type": "text", "default": "Voltar" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ui/Article",
+      "file": "components/ui/Article.vue",
+      "category": "ui",
+      "description": "Styled article layout renderer with top image, side images, author line, and markdown body.",
+      "props": [
+        { "name": "title",      "label": "Title",            "type": "text",     "default": "" },
+        { "name": "content",    "label": "Body (Markdown)",  "type": "markdown", "default": "" },
+        { "name": "topImage",   "label": "Top Banner Image", "type": "image",    "default": "" },
+        {
+          "name": "sideImages",
+          "label": "Side Images",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "url", "label": "Image", "type": "image", "required": true }
+          ]
+        },
+        { "name": "author", "label": "Author",            "type": "text", "default": "" },
+        { "name": "date",   "label": "Publication Date",  "type": "date", "default": "" },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "cw-1",
+          "options": [
+            { "value": "cw-0", "label": "Full width" },
+            { "value": "cw-1", "label": "Wide — 900px" },
+            { "value": "cw-2", "label": "Medium — 800px" },
+            { "value": "cw-3", "label": "Narrow — 600px" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ui/Card",
+      "file": "components/ui/Card.vue",
+      "category": "ui",
+      "description": "Generic card with optional icon, title, and description. Accepts slot content.",
+      "props": [
+        { "name": "title",          "label": "Title",           "type": "text",     "default": "" },
+        { "name": "description",    "label": "Description",     "type": "textarea", "default": "" },
+        { "name": "icon",           "label": "Icon",            "type": "icon",     "default": "" },
+        { "name": "contentPadding", "label": "Inner Padding (CSS class)", "type": "text", "default": "p-8" }
+      ]
+    },
+
+    {
+      "name": "ui/FormBuilder",
+      "file": "components/ui/FormBuilder.vue",
+      "category": "ui",
+      "description": "Dynamic form renderer. Driven by a schema array — same structure as formSchema in Sirius-ContactModel1.",
+      "props": [
+        {
+          "name": "schema",
+          "label": "Form Fields",
+          "type": "array",
+          "required": true,
+          "itemSchema": [
+            { "name": "name",        "label": "Field Key",   "type": "text",    "required": true },
+            { "name": "label",       "label": "Label",       "type": "text",    "required": true },
+            {
+              "name": "type",
+              "label": "Field Type",
+              "type": "select",
+              "default": "text",
+              "options": [
+                { "value": "text",     "label": "Text" },
+                { "value": "email",    "label": "Email" },
+                { "value": "textarea", "label": "Textarea" },
+                { "value": "number",   "label": "Number" },
+                { "value": "tel",      "label": "Phone" },
+                { "value": "password", "label": "Password" }
+              ]
+            },
+            { "name": "placeholder", "label": "Placeholder", "type": "text",    "default": "" },
+            { "name": "required",    "label": "Required",    "type": "boolean", "default": false }
+          ]
+        },
+        {
+          "name": "submitConfig",
+          "label": "Submit Button",
+          "type": "object",
+          "fields": [
+            { "name": "label", "label": "Button Label", "type": "text", "default": "Enviar" },
+            { "name": "icon",  "label": "Button Icon",  "type": "icon", "default": "" },
+            { "name": "terms", "label": "Terms Text",   "type": "text", "default": "" }
+          ]
+        },
+        {
+          "name": "successConfig",
+          "label": "Success Screen",
+          "type": "object",
+          "fields": [
+            { "name": "title",       "label": "Title",          "type": "text",     "default": "Sucesso!" },
+            { "name": "message",     "label": "Message",        "type": "textarea", "default": "" },
+            { "name": "icon",        "label": "Icon",           "type": "icon",     "default": "pi-check" },
+            { "name": "buttonLabel", "label": "Back Button Text","type": "text",    "default": "Voltar" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ui/Input",
+      "file": "components/ui/Input.vue",
+      "category": "ui",
+      "description": "Single form input or textarea. Used internally by FormBuilder.",
+      "props": [
+        { "name": "id",          "label": "Field ID (HTML)",  "type": "text",    "required": true },
+        { "name": "label",       "label": "Label",            "type": "text",    "required": true },
+        {
+          "name": "type",
+          "label": "Input Type",
+          "type": "select",
+          "default": "text",
+          "options": [
+            { "value": "text",     "label": "Text" },
+            { "value": "email",    "label": "Email" },
+            { "value": "textarea", "label": "Textarea" },
+            { "value": "number",   "label": "Number" },
+            { "value": "tel",      "label": "Phone" },
+            { "value": "password", "label": "Password" }
+          ]
+        },
+        { "name": "placeholder", "label": "Placeholder",      "type": "text",    "default": "" },
+        { "name": "required",    "label": "Required",         "type": "boolean", "default": false },
+        { "name": "rows",        "label": "Rows (textarea)",  "type": "number",  "default": 5 }
+      ]
+    },
+
+    {
+      "name": "SiteHeader",
+      "file": "components/SiteHeader.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Main site header/topbar. Config driven by _global/_topbar.json — not a page block.",
+      "props": [
+        {
+          "name": "isGlass",
+          "label": "Glass / Transparent Mode (over hero)",
+          "type": "boolean",
+          "default": false
+        }
+      ]
+    },
+
+    {
+      "name": "SiteHeaderLogo",
+      "file": "components/SiteHeaderLogo.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Logo block inside SiteHeader. Used internally.",
+      "props": [
+        { "name": "brandName",  "label": "Brand Name",  "type": "text",   "default": "SIRIUS" },
+        { "name": "signature",  "label": "Signature",   "type": "text",   "default": "STUDIO" },
+        {
+          "name": "variation",
+          "label": "Logo Variant",
+          "type": "select",
+          "default": "signature",
+          "options": [
+            { "value": "signature", "label": "Text only" },
+            { "value": "icon-text", "label": "Icon + Text" },
+            { "value": "minimal",   "label": "Icon only" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "SiteHeaderMenu",
+      "file": "components/SiteHeaderMenu.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Navigation menu inside SiteHeader. Menu items come from _topbar.json.",
+      "props": [
+        {
+          "name": "menuItems",
+          "label": "Menu Items",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "label", "label": "Label", "type": "text", "required": true },
+            { "name": "path",  "label": "URL",   "type": "url",  "required": true }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "SiteHeaderExtra",
+      "file": "components/SiteHeaderExtra.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Header extras (dark mode toggle, CTA button). Internal use only."
+    },
+
+    {
+      "name": "Footer",
+      "file": "components/Footer.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Site footer. No configurable props — content defined inside the component."
+    }
+
+  ]
+}

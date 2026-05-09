@@ -1,0 +1,11 @@
+{
+  "name": "sirius-cms",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "api": "cd api && bun run dev",
+    "ui": "cd ui && bun run dev",
+    "dev": "bun run api & bun run ui",
+    "install:all": "cd api && bun install && cd ../ui && bun install"
+  }
+}
