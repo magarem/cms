@@ -7,6 +7,9 @@ import { SITES_ROOT } from "../lib/content"
 
 const JWT_SECRET = process.env.JWT_SECRET || "sirius_cms_dev_secret_change_in_production"
 
+const COOKIE_SAMESITE = (process.env.COOKIE_SAMESITE || "lax") as "lax" | "strict" | "none"
+const COOKIE_SECURE   = process.env.COOKIE_SECURE === "true" || COOKIE_SAMESITE === "none"
+
 export const authRoutes = new Elysia({ prefix: "/auth" })
   .use(jwt({ name: "jwt", secret: JWT_SECRET }))
 
@@ -52,7 +55,8 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
-        sameSite: "lax",
+        sameSite: COOKIE_SAMESITE,
+        secure: COOKIE_SECURE,
       })
 
       return { success: true, user: { ...sanitizeUser(user), site } }
@@ -67,7 +71,11 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
   )
 
   .post("/logout", ({ cookie: { cms_token } }) => {
-    cms_token.remove()
+    cms_token.remove({
+      path: "/",
+      sameSite: COOKIE_SAMESITE,
+      secure: COOKIE_SECURE,
+    })
     return { success: true }
   })
 
