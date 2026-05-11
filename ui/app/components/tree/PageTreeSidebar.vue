@@ -74,6 +74,7 @@ async function submitCreate() {
       toast.add({ title: "Nova coleção criada.", color: "success" })
       showCreate.value = false
       await fetchTree()
+      router.push(`/${props.site}/collections/${cleanPath}`)
     }
   } catch (e: any) {
     toast.add({ title: e.data?.error || "Erro ao criar.", color: "error" })

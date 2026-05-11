@@ -129,6 +129,27 @@ const metaFields = computed(() => getPageTypeSchema(form.value?.layout))
 
 const title = computed(() => form.value?.title || contentPath.split("/").pop() || "Página")
 useHead({ title: `${title.value} — Sirius CMS` })
+
+// Raw JSON editor
+const rawOpen = ref(false)
+const rawText = ref('')
+const rawError = ref('')
+
+function openRaw() {
+  rawText.value = JSON.stringify(form.value, null, 2)
+  rawError.value = ''
+  rawOpen.value = true
+}
+
+function applyRaw() {
+  try {
+    form.value = JSON.parse(rawText.value)
+    rawOpen.value = false
+    rawError.value = ''
+  } catch (e: any) {
+    rawError.value = e.message
+  }
+}
 </script>
 
 <template>
@@ -149,10 +170,13 @@ useHead({ title: `${title.value} — Sirius CMS` })
       <UBadge v-if="dirty" color="warning" variant="soft" size="xs" class="flex-shrink-0 ml-1">não guardado</UBadge>
     </template>
     <template #actions>
-       <UButton icon="i-heroicons-check" size="sm" :loading="saving" :disabled="!dirty" @click="save">
+      <UButton icon="i-heroicons-check" size="sm" :loading="saving" :disabled="!dirty" @click="save">
         Salvar
       </UButton>
-      <NuxtLink :to="`/${site}/preview?path=${encodeURIComponent('/' + contentPath)}`">
+      <UButton icon="i-heroicons-code-bracket" size="sm" variant="outline" color="neutral" :disabled="!form" @click="openRaw">
+        Raw
+      </UButton>
+      <NuxtLink :to="`/${site}/preview?path=${encodeURIComponent(contentPath === 'home' ? '/' : '/' + contentPath)}`">
         <UButton icon="i-heroicons-eye" size="sm" variant="outline" color="neutral">Preview</UButton>
       </NuxtLink>
     </template>
@@ -200,5 +224,25 @@ useHead({ title: `${title.value} — Sirius CMS` })
   <div v-else class="flex-1 flex items-center justify-center text-gray-600 text-sm">
     Página não encontrada
   </div>
+
+  <!-- Raw JSON editor modal -->
+  <UModal v-model:open="rawOpen" title="Editar ficheiro raw" :ui="{ content: 'max-w-4xl' }">
+    <template #body>
+      <div class="space-y-2">
+        <textarea
+          v-model="rawText"
+          class="w-full h-[60vh] font-mono text-xs bg-gray-950 text-gray-200 border border-gray-700 rounded-lg p-3 resize-none focus:outline-none focus:border-primary-500"
+          spellcheck="false"
+        />
+        <p v-if="rawError" class="text-xs text-red-400 font-mono">{{ rawError }}</p>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton variant="ghost" color="neutral" @click="rawOpen = false">Cancelar</UButton>
+        <UButton icon="i-heroicons-check" @click="applyRaw">Aplicar</UButton>
+      </div>
+    </template>
+  </UModal>
 
 </template>

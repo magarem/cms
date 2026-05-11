@@ -6,6 +6,7 @@ interface Block {
   id?: string
   componentName: string
   isHero?: boolean
+  active?: boolean
   props?: Record<string, any>
 }
 
@@ -45,6 +46,7 @@ function addBlock(componentName: string) {
       id: componentName.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now().toString(36),
       componentName,
       isHero: false,
+      active: true,
       props: buildDefaultProps(componentName),
     },
   ]

@@ -160,6 +160,9 @@ async function deleteItem(itemSlug: string) {
       <UBadge color="neutral" variant="soft" size="xs" class="ml-1">{{ localItems.length }}</UBadge>
     </template>
     <template #actions>
+      <NuxtLink :to="`/${site}/preview?path=${encodeURIComponent('/' + collectionPath)}`">
+        <UButton icon="i-heroicons-eye" size="sm" variant="outline" color="neutral">Preview</UButton>
+      </NuxtLink>
       <UButton icon="i-heroicons-plus" size="sm" @click="showCreate = true">Novo item</UButton>
     </template>
   </CmsTopbar>

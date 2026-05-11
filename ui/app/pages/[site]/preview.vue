@@ -49,6 +49,16 @@ const iframeSrc = computed(() => {
   return url.toString()
 })
 
+// URL shown in the toolbar — tracks selectedPath so it updates on every in-frame navigation
+const displayUrl = computed(() => {
+  if (!previewUrl.value) return ""
+  const base = previewUrl.value.replace(/\/+$/, "")
+  const path = selectedPath.value.startsWith("/") ? selectedPath.value : `/${selectedPath.value}`
+  const url  = new URL(base + path)
+  url.searchParams.set("version", selectedVersion.value)
+  return url.toString()
+})
+
 // When path selector changes, navigate inside iframe via router.push (no reload)
 const iframeRef = ref<HTMLIFrameElement>()
 watch(selectedPath, (newPath, oldPath) => {
@@ -83,7 +93,7 @@ function scheduleHide() {
 }
 
 function openInTab() {
-  if (iframeSrc.value) window.open(iframeSrc.value, "_blank")
+  if (displayUrl.value) window.open(displayUrl.value, "_blank")
 }
 
 // Sync iframe navigation → update path selector
@@ -96,12 +106,33 @@ onMounted(() => {
 })
 
 
-// Back link: root → dashboard, any other page → its CMS editor
+// Back link: root/home → home editor, any other page → its CMS editor
 const editorPath = computed(() => {
   const p = selectedPath.value
-  if (!p || p === "/") return `/${site}`
-  return `/${site}/pages${p.startsWith("/") ? p : `/${p}`}`
+  const normalised = (!p || p === "/") ? "/home" : (p.startsWith("/") ? p : `/${p}`)
+  return `/${site}/pages${normalised}`
 })
+
+// URL input bar — mirrors displayUrl, editable by user
+const urlInput = ref(displayUrl.value)
+watch(displayUrl, (v) => { urlInput.value = v })
+
+const urlCopied = ref(false)
+
+function goToUrl() {
+  const raw = urlInput.value.trim()
+  if (!raw) return
+  try {
+    const path = raw.startsWith('http') ? new URL(raw).pathname : raw
+    selectedPath.value = path.startsWith('/') ? path : `/${path}`
+  } catch { /* ignore invalid URL */ }
+}
+
+function copyDisplayUrl() {
+  navigator.clipboard.writeText(urlInput.value)
+  urlCopied.value = true
+  setTimeout(() => { urlCopied.value = false }, 2000)
+}
 </script>
 
 <template>
@@ -136,10 +167,34 @@ const editorPath = computed(() => {
           @update:model-value="(v: string) => selectedPath = v"
         />
 
-        <!-- Path display -->
-        <div class="flex items-center gap-1.5 text-[10px] font-mono text-gray-500 flex-1 min-w-0">
-          <UIcon name="i-heroicons-link" class="w-3 h-3 flex-shrink-0 opacity-50" />
-          <span class="truncate">{{ iframeSrc || "—" }}</span>
+        <!-- URL input bar -->
+        <div class="flex items-center gap-1 flex-1 min-w-0">
+          <input
+            v-model="urlInput"
+            type="text"
+            class="flex-1 min-w-0 h-7 px-2.5 rounded bg-gray-800/60 border border-white/8 text-[11px] font-mono text-gray-300 placeholder-gray-600 focus:outline-none focus:border-primary-500/60 focus:bg-gray-800 focus:text-white transition-colors"
+            @keyup.enter="goToUrl"
+          />
+          <UTooltip text="Navegar">
+            <UButton
+              icon="i-heroicons-arrow-right-circle"
+              size="xs"
+              variant="ghost"
+              color="neutral"
+              class="shrink-0"
+              @click="goToUrl"
+            />
+          </UTooltip>
+          <UTooltip :text="urlCopied ? 'Copiado!' : 'Copiar URL'">
+            <UButton
+              :icon="urlCopied ? 'i-heroicons-check' : 'i-heroicons-clipboard-document'"
+              size="xs"
+              variant="ghost"
+              :color="urlCopied ? 'primary' : 'neutral'"
+              class="shrink-0"
+              @click="copyDisplayUrl"
+            />
+          </UTooltip>
         </div>
 
         <!-- Version -->

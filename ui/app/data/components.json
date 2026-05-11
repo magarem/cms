@@ -309,38 +309,35 @@
       "name": "HeroSlideShow",
       "file": "components/HeroSlideShow.vue",
       "category": "block",
-      "description": "Full-screen hero section with auto-playing image/video slideshow and overlay text.",
+      "description": "Full-screen hero with auto-playing image/video slideshow, gradient overlay, badge, split title, description, and dual CTA buttons.",
       "props": [
+        { "name": "badge",          "label": "Badge Label",              "type": "text",     "description": "Small badge above the title", "default": "" },
+        { "name": "badgeIcon",      "label": "Badge Icon",               "type": "icon",     "default": "" },
+        { "name": "titlePrefix",    "label": "Title — Normal Part",      "type": "text",     "default": "" },
+        { "name": "titleHighlight", "label": "Title — Highlighted Part", "type": "text",     "description": "Rendered in the primary brand color", "default": "" },
+        { "name": "description",    "label": "Description",              "type": "textarea", "default": "" },
         {
-          "name": "config",
-          "label": "Hero Configuration",
-          "type": "object",
-          "fields": [
-            { "name": "tag",            "label": "Tag Badge",          "type": "text",   "default": "" },
-            { "name": "tagIcon",        "label": "Tag Icon",           "type": "icon",   "default": "pi-sparkles" },
-            { "name": "titlePrefix",    "label": "Title — Normal Part","type": "text",   "default": "" },
-            { "name": "titleHighlight", "label": "Title — Highlighted","type": "text",   "default": "" },
-            { "name": "subtitle",       "label": "Subtitle",           "type": "textarea","default": "" },
-            {
-              "name": "slides",
-              "label": "Slides (images or videos)",
-              "type": "array",
-              "itemType": "media",
-              "default": []
-            },
-            { "name": "slideDuration", "label": "Slide Duration (ms)", "type": "number", "default": 5000 },
-            {
-              "name": "cWidth",
-              "label": "Content Width",
-              "type": "select",
-              "default": "content",
-              "options": [
-                { "value": "site",    "label": "Site — 1440px" },
-                { "value": "content", "label": "Content — 1200px" }
-              ]
-            }
+          "name": "slides",
+          "label": "Slides (images or videos)",
+          "type": "array",
+          "itemType": "media",
+          "default": []
+        },
+        { "name": "slideDuration", "label": "Slide Duration (ms)", "type": "number", "default": 5000 },
+        {
+          "name": "cWidth",
+          "label": "Content Width",
+          "type": "select",
+          "default": "content",
+          "options": [
+            { "value": "site",    "label": "Site — 1440px" },
+            { "value": "content", "label": "Content — 1200px" }
           ]
-        }
+        },
+        { "name": "btnLabel", "label": "Primary Button Label",          "type": "text", "default": "Saber Mais" },
+        { "name": "btnLink",  "label": "Primary Button Link",           "type": "url",  "default": "" },
+        { "name": "ctaLabel", "label": "CTA Button Label (Buy/Purchase)","type": "text", "description": "Leave empty to hide the button", "default": "Comprar Agora" },
+        { "name": "ctaLink",  "label": "CTA Button Link",               "type": "url",  "description": "Purchase/checkout URL — leave empty to hide", "default": "" }
       ]
     },
 
@@ -475,6 +472,18 @@
             { "value": "cw-1",   "label": "Wide — 900px" },
             { "value": "cw-2",   "label": "Medium — 800px" }
           ]
+        },
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo",
+          "type": "text",
+          "default": ""
         }
       ]
     },
@@ -879,6 +888,149 @@
             { "name": "label", "label": "Label", "type": "text", "required": true },
             { "name": "path",  "label": "URL",   "type": "url",  "required": true }
           ]
+        }
+      ]
+    },
+
+    {
+      "name": "ContentBlock",
+      "file": "components/ContentBlock.vue",
+      "category": "block",
+      "description": "Two-column section with text content on one side and an image on the other. Supports badge, title, body text, feature icons, and image side control.",
+      "props": [
+        { "name": "badge",     "label": "Badge Label",  "type": "text",     "description": "Small tag above the title", "default": "" },
+        { "name": "title",     "label": "Title",        "type": "text",     "required": true, "default": "" },
+        { "name": "text",      "label": "Body Text",    "type": "textarea", "default": "" },
+        { "name": "image",     "label": "Image",        "type": "image",    "default": "" },
+        {
+          "name": "imageSide",
+          "label": "Image Side",
+          "type": "select",
+          "default": "right",
+          "options": [
+            { "value": "right", "label": "Right" },
+            { "value": "left",  "label": "Left" }
+          ]
+        },
+        {
+          "name": "features",
+          "label": "Feature Pills",
+          "description": "Small icon + label pills shown below the text",
+          "type": "array",
+          "itemSchema": [
+            { "name": "icon",  "label": "Icon",  "type": "icon", "default": "" },
+            { "name": "label", "label": "Label", "type": "text", "default": "" }
+          ],
+          "default": []
+        },
+        { "name": "pagePath", "label": "Page Path", "type": "path", "cms_hidden": true, "default": "" }
+      ]
+    },
+
+    {
+      "name": "Curriculum",
+      "file": "components/Curriculum.vue",
+      "category": "block",
+      "description": "Numbered module/curriculum grid with an optional CTA banner at the bottom.",
+      "props": [
+        { "name": "title",    "label": "Title",    "type": "text",     "required": true, "default": "" },
+        { "name": "subtitle", "label": "Subtitle", "type": "text",     "default": "" },
+        { "name": "modules",  "label": "Modules",  "description": "Plain list of module names — one per line", "default": [] },
+        { "name": "ctaTitle", "label": "CTA Title",        "type": "text",     "default": "" },
+        { "name": "ctaText",  "label": "CTA Description",  "type": "textarea", "default": "" },
+        { "name": "ctaLabel", "label": "CTA Button Label", "type": "text",     "description": "Leave empty to hide the CTA banner", "default": "" },
+        { "name": "ctaLink",  "label": "CTA Button Link",  "type": "url",      "default": "/inscricao" }
+      ]
+    },
+
+    {
+      "name": "Instructor",
+      "file": "components/Instructor.vue",
+      "category": "block",
+      "description": "Instructor/author profile section with photo, bio, credentials list, and an optional footer badge.",
+      "props": [
+        { "name": "label",          "label": "Section Label",      "type": "text",         "description": "Small label above the name (e.g. 'Your Instructor')", "default": "Seu Instrutor" },
+        { "name": "name",           "label": "Name",               "type": "text",         "required": true, "default": "" },
+        { "name": "image",          "label": "Photo",              "type": "image",        "default": "" },
+        { "name": "bio",            "label": "Bio / Quote",        "type": "textarea",     "description": "Displayed as a styled blockquote", "default": "" },
+        {
+          "name": "credentials",
+          "label": "Credentials / Highlights",
+          "description": "List of bullet points shown with a decorative icon",
+          "default": []
+        },
+        { "name": "footerBadge",    "label": "Footer Badge Text",    "type": "text", "description": "Small text below the credentials (e.g. lineage, certification)", "default": "" },
+        { "name": "footerSubtitle", "label": "Footer Subtitle",      "type": "text", "description": "Italic subtitle next to the badge (e.g. city, school)", "default": "" },
+        { "name": "pagePath",       "label": "Page Path",            "type": "path", "cms_hidden": true, "default": "" }
+      ]
+    },
+
+    {
+      "name": "Hero",
+      "file": "components/Hero.vue",
+      "category": "block",
+      "description": "Full-screen hero section with video background, title, description, and dual CTA buttons.",
+      "props": [
+        {
+          "name": "badge",
+          "label": "Badge Label",
+          "type": "text",
+          "description": "Small badge text above the title",
+          "default": ""
+        },
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "description": "Hero subtitle or description text",
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Fallback Image",
+          "type": "image",
+          "description": "Used if video doesn't load",
+          "default": ""
+        },
+        {
+          "name": "video",
+          "label": "Background Video",
+          "type": "video",
+          "description": "Video file URL (MP4)",
+          "default": ""
+        },
+        {
+          "name": "btnLabel",
+          "label": "Primary Button Label",
+          "type": "text",
+          "default": "Learn More"
+        },
+        {
+          "name": "btnLink",
+          "label": "Primary Button Link",
+          "type": "url",
+          "default": "/inscricao"
+        },
+        {
+          "name": "ctaLabel",
+          "label": "CTA Button Label (Buy/Purchase)",
+          "type": "text",
+          "description": "Leave empty to hide the CTA button",
+          "default": "Comprar Agora"
+        },
+        {
+          "name": "ctaLink",
+          "label": "CTA Button Link",
+          "type": "url",
+          "description": "Purchase/checkout URL",
+          "default": ""
         }
       ]
     },
