@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { PropSchema } from '~/composables/useComponentSchema'
+
 const props = defineProps<{
   modelValue: Record<string, any>
   skipKeys?: string[]
+  schemaDefs?: Record<string, PropSchema>
 }>()
 const emit = defineEmits<{ "update:modelValue": [v: Record<string, any>] }>()
 
@@ -19,10 +22,11 @@ const keys = computed(() => {
 <template>
   <div class="space-y-3">
     <div v-for="key in keys" :key="key">
-      <label class="block text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">{{ key }}</label>
+      <label class="block text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">{{ schemaDefs?.[key]?.label || key }}</label>
       <PropField
         :field-key="key"
         :model-value="modelValue[key]"
+        :schema="schemaDefs?.[key]"
         @update:model-value="setKey(key, $event)"
       />
     </div>

@@ -61,7 +61,12 @@ const SCHEMA_TYPE_MAP: Record<string, FieldType> = {
 }
 
 const type = computed<FieldType>(() => {
-  if (props.schema?.type) return SCHEMA_TYPE_MAP[props.schema.type] ?? "text"
+  if (props.schema?.type) {
+    const mapped = SCHEMA_TYPE_MAP[props.schema.type] ?? "text"
+    // Schema says generic "text" — still run key-name inference so image/media fields keep their picker
+    if (mapped === "text") return infer(props.fieldKey, props.modelValue)
+    return mapped
+  }
   return infer(props.fieldKey, props.modelValue)
 })
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getSchema } from '~/composables/useComponentSchema'
+
 interface Block {
   id?: string
   componentName: string
@@ -37,6 +39,12 @@ function setProps(v: Record<string, any>) {
 const localProps = computed({
   get: () => props.block.props || {},
   set: setProps,
+})
+
+const schemaDefs = computed(() => {
+  const schema = getSchema(props.block.componentName)
+  if (!schema?.props) return {}
+  return Object.fromEntries(schema.props.map(p => [p.name, p]))
 })
 
 // ── ContentMD markdown file support ──────────────────────────
@@ -296,6 +304,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
       <PropForm
         v-if="!isContentMD"
         :model-value="localProps"
+        :schema-defs="schemaDefs"
         @update:model-value="setProps"
       />
 

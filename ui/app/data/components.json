@@ -394,12 +394,9 @@
       "props": [
         {
           "name": "images",
-          "label": "Images (first = hero, up to 5 total)",
-          "type": "array",
-          "required": true,
-          "itemSchema": [
-            { "name": "url", "label": "Image", "type": "image", "required": true }
-          ]
+          "label": "Imagens / Vídeos (primeiro = destaque, até 5)",
+          "type": "image-array",
+          "required": true
         },
         {
           "name": "cWidth",
@@ -410,6 +407,16 @@
             { "value": "full",    "label": "Full bleed" },
             { "value": "site",    "label": "Site — 1440px" },
             { "value": "content", "label": "Content — 1200px" }
+          ]
+        },
+        {
+          "name": "height",
+          "label": "Altura",
+          "type": "select",
+          "default": "horizontal",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal (55vh)" },
+            { "value": "full",       "label": "Full screen (100vh)" }
           ]
         }
       ]
