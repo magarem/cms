@@ -203,7 +203,7 @@ onMounted(() => {
     v-else-if="type === 'textarea' || type === 'markdown'"
     v-model="local"
     :rows="type === 'markdown' ? 10 : 3"
-    :class="type === 'markdown' ? 'font-mono text-xs' : ''"
+    :class="type === 'markdown' ? 'font-mono text-xs max-h-[400px] overflow-y-auto' : ''"
     class="w-full"
   />
 

@@ -22,13 +22,28 @@ const STYLE_DEFAULTS = {
   textColor: '',
   minHeight: '',
   blockPadding: '',
+  copyright: '',
+  vendorName: '',
+  vendorUrl: '',
+  copyrightAlign: 'justify',
 }
 
 const STYLE_SCHEMA: Record<string, PropSchema> = {
-  bgColor:      { name: 'bgColor',      label: 'Cor de fundo',         type: 'color' },
-  textColor:    { name: 'textColor',    label: 'Cor do texto',          type: 'color' },
-  minHeight:    { name: 'minHeight',    label: 'Altura mínima (ex: 200px)', type: 'text' },
-  blockPadding: { name: 'blockPadding', label: 'Padding dos blocos (ex: 24px)', type: 'text' },
+  bgColor:      { name: 'bgColor',      label: 'Cor de fundo',                    type: 'color' },
+  textColor:    { name: 'textColor',    label: 'Cor do texto',                    type: 'color' },
+  minHeight:    { name: 'minHeight',    label: 'Altura mínima (ex: 200px)',        type: 'text' },
+  blockPadding: { name: 'blockPadding', label: 'Padding dos blocos (ex: 24px)',   type: 'text' },
+  copyright:    { name: 'copyright',    label: 'Linha de copyright',              type: 'text' },
+  vendorName:     { name: 'vendorName',     label: 'Vendor (nome)',                   type: 'text' },
+  vendorUrl:      { name: 'vendorUrl',      label: 'Vendor (link)',                   type: 'url' },
+  copyrightAlign: { name: 'copyrightAlign', label: 'Alinhamento da linha de copyright', type: 'select',
+    options: [
+      { value: 'justify', label: 'Justify (copyright ← → vendor)' },
+      { value: 'left',    label: 'Esquerda' },
+      { value: 'center',  label: 'Centro' },
+      { value: 'right',   label: 'Direita' },
+    ]
+  },
 }
 
 const globalKeys = computed(() => Object.keys(data.value?.global || {}))

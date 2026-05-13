@@ -107,6 +107,7 @@ const navItems = computed(() => {
     { label: "Estatísticas",  icon: "i-heroicons-chart-bar",              to: `${base}/stats` },
     { label: "Global",        icon: "i-heroicons-cog-6-tooth",            to: `${base}/global` },
     { label: "Configurações", icon: "i-heroicons-adjustments-horizontal", to: `${base}/settings` },
+    { label: "Newsletter",    icon: "i-heroicons-envelope",               to: `${base}/newsletter` },
   ]
   if (user.value?.role === "admin")
     items.push({ label: "Usuários", icon: "i-heroicons-users", to: `${base}/users`, exact: false })

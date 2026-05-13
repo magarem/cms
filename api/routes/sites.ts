@@ -701,6 +701,40 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   )
 
   // ── Analytics ─────────────────────────────────────────────────
+  // ── Newsletter subscribers ─────────────────────────────────
+  .get("/:site/newsletter", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const file = join(SITES_ROOT, params.site, "_newsletter", "subscribers.json")
+    try {
+      const raw = await readFile(file, "utf-8")
+      const subscribers = JSON.parse(raw)
+      return { subscribers }
+    } catch {
+      return { subscribers: [] }
+    }
+  })
+
+  .delete("/:site/newsletter", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const email = ((query as any).email as string || "").trim().toLowerCase()
+    if (!email) { set.status = 400; return { error: "Email obrigatório." } }
+
+    const file = join(SITES_ROOT, params.site, "_newsletter", "subscribers.json")
+    try {
+      const raw = await readFile(file, "utf-8")
+      const subscribers = JSON.parse(raw)
+      const filtered = subscribers.filter((s: any) => s.email !== email)
+      await writeFile(file, JSON.stringify(filtered, null, 2), "utf-8")
+      return { success: true }
+    } catch {
+      set.status = 404; return { error: "Lista de subscribers não encontrada." }
+    }
+  })
+
   .get("/:site/analytics", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
     const user = await getUser(jwt, cms_token?.value)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }

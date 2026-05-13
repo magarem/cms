@@ -1045,6 +1045,70 @@
     },
 
     {
+      "name": "SocialLinks",
+      "file": "components/SocialLinks.vue",
+      "category": "block",
+      "description": "Social media icon links with title, subtitle, and horizontal/vertical layout.",
+      "props": [
+        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
+        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
+        {
+          "name": "layout",
+          "label": "Visualização",
+          "type": "select",
+          "default": "horizontal",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal (ícones)" },
+            { "value": "vertical",   "label": "Vertical (ícone + nome)" }
+          ]
+        },
+        {
+          "name": "items",
+          "label": "Redes sociais",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "platform",
+              "label": "Plataforma",
+              "type": "select",
+              "default": "instagram",
+              "options": [
+                { "value": "instagram", "label": "Instagram" },
+                { "value": "facebook",  "label": "Facebook" },
+                { "value": "youtube",   "label": "YouTube" },
+                { "value": "linkedin",  "label": "LinkedIn" },
+                { "value": "twitter",   "label": "Twitter / X" },
+                { "value": "tiktok",    "label": "TikTok" },
+                { "value": "whatsapp",  "label": "WhatsApp" },
+                { "value": "github",    "label": "GitHub" },
+                { "value": "pinterest", "label": "Pinterest" },
+                { "value": "telegram",  "label": "Telegram" },
+                { "value": "discord",   "label": "Discord" },
+                { "value": "reddit",    "label": "Reddit" }
+              ]
+            },
+            { "name": "url",   "label": "URL",              "type": "url",  "default": "" },
+            { "name": "label", "label": "Nome personalizado (opcional)", "type": "text", "default": "" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "Textbox",
+      "file": "components/Textbox.vue",
+      "category": "block",
+      "description": "Content block with title, subtitle, image gallery, and rich text body.",
+      "props": [
+        { "name": "title",    "label": "Título",    "type": "text",        "default": "" },
+        { "name": "subtitle", "label": "Subtítulo", "type": "textarea",    "default": "" },
+        { "name": "images",   "label": "Imagens",   "type": "image-array", "default": [] },
+        { "name": "body",     "label": "Texto",     "type": "markdown",    "default": "" }
+      ]
+    },
+
+    {
       "name": "Hero",
       "file": "components/Hero.vue",
       "category": "block",

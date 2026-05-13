@@ -106,7 +106,11 @@ onMounted(() => {
 })
 
 
-// Back link: root/home → home editor, any other page → its CMS editor
+const router = useRouter()
+
+function goBack() { router.back() }
+
+// "Edit page" — CMS editor for the currently previewed page
 const editorPath = computed(() => {
   const p = selectedPath.value
   const normalised = (!p || p === "/") ? "/home" : (p.startsWith("/") ? p : `/${p}`)
@@ -149,13 +153,22 @@ function copyDisplayUrl() {
         @mouseenter="showToolbar"
       >
 
-        <!-- Back to editor -->
+        <!-- Back -->
+        <button
+          class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors shrink-0"
+          @click="goBack"
+        >
+          <UIcon name="i-heroicons-arrow-left" class="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Editor</span>
+        </button>
+
+        <!-- Edit page -->
         <NuxtLink
           :to="editorPath"
           class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors shrink-0 pr-3 border-r border-white/10"
         >
-          <UIcon name="i-heroicons-arrow-left" class="w-3.5 h-3.5" />
-          <span class="hidden sm:inline">Editor</span>
+          <UIcon name="i-heroicons-pencil-square" class="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Editar página</span>
         </NuxtLink>
 
         <!-- Page picker -->
