@@ -13,9 +13,12 @@ function setKey(key: string, value: any) {
 }
 
 const keys = computed(() => {
-  if (!props.modelValue || typeof props.modelValue !== "object") return []
   const skip = props.skipKeys || []
-  return Object.keys(props.modelValue).filter((k) => !k.startsWith("_") && !skip.includes(k))
+  const objKeys = (props.modelValue && typeof props.modelValue === "object")
+    ? Object.keys(props.modelValue).filter((k) => !k.startsWith("_"))
+    : []
+  const schemaKeys = props.schemaDefs ? Object.keys(props.schemaDefs) : []
+  return [...new Set([...schemaKeys, ...objKeys])].filter((k) => !skip.includes(k))
 })
 </script>
 

@@ -277,7 +277,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
 
       <div class="flex items-center gap-1.5">
         <span class="text-[10px] text-gray-600 uppercase">Hero</span>
-        <UToggle :model-value="block.isHero || false" size="xs" @update:model-value="setIsHero" />
+        <USwitch :model-value="block.isHero || false" size="xs" @update:model-value="setIsHero" />
       </div>
 
       <UButton

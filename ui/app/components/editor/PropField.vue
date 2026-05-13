@@ -56,6 +56,7 @@ const SCHEMA_TYPE_MAP: Record<string, FieldType> = {
   select: "select", url: "url",
   image: "image", video: "image", media: "image",
   "image-array": "media-array",
+  array: "object-array",
   icon: "icon-text", date: "date", color: "color",
   object: "object",
 }
@@ -77,7 +78,7 @@ const showMediaPicker = computed(() =>
 )
 
 const local = computed({
-  get: () => props.modelValue,
+  get: () => type.value === 'toggle' ? Boolean(props.modelValue ?? false) : props.modelValue,
   set: (v) => emit("update:modelValue", v),
 })
 
@@ -113,17 +114,30 @@ function updateStringItem(i: number, val: string) {
 
 // Object array helpers
 function addObjectItem() {
-  const template = props.modelValue?.length
-    ? JSON.parse(JSON.stringify(props.modelValue[0]))
-    : {}
-  // Clear values in the template
-  function clearObj(o: any): any {
-    if (typeof o !== "object" || o === null) return typeof o === "boolean" ? false : typeof o === "number" ? 0 : ""
-    if (Array.isArray(o)) return []
-    return Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clearObj(v)]))
+  let newItem: any = {}
+  if (props.schema?.itemSchema?.length) {
+    for (const field of props.schema.itemSchema) {
+      newItem[field.name] = field.default !== undefined ? field.default
+        : field.type === "boolean" ? false
+        : field.type === "number" ? 0
+        : ""
+    }
+  } else if (props.modelValue?.length) {
+    const template = JSON.parse(JSON.stringify(props.modelValue[0]))
+    function clearObj(o: any): any {
+      if (typeof o !== "object" || o === null) return typeof o === "boolean" ? false : typeof o === "number" ? 0 : ""
+      if (Array.isArray(o)) return []
+      return Object.fromEntries(Object.entries(o).map(([k, v]) => [k, clearObj(v)]))
+    }
+    newItem = clearObj(template)
   }
-  emit("update:modelValue", [...(props.modelValue || []), clearObj(template)])
+  emit("update:modelValue", [...(props.modelValue || []), newItem])
 }
+
+const itemSchemaDefs = computed(() => {
+  if (!props.schema?.itemSchema?.length) return undefined
+  return Object.fromEntries(props.schema.itemSchema.map(s => [s.name, s]))
+})
 function removeObjectItem(i: number) {
   const arr = [...props.modelValue]
   arr.splice(i, 1)
@@ -160,7 +174,7 @@ onMounted(() => {
 
 <template>
   <!-- Toggle -->
-  <UToggle v-if="type === 'toggle'" v-model="local" />
+  <USwitch v-if="type === 'toggle'" v-model="local" />
 
   <!-- Number -->
   <UInput v-else-if="type === 'number'" v-model.number="local" type="number" class="w-full" />
@@ -267,7 +281,7 @@ onMounted(() => {
           />
         </button>
         <div v-if="objectItemsExpanded[i]" class="p-3 bg-gray-900">
-          <PropForm :model-value="item" @update:model-value="updateObjectItem(i, $event)" />
+          <PropForm :model-value="item" :schema-defs="itemSchemaDefs" @update:model-value="updateObjectItem(i, $event)" />
         </div>
       </div>
     </VueDraggable>

@@ -418,6 +418,11 @@
             { "value": "horizontal", "label": "Horizontal (55vh)" },
             { "value": "full",       "label": "Full screen (100vh)" }
           ]
+        },
+        {
+          "name": "linkPath",
+          "label": "Link ao clicar (deixar vazio para zoom)",
+          "type": "url"
         }
       ]
     },
@@ -859,9 +864,8 @@
     {
       "name": "SiteHeaderLogo",
       "file": "components/SiteHeaderLogo.vue",
-      "category": "layout",
-      "cms_hidden": true,
-      "description": "Logo block inside SiteHeader. Used internally.",
+      "category": "block",
+      "description": "Logo / brand mark — usable standalone in footer or any block area.",
       "props": [
         { "name": "brandName",  "label": "Brand Name",  "type": "text",   "default": "SIRIUS" },
         { "name": "signature",  "label": "Signature",   "type": "text",   "default": "STUDIO" },
@@ -882,8 +886,8 @@
     {
       "name": "SiteHeaderMenu",
       "file": "components/SiteHeaderMenu.vue",
-      "category": "layout",
-      "cms_hidden": true,
+      "category": "block",
+      "cms_hidden": false,
       "description": "Navigation menu inside SiteHeader. Menu items come from _topbar.json.",
       "props": [
         {
@@ -969,6 +973,74 @@
         { "name": "footerBadge",    "label": "Footer Badge Text",    "type": "text", "description": "Small text below the credentials (e.g. lineage, certification)", "default": "" },
         { "name": "footerSubtitle", "label": "Footer Subtitle",      "type": "text", "description": "Italic subtitle next to the badge (e.g. city, school)", "default": "" },
         { "name": "pagePath",       "label": "Page Path",            "type": "path", "cms_hidden": true, "default": "" }
+      ]
+    },
+
+    {
+      "name": "Menu",
+      "file": "components/Menu.vue",
+      "category": "block",
+      "description": "Navigation menu — horizontal or vertical list of links.",
+      "props": [
+        { "name": "title", "label": "Título", "type": "text", "default": "" },
+        {
+          "name": "type",
+          "label": "Tipo",
+          "type": "select",
+          "default": "horizontal",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal" },
+            { "value": "vertical",   "label": "Vertical" }
+          ]
+        },
+        {
+          "name": "items",
+          "label": "Itens",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "label",   "label": "Texto",             "type": "text",    "default": "" },
+            { "name": "link",    "label": "Link",              "type": "url",     "default": "" },
+            { "name": "newpage", "label": "Abrir em nova aba", "type": "boolean", "default": false }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "ContactInfo",
+      "file": "components/ContactInfo.vue",
+      "category": "block",
+      "description": "Contact details: WhatsApp, phone, email, and address with icons.",
+      "props": [
+        { "name": "title",    "label": "Título",    "type": "text", "default": "" },
+        { "name": "whatsapp", "label": "WhatsApp",  "type": "text", "default": "" },
+        { "name": "phone",    "label": "Telefone",  "type": "text", "default": "" },
+        { "name": "email",    "label": "Email",     "type": "email","default": "" },
+        { "name": "address",  "label": "Endereço",  "type": "textarea", "default": "" },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "vertical",
+          "options": [
+            { "value": "vertical",   "label": "Vertical" },
+            { "value": "horizontal", "label": "Horizontal" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "NewsletterSubscribe",
+      "file": "components/NewsletterSubscribe.vue",
+      "category": "block",
+      "description": "Newsletter subscription box with title, subtitle, and email input.",
+      "props": [
+        { "name": "title",      "label": "Título",       "type": "text",     "default": "Subscreva a nossa newsletter" },
+        { "name": "subtitle",   "label": "Subtítulo",    "type": "textarea", "default": "Receba as novidades diretamente no seu email." },
+        { "name": "buttonText", "label": "Texto do botão", "type": "text",   "default": "Subscrever" },
+        { "name": "actionUrl",  "label": "URL de destino (POST)", "type": "url", "default": "" }
       ]
     },
 
