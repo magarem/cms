@@ -318,9 +318,8 @@
         { "name": "description",    "label": "Description",              "type": "textarea", "default": "" },
         {
           "name": "slides",
-          "label": "Slides (images or videos)",
-          "type": "array",
-          "itemType": "media",
+          "label": "Slides (imagens ou vídeos)",
+          "type": "image-array",
           "default": []
         },
         { "name": "slideDuration", "label": "Slide Duration (ms)", "type": "number", "default": 5000 },
@@ -595,8 +594,82 @@
     },
 
     {
+      "name": "Depoimentos",
+      "file": "components/Depoimentos.vue",
+      "category": "block",
+      "description": "Vídeos de depoimentos em grelha (3 por linha) ou carrossel horizontal.",
+      "props": [
+        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
+        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "grid",
+          "options": [
+            { "value": "grid",   "label": "Grelha (3 por linha)" },
+            { "value": "scroll", "label": "Carrossel horizontal" }
+          ]
+        },
+        {
+          "name": "videos",
+          "label": "Vídeos",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "videoId", "label": "YouTube Video ID", "type": "text", "default": "" },
+            { "name": "name",    "label": "Nome",             "type": "text", "default": "" },
+            { "name": "label",   "label": "Etiqueta",         "type": "text", "default": "" }
+          ]
+        }
+      ]
+    },
+
+    {
       "name": "Testimonials",
       "file": "components/Testimonials.vue",
+      "category": "block",
+      "description": "YouTube video testimonials — grid or horizontal scroll with navigation buttons.",
+      "props": [
+        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
+        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "grid",
+          "options": [
+            { "value": "grid",   "label": "Grelha (3 por linha)" },
+            { "value": "scroll", "label": "Linha única com scroll" }
+          ]
+        },
+        {
+          "name": "theme",
+          "label": "Tema",
+          "type": "select",
+          "default": "dark",
+          "options": [
+            { "value": "dark",  "label": "Escuro" },
+            { "value": "light", "label": "Claro" }
+          ]
+        },
+        {
+          "name": "videos",
+          "label": "Vídeos",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            { "name": "videoId", "label": "YouTube Video ID", "type": "text", "default": "" },
+            { "name": "name",    "label": "Nome",             "type": "text", "default": "" },
+            { "name": "label",   "label": "Etiqueta",         "type": "text", "default": "" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "Testimonials_type1",
+      "file": "components/Testimonials_type1.vue",
       "category": "block",
       "description": "Grid of customer review cards with rating, quote, name, role, and avatar.",
       "props": [
