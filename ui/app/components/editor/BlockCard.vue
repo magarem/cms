@@ -237,12 +237,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
 <template>
   <div
     ref="cardRef"
-    :class="[
-      'border rounded-lg overflow-hidden transition-opacity',
-      block.active === false
-        ? 'border-gray-800/50 bg-gray-900/50 opacity-50'
-        : 'border-gray-800 bg-gray-900'
-    ]"
+    class="border rounded-lg overflow-hidden border-gray-800 bg-gray-900"
   >
     <!-- Block header -->
     <div class="flex items-center gap-2 px-3 py-2.5 bg-gray-900">
@@ -254,7 +249,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
       </div>
 
       <div class="flex-1 min-w-0">
-        <span :class="['text-sm font-medium', block.active === false ? 'text-gray-500 line-through' : 'text-white']">{{ block.componentName }}</span>
+        <span class="text-sm font-medium text-white">{{ block.componentName }}</span>
         <span v-if="block.id" class="text-[10px] font-mono text-gray-600 ml-2">#{{ block.id }}</span>
       </div>
 

@@ -594,7 +594,7 @@
     },
 
     {
-      "name": "Depoimentos",
+      "name": "VideosShowcase",
       "file": "components/Depoimentos.vue",
       "category": "block",
       "description": "Vídeos de depoimentos em grelha (3 por linha) ou carrossel horizontal.",
@@ -609,6 +609,16 @@
           "options": [
             { "value": "grid",   "label": "Grelha (3 por linha)" },
             { "value": "scroll", "label": "Carrossel horizontal" }
+          ]
+        },
+        {
+          "name": "playerOrientation",
+          "label": "Orientação do Player",
+          "type": "select",
+          "default": "horizontal",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal (16:9)" },
+            { "value": "vertical",   "label": "Vertical (9:16 — Shorts)" }
           ]
         },
         {
