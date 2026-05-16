@@ -15,7 +15,7 @@ const props = defineProps<{
   site: string
   contentPath: string
 }>()
-const emit = defineEmits<{ "update:modelValue": [v: Block[]] }>()
+const emit = defineEmits<{ "update:modelValue": [v: Block[]]; reorder: [] }>()
 
 provide("editorSite", toRef(props, "site"))
 provide("editorContentPath", toRef(props, "contentPath"))
@@ -69,6 +69,7 @@ function addBlock(componentName: string) {
         :animation="150"
         :disabled="!isAdmin"
         class="space-y-2"
+        @end="emit('reorder')"
       >
         <BlockCard
           v-for="(block, i) in blocks"

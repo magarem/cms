@@ -1,15 +1,19 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path === "/login") return
 
-  const { user, ready, fetchMe } = useAuth()
+  const { user, ready, fetchMe, logout } = useAuth()
 
   if (!ready.value) await fetchMe()
 
   if (!user.value) return navigateTo("/login")
 
   const site = to.params.site as string | undefined
-  if (site) {
-    const hasAccess = user.value.sites?.includes("*") || user.value.sites?.includes(site)
-    if (!hasAccess) return navigateTo("/login")
+  if (!site) return
+
+  // URL site must match the authenticated site (from the JWT).
+  // Any mismatch — including admins with wildcard access — is treated as a
+  // URL-tampering attempt: clear the session and force re-authentication.
+  if (user.value.site !== site) {
+    await logout()
   }
 })

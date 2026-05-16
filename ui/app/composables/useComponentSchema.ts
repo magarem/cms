@@ -43,6 +43,13 @@ export const blockComponents = components.filter(
   (c) => c.category === 'block' && !c.cms_hidden
 )
 
+/** All non-hidden components grouped by category for the block picker */
+export const componentGroups: { label: string; key: string; components: ComponentSchema[] }[] = [
+  { label: 'Blocos',  key: 'block',  components: components.filter(c => c.category === 'block'  && !c.cms_hidden) },
+  { label: 'Layout',  key: 'layout', components: components.filter(c => c.category === 'layout' && !c.cms_hidden) },
+  { label: 'UI',      key: 'ui',     components: components.filter(c => c.category === 'ui'     && !c.cms_hidden) },
+].filter(g => g.components.length > 0)
+
 /** Find a component definition by name */
 export function getSchema(name: string): ComponentSchema | undefined {
   return components.find((c) => c.name === name)

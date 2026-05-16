@@ -14,7 +14,7 @@ const collectionName = collectionPath.split("/").pop() || collectionPath
 
 const { data, pending, refresh } = await useAsyncData(
   `collection-${site}-${collectionPath}`,
-  () => api.get<{ success: boolean; items: any[] }>(`/sites/${site}/collection?path=${encodeURIComponent(collectionPath)}`)
+  () => api.get<{ success: boolean; items: any[]; collection: any }>(`/sites/${site}/collection?path=${encodeURIComponent(collectionPath)}`)
 )
 
 const { data: treeData } = await useAsyncData(
@@ -98,10 +98,27 @@ function statusStyle(s: string | null) {
 // ── Create item ───────────────────────────────────────────────
 const router = useRouter()
 
+// Available models for collection items + the collection's default
+const { fetchModels, forTarget } = useModels(() => site)
+onMounted(fetchModels)
+
+const itemModels = forTarget("collection-item")
+const NONE_VALUE = "__none__"
+const itemModelOptions = computed(() => [
+  { value: NONE_VALUE, label: "Padrão (item simples)" },
+  ...itemModels.value.map((m) => ({ value: m.name, label: m.label })),
+])
+const defaultItemModel = computed<string>(() => data.value?.collection?.itemModel || NONE_VALUE)
+
 const showCreate = ref(false)
 const newTitle = ref("")
 const newSlug = ref("")
+const newModel = ref<string>(NONE_VALUE)
 const creating = ref(false)
+
+watch(showCreate, (open) => {
+  if (open) newModel.value = defaultItemModel.value
+})
 
 watch(newTitle, (val) => {
   newSlug.value = val
@@ -119,6 +136,7 @@ async function createItem() {
       collectionPath,
       slug: newSlug.value,
       title: newTitle.value || newSlug.value,
+      model: newModel.value && newModel.value !== NONE_VALUE ? newModel.value : undefined,
     })
     showCreate.value = false
     newTitle.value = ""
@@ -344,6 +362,14 @@ async function deleteItem(itemSlug: string) {
         </UFormField>
         <UFormField label="Slug (URL)">
           <UInput v-model="newSlug" placeholder="slug-do-item" class="w-full font-mono" />
+        </UFormField>
+        <UFormField label="Modelo" hint="Estrutura inicial do item">
+          <USelect
+            v-model="newModel"
+            :items="itemModelOptions"
+            value-key="value"
+            class="w-full"
+          />
         </UFormField>
       </div>
     </template>

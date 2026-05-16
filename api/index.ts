@@ -3,6 +3,7 @@ import { cors } from "@elysiajs/cors"
 import { authRoutes } from "./routes/auth"
 import { sitesRoutes } from "./routes/sites"
 import { usersRoutes } from "./routes/users"
+import { modelsRoutes } from "./routes/models"
 
 const PORT = Number(process.env.PORT || 3002)
 const UI_ORIGIN = process.env.CMS_UI_URL || "http://localhost:3001"
@@ -19,6 +20,7 @@ const app = new Elysia()
   .get("/health", () => ({ status: "ok", ts: new Date().toISOString() }))
   .use(authRoutes)
   .use(sitesRoutes)
+  .use(modelsRoutes)
   .use(usersRoutes)
   .listen(PORT)
 

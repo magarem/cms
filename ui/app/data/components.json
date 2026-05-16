@@ -359,32 +359,6 @@
         }
       ]
     },
-
-    {
-      "name": "CallToAction2",
-      "file": "components/CallToAction2.vue",
-      "category": "block",
-      "description": "Alternative CTA block — flat props version with same visual output.",
-      "props": [
-        { "name": "title",      "label": "Title",       "type": "text",     "default": "Pronto para inovar?" },
-        { "name": "subtitle",   "label": "Subtitle",    "type": "textarea", "default": "" },
-        { "name": "buttonText", "label": "Button Text", "type": "text",     "default": "Falar Connosco" },
-        { "name": "buttonLink", "label": "Button URL",  "type": "url",      "default": "/contactos" },
-        {
-          "name": "cWidth",
-          "label": "Content Width",
-          "type": "select",
-          "default": "cw-1",
-          "options": [
-            { "value": "cw-0", "label": "Full width" },
-            { "value": "cw-1", "label": "Wide — 900px" },
-            { "value": "cw-2", "label": "Medium — 800px" },
-            { "value": "cw-3", "label": "Narrow — 600px" }
-          ]
-        }
-      ]
-    },
-
     {
       "name": "MultiImageBanner",
       "file": "components/MultiImageBanner.vue",
@@ -425,41 +399,6 @@
         }
       ]
     },
-
-    {
-      "name": "CardGrid",
-      "file": "components/CardGrid.vue",
-      "category": "block",
-      "description": "Responsive grid of cards with image, tag, title, description, and lightbox.",
-      "props": [
-        {
-          "name": "items",
-          "label": "Cards",
-          "type": "array",
-          "required": true,
-          "itemSchema": [
-            { "name": "title",       "label": "Title",       "type": "text",     "required": true },
-            { "name": "description", "label": "Description", "type": "textarea", "default": "" },
-            { "name": "image",       "label": "Image",       "type": "image",    "default": "" },
-            { "name": "tag",         "label": "Tag Badge",   "type": "text",     "default": "" },
-            { "name": "path",        "label": "Link URL",    "type": "url",      "default": "" }
-          ]
-        },
-        {
-          "name": "cWidth",
-          "label": "Content Width",
-          "type": "select",
-          "default": "cw-1",
-          "options": [
-            { "value": "cw-0", "label": "Full width" },
-            { "value": "cw-1", "label": "Wide — 900px" },
-            { "value": "cw-2", "label": "Medium — 800px" },
-            { "value": "cw-3", "label": "Narrow — 600px" }
-          ]
-        }
-      ]
-    },
-
     {
       "name": "ChildGrid",
       "file": "components/ChildGrid.vue",
@@ -473,32 +412,113 @@
           "required": true,
           "description": "Points to a folder inside data/. All sub-folders become cards automatically."
         },
-        {
-          "name": "cWidth",
-          "label": "Content Width",
-          "type": "select",
-          "default": "w-full",
-          "options": [
-            { "value": "w-full", "label": "Full width" },
-            { "value": "cw-1",   "label": "Wide — 900px" },
-            { "value": "cw-2",   "label": "Medium — 800px" }
-          ]
-        },
-        {
+         {
           "name": "title",
-          "label": "Título",
+          "label": "Título da secção",
           "type": "text",
           "default": ""
         },
         {
           "name": "subtitle",
-          "label": "Subtítulo",
+          "label": "Subtítulo da secção",
           "type": "text",
           "default": ""
+        }, {
+          "name": "titlePosition",
+          "label": "Posição do título",
+          "type": "select",
+          "default": "outside",
+          "options": [
+            { "value": "outside", "label": "Fora da imagem" },
+            { "value": "inside",  "label": "Dentro da imagem" }
+          ]
+        },
+        {
+          "name": "cardType",
+          "label": "Tipo de card",
+          "type": "select",
+          "default": "vertical",
+          "options": [
+            { "value": "vertical",   "label": "Vertical (imagem em cima)" },
+            { "value": "horizontal", "label": "Horizontal (imagem à esquerda)" }
+          ]
+        },
+        {
+          "name": "cardHeight",
+          "label": "Altura do card",
+          "type": "select",
+          "default": "auto",
+          "options": [
+            { "value": "auto", "label": "Auto (proporção natural)" },
+            { "value": "xs",   "label": "XS — 128px / 112px" },
+            { "value": "sm",   "label": "SM — 192px / 144px" },
+            { "value": "md",   "label": "MD — 256px / 192px" },
+            { "value": "lg",   "label": "LG — 320px / 256px" },
+            { "value": "xl",   "label": "XL — 384px / 320px" }
+          ]
+        },
+        {
+          "name": "titleAlign",
+          "label": "Alinhamento do título",
+          "type": "select",
+          "default": "left",
+          "options": [
+            { "value": "left",   "label": "Esquerda" },
+            { "value": "center", "label": "Centro" },
+            { "value": "right",  "label": "Direita" }
+          ]
+        },
+        {
+          "name": "buttonText",
+          "label": "Texto do botão",
+          "type": "text",
+          "default": "Ver mais"
+        },
+        {
+          "name": "colsPerRow",
+          "label": "Cards por linha",
+          "type": "select",
+          "default": 3,
+          "options": [
+            { "value": 1, "label": "1 por linha" },
+            { "value": 2, "label": "2 por linha" },
+            { "value": 3, "label": "3 por linha" },
+            { "value": 4, "label": "4 por linha" },
+            { "value": 5, "label": "5 por linha" },
+            { "value": 6, "label": "6 por linha" }
+          ]
+        },
+        {
+          "name": "limit",
+          "label": "Limite de cards (0 = sem limite)",
+          "type": "number",
+          "default": 0
+        }, {
+          "name": "showTitle",
+          "label": "Mostrar título",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "showDescription",
+          "label": "Mostrar descrição",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "showImage",
+          "label": "Mostrar imagem",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "showButton",
+          "label": "Mostrar botão",
+          "type": "boolean",
+          "default": true
         }
       ]
     },
-
     {
       "name": "ContentMD",
       "file": "components/ContentMD.vue",
@@ -514,7 +534,6 @@
         }
       ]
     },
-
     {
       "name": "QuickNavigation",
       "file": "components/QuickNavigation.vue",
@@ -540,9 +559,9 @@
           "type": "select",
           "default": "w-full",
           "options": [
-            { "value": "w-full", "label": "Full width" },
-            { "value": "cw-1",   "label": "Wide — 900px" },
-            { "value": "cw-2",   "label": "Medium — 800px" }
+            { "value": "site", "label": "100%" },
+            { "value": "content",   "label": "content" },
+            { "value": "article",   "label": "article" }
           ]
         }
       ]
@@ -676,51 +695,6 @@
         }
       ]
     },
-
-    {
-      "name": "Testimonials_type1",
-      "file": "components/Testimonials_type1.vue",
-      "category": "block",
-      "description": "Grid of customer review cards with rating, quote, name, role, and avatar.",
-      "props": [
-        {
-          "name": "title",
-          "label": "Section Title",
-          "type": "text",
-          "default": "Histórias de Sucesso"
-        },
-        {
-          "name": "subtitle",
-          "label": "Section Subtitle",
-          "type": "textarea",
-          "default": ""
-        },
-        {
-          "name": "reviews",
-          "label": "Testimonials",
-          "type": "array",
-          "default": [],
-          "itemSchema": [
-            { "name": "name",   "label": "Name",           "type": "text",   "required": true },
-            { "name": "role",   "label": "Role / Company", "type": "text",   "default": "" },
-            { "name": "text",   "label": "Quote",          "type": "textarea","required": true },
-            { "name": "rating", "label": "Rating (1–5)",   "type": "number", "default": 5 },
-            { "name": "avatar", "label": "Avatar Photo",   "type": "image",  "default": "" }
-          ]
-        },
-        {
-          "name": "cWidth",
-          "label": "Content Width",
-          "type": "select",
-          "default": "w-full",
-          "options": [
-            { "value": "w-full", "label": "Full width" },
-            { "value": "cw-1",   "label": "Wide — 900px" }
-          ]
-        }
-      ]
-    },
-
     {
       "name": "Sirius-ContactModel1",
       "file": "components/Sirius-ContactModel1.vue",
@@ -795,139 +769,6 @@
         }
       ]
     },
-
-    {
-      "name": "ui/Article",
-      "file": "components/ui/Article.vue",
-      "category": "ui",
-      "description": "Styled article layout renderer with top image, side images, author line, and markdown body.",
-      "props": [
-        { "name": "title",      "label": "Title",            "type": "text",     "default": "" },
-        { "name": "content",    "label": "Body (Markdown)",  "type": "markdown", "default": "" },
-        { "name": "topImage",   "label": "Top Banner Image", "type": "image",    "default": "" },
-        {
-          "name": "sideImages",
-          "label": "Side Images",
-          "type": "array",
-          "default": [],
-          "itemSchema": [
-            { "name": "url", "label": "Image", "type": "image", "required": true }
-          ]
-        },
-        { "name": "author", "label": "Author",            "type": "text", "default": "" },
-        { "name": "date",   "label": "Publication Date",  "type": "date", "default": "" },
-        {
-          "name": "cWidth",
-          "label": "Content Width",
-          "type": "select",
-          "default": "cw-1",
-          "options": [
-            { "value": "cw-0", "label": "Full width" },
-            { "value": "cw-1", "label": "Wide — 900px" },
-            { "value": "cw-2", "label": "Medium — 800px" },
-            { "value": "cw-3", "label": "Narrow — 600px" }
-          ]
-        }
-      ]
-    },
-
-    {
-      "name": "ui/Card",
-      "file": "components/ui/Card.vue",
-      "category": "ui",
-      "description": "Generic card with optional icon, title, and description. Accepts slot content.",
-      "props": [
-        { "name": "title",          "label": "Title",           "type": "text",     "default": "" },
-        { "name": "description",    "label": "Description",     "type": "textarea", "default": "" },
-        { "name": "icon",           "label": "Icon",            "type": "icon",     "default": "" },
-        { "name": "contentPadding", "label": "Inner Padding (CSS class)", "type": "text", "default": "p-8" }
-      ]
-    },
-
-    {
-      "name": "ui/FormBuilder",
-      "file": "components/ui/FormBuilder.vue",
-      "category": "ui",
-      "description": "Dynamic form renderer. Driven by a schema array — same structure as formSchema in Sirius-ContactModel1.",
-      "props": [
-        {
-          "name": "schema",
-          "label": "Form Fields",
-          "type": "array",
-          "required": true,
-          "itemSchema": [
-            { "name": "name",        "label": "Field Key",   "type": "text",    "required": true },
-            { "name": "label",       "label": "Label",       "type": "text",    "required": true },
-            {
-              "name": "type",
-              "label": "Field Type",
-              "type": "select",
-              "default": "text",
-              "options": [
-                { "value": "text",     "label": "Text" },
-                { "value": "email",    "label": "Email" },
-                { "value": "textarea", "label": "Textarea" },
-                { "value": "number",   "label": "Number" },
-                { "value": "tel",      "label": "Phone" },
-                { "value": "password", "label": "Password" }
-              ]
-            },
-            { "name": "placeholder", "label": "Placeholder", "type": "text",    "default": "" },
-            { "name": "required",    "label": "Required",    "type": "boolean", "default": false }
-          ]
-        },
-        {
-          "name": "submitConfig",
-          "label": "Submit Button",
-          "type": "object",
-          "fields": [
-            { "name": "label", "label": "Button Label", "type": "text", "default": "Enviar" },
-            { "name": "icon",  "label": "Button Icon",  "type": "icon", "default": "" },
-            { "name": "terms", "label": "Terms Text",   "type": "text", "default": "" }
-          ]
-        },
-        {
-          "name": "successConfig",
-          "label": "Success Screen",
-          "type": "object",
-          "fields": [
-            { "name": "title",       "label": "Title",          "type": "text",     "default": "Sucesso!" },
-            { "name": "message",     "label": "Message",        "type": "textarea", "default": "" },
-            { "name": "icon",        "label": "Icon",           "type": "icon",     "default": "pi-check" },
-            { "name": "buttonLabel", "label": "Back Button Text","type": "text",    "default": "Voltar" }
-          ]
-        }
-      ]
-    },
-
-    {
-      "name": "ui/Input",
-      "file": "components/ui/Input.vue",
-      "category": "ui",
-      "description": "Single form input or textarea. Used internally by FormBuilder.",
-      "props": [
-        { "name": "id",          "label": "Field ID (HTML)",  "type": "text",    "required": true },
-        { "name": "label",       "label": "Label",            "type": "text",    "required": true },
-        {
-          "name": "type",
-          "label": "Input Type",
-          "type": "select",
-          "default": "text",
-          "options": [
-            { "value": "text",     "label": "Text" },
-            { "value": "email",    "label": "Email" },
-            { "value": "textarea", "label": "Textarea" },
-            { "value": "number",   "label": "Number" },
-            { "value": "tel",      "label": "Phone" },
-            { "value": "password", "label": "Password" }
-          ]
-        },
-        { "name": "placeholder", "label": "Placeholder",      "type": "text",    "default": "" },
-        { "name": "required",    "label": "Required",         "type": "boolean", "default": false },
-        { "name": "rows",        "label": "Rows (textarea)",  "type": "number",  "default": 5 }
-      ]
-    },
-
     {
       "name": "SiteHeader",
       "file": "components/SiteHeader.vue",
@@ -947,7 +788,7 @@
     {
       "name": "SiteHeaderLogo",
       "file": "components/SiteHeaderLogo.vue",
-      "category": "block",
+      "category": "layout",
       "description": "Logo / brand mark — usable standalone in footer or any block area.",
       "props": [
         { "name": "brandName",  "label": "Brand Name",  "type": "text",   "default": "SIRIUS" },
@@ -969,7 +810,7 @@
     {
       "name": "SiteHeaderMenu",
       "file": "components/SiteHeaderMenu.vue",
-      "category": "block",
+      "category": "layout",
       "cms_hidden": false,
       "description": "Navigation menu inside SiteHeader. Menu items come from _topbar.json.",
       "props": [
@@ -1062,7 +903,7 @@
     {
       "name": "Menu",
       "file": "components/Menu.vue",
-      "category": "block",
+      "category": "layout",
       "description": "Navigation menu — horizontal or vertical list of links.",
       "props": [
         { "name": "title", "label": "Título", "type": "text", "default": "" },
@@ -1117,7 +958,7 @@
     {
       "name": "NewsletterSubscribe",
       "file": "components/NewsletterSubscribe.vue",
-      "category": "block",
+      "category": "layout",
       "description": "Newsletter subscription box with title, subtitle, and email input.",
       "props": [
         { "name": "title",      "label": "Título",       "type": "text",     "default": "Subscreva a nossa newsletter" },
@@ -1130,7 +971,7 @@
     {
       "name": "SocialLinks",
       "file": "components/SocialLinks.vue",
-      "category": "block",
+      "category": "layout",
       "description": "Social media icon links with title, subtitle, and horizontal/vertical layout.",
       "props": [
         { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
@@ -1267,14 +1108,6 @@
       "category": "layout",
       "cms_hidden": true,
       "description": "Header extras (dark mode toggle, CTA button). Internal use only."
-    },
-
-    {
-      "name": "Footer",
-      "file": "components/Footer.vue",
-      "category": "layout",
-      "cms_hidden": true,
-      "description": "Site footer. No configurable props — content defined inside the component."
     }
 
   ]

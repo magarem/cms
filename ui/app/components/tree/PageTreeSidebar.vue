@@ -25,6 +25,29 @@ provide("refreshTree", fetchTree)
 onMounted(fetchTree)
 watch(() => props.site, fetchTree)
 
+// ── Models for the create modal ───────────────────────────────
+const { models, fetchModels, forTarget } = useModels(() => props.site)
+onMounted(fetchModels)
+watch(() => props.site, fetchModels)
+
+const pageModels = forTarget("page")
+const itemModels = forTarget("collection-item")
+
+const NONE_VALUE = "__none__"
+type ModelOption = { value: string; label: string }
+
+function modelLabel(m: { label: string; source?: "global" | "site" }): string {
+  return m.source === "site" ? `${m.label} · este site` : m.label
+}
+const pageModelOptions = computed<ModelOption[]>(() => [
+  { value: NONE_VALUE, label: "Padrão (Página Normal)" },
+  ...pageModels.value.map((m) => ({ value: m.name, label: modelLabel(m) })),
+])
+const itemModelOptions = computed<ModelOption[]>(() => [
+  { value: NONE_VALUE, label: "Padrão (item simples)" },
+  ...itemModels.value.map((m) => ({ value: m.name, label: modelLabel(m) })),
+])
+
 // ── Create modal ──────────────────────────────────────────────
 type CreateType = "page" | "folder" | "collection"
 
@@ -32,6 +55,7 @@ const showCreate = ref(false)
 const createType = ref<CreateType>("page")
 const createPath = ref("")
 const createTitle = ref("")
+const createModel = ref<string>(NONE_VALUE)
 const creating = ref(false)
 
 const CREATE_META: Record<CreateType, { label: string; icon: string; pathPlaceholder: string }> = {
@@ -44,6 +68,7 @@ function openCreate(type: CreateType) {
   createType.value = type
   createPath.value = ""
   createTitle.value = ""
+  createModel.value = NONE_VALUE
   showCreate.value = true
 }
 
@@ -51,11 +76,15 @@ async function submitCreate() {
   const cleanPath = createPath.value.trim().replace(/^\/+|\/+$/g, "")
   if (!cleanPath) return
   creating.value = true
+  const modelArg = createModel.value && createModel.value !== NONE_VALUE
+    ? createModel.value
+    : undefined
   try {
     if (createType.value === "page") {
       await api.post(`/sites/${props.site}/page`, {
         path: cleanPath,
         title: createTitle.value || undefined,
+        model: modelArg,
       })
       toast.add({ title: "Nova página criada.", color: "success" })
       showCreate.value = false
@@ -70,6 +99,7 @@ async function submitCreate() {
       await api.post(`/sites/${props.site}/tree/collection`, {
         path: cleanPath,
         title: createTitle.value || undefined,
+        itemModel: modelArg,
       })
       toast.add({ title: "Nova coleção criada.", color: "success" })
       showCreate.value = false
@@ -141,6 +171,30 @@ async function submitCreate() {
             placeholder="Título (opcional)"
             class="w-full"
             @keyup.enter="submitCreate"
+          />
+        </UFormField>
+        <UFormField
+          v-if="createType === 'page'"
+          label="Modelo"
+          hint="Estrutura inicial da página"
+        >
+          <USelect
+            v-model="createModel"
+            :items="pageModelOptions"
+            value-key="value"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField
+          v-else-if="createType === 'collection'"
+          label="Modelo dos itens"
+          hint="Será usado por padrão ao criar novos itens nesta coleção"
+        >
+          <USelect
+            v-model="createModel"
+            :items="itemModelOptions"
+            value-key="value"
+            class="w-full"
           />
         </UFormField>
       </div>

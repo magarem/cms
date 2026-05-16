@@ -64,8 +64,13 @@ const SCHEMA_TYPE_MAP: Record<string, FieldType> = {
 const type = computed<FieldType>(() => {
   if (props.schema?.type) {
     const mapped = SCHEMA_TYPE_MAP[props.schema.type] ?? "text"
-    // Schema says generic "text" — still run key-name inference so image/media fields keep their picker
-    if (mapped === "text") return infer(props.fieldKey, props.modelValue)
+    if (mapped === "text") {
+      // Only allow special pickers to override an explicit "text" schema.
+      // Never upgrade to textarea or markdown based on key name or value length.
+      const inferred = infer(props.fieldKey, props.modelValue)
+      const PICKER_TYPES: FieldType[] = ["image", "url", "icon-text", "color"]
+      return PICKER_TYPES.includes(inferred) ? inferred : "text"
+    }
     return mapped
   }
   return infer(props.fieldKey, props.modelValue)

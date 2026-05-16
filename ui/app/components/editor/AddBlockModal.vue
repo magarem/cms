@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { blockComponents } from '~/composables/useComponentSchema'
+import { componentGroups } from '~/composables/useComponentSchema'
 
 const emit = defineEmits<{ add: [componentName: string] }>()
 const open = ref(false)
@@ -31,20 +31,23 @@ function pickCustom() {
 
     <UModal v-model:open="open" title="Escolher Componente">
       <template #body>
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="c in blockComponents"
-              :key="c.name"
-              class="flex items-center gap-2.5 p-3 rounded-lg border border-gray-800 bg-gray-900 hover:border-primary-500/50 hover:bg-primary-500/5 transition-colors text-left"
-              :title="c.description"
-              @click="pick(c.name)"
-            >
-              <div class="flex-1 min-w-0">
-                <div class="text-xs font-medium text-white">{{ c.name }}</div>
-                <div class="text-[10px] text-gray-500 leading-snug mt-0.5 line-clamp-2">{{ c.description }}</div>
-              </div>
-            </button>
+        <div class="space-y-5">
+          <div v-for="group in componentGroups" :key="group.key" class="space-y-2">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-500 px-0.5">{{ group.label }}</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                v-for="c in group.components"
+                :key="c.name"
+                class="flex items-center gap-2.5 p-3 rounded-lg border border-gray-800 bg-gray-900 hover:border-primary-500/50 hover:bg-primary-500/5 transition-colors text-left"
+                :title="c.description"
+                @click="pick(c.name)"
+              >
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs font-medium text-white">{{ c.name }}</div>
+                  <div class="text-[10px] text-gray-500 leading-snug mt-0.5 line-clamp-2">{{ c.description }}</div>
+                </div>
+              </button>
+            </div>
           </div>
 
           <div class="border-t border-gray-800 pt-3">

@@ -1,0 +1,113 @@
+name: "Página Normal"
+description: "Página comum"
+target: all
+fields:
+  - name: title
+    label: "Título"
+    type: string
+    required: true
+    default: ""
+  - name: layout
+    label: "Layout"
+    type: select
+    default: default
+    options:
+      - value: default
+        label: "Default"
+      - value: post
+        label: "Post / Artigo"
+      - value: topbar-glass
+        label: "Glass Topbar"
+      - value: landing
+        label: "Landing Page"
+  - name: description
+    label: "Descrição"
+    type: markdown
+    default: ""
+  - name: date
+    label: "Data"
+    type: date
+    default: $today
+  - name: image
+    label: "Imagem de capa"
+    type: image-array
+    default: []
+  - name: sideimages
+    label: "Imagens laterais"
+    type: image-array
+    default: []
+  - name: sideimages_position
+    label: "Posição das imagens laterais"
+    type: select
+    default: left
+    options:
+      - value: right
+        label: "Direita"
+      - value: left
+        label: "Esquerda"
+  - name: seo
+    label: "SEO"
+    type: object
+    default: {}
+    fields:
+      - name: meta_title
+        label: "Meta Título"
+        type: string
+        default: ""
+      - name: meta_description
+        label: "Meta Descrição"
+        type: markdown
+        default: ""
+      - name: keywords
+        label: "Palavras-chave"
+        type: string
+        default: ""
+      - name: og_image
+        label: "Imagem social (OG)"
+        type: image
+        default: ""
+      - name: canonical
+        label: "URL canónico"
+        type: string
+        default: ""
+      - name: robots
+        label: "Robots"
+        type: select
+        default: "index, follow"
+        options:
+          - value: "index, follow"
+            label: "Index + Follow (padrão)"
+          - value: "noindex, follow"
+            label: "No Index"
+          - value: "index, nofollow"
+            label: "No Follow"
+          - value: "noindex, nofollow"
+            label: "No Index + No Follow"
+      - name: schema_type
+        label: "Schema.org Tipo"
+        type: select
+        default: WebPage
+        options:
+          - value: WebPage
+            label: "WebPage"
+          - value: Article
+            label: "Artigo"
+          - value: BlogPosting
+            label: "Blog Post"
+          - value: AboutPage
+            label: "Sobre"
+          - value: ContactPage
+            label: "Contacto"
+          - value: FAQPage
+            label: "FAQ"
+          - value: ProductPage
+            label: "Produto"
+          - value: ServicePage
+            label: "Serviço"
+          - value: CollectionPage
+            label: "Coleção"
+blocks:
+  - componentName: ContentMD
+    isHero: false
+    props:
+      fileName: content.md

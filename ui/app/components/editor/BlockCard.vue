@@ -4,6 +4,7 @@ import { getSchema } from '~/composables/useComponentSchema'
 interface Block {
   id?: string
   componentName: string
+  label?: string
   isHero?: boolean
   active?: boolean
   props?: Record<string, any>
@@ -23,6 +24,30 @@ const emit = defineEmits<{
 }>()
 
 const expanded = ref(props.block.componentName === "ContentMD")
+
+// ── Inline label editing ──────────────────────────────────────
+const editingLabel = ref(false)
+const localLabel = ref(props.block.label || '')
+const labelInput = ref<HTMLInputElement | null>(null)
+
+function startEditLabel() {
+  localLabel.value = props.block.label || ''
+  editingLabel.value = true
+  nextTick(() => labelInput.value?.focus())
+}
+
+function saveLabel() {
+  editingLabel.value = false
+  const newLabel = localLabel.value.trim() || undefined
+  if (newLabel !== props.block.label) {
+    emit('update:block', { ...props.block, label: newLabel })
+  }
+}
+
+function cancelLabel() {
+  editingLabel.value = false
+  localLabel.value = props.block.label || ''
+}
 
 function setIsHero(v: boolean) {
   emit("update:block", { ...props.block, isHero: v })
@@ -248,9 +273,37 @@ watch(mdPending, () => nextTick(recalcTextareaH))
         <UIcon name="i-heroicons-bars-2" class="w-4 h-4" />
       </div>
 
-      <div class="flex-1 min-w-0">
-        <span class="text-sm font-medium text-white">{{ block.componentName }}</span>
-        <span v-if="block.id" class="text-[10px] font-mono text-gray-600 ml-2">#{{ block.id }}</span>
+      <div class="flex-1 min-w-0 cursor-pointer select-none" @click="expanded = !expanded">
+        <template v-if="block.label">
+          <div class="text-sm font-semibold text-white leading-tight truncate">{{ block.label }}</div>
+          <div class="text-[10px] text-gray-500 leading-tight">{{ block.componentName }}</div>
+        </template>
+        <template v-else>
+          <span class="text-sm font-medium text-white">{{ block.componentName }}</span>
+          <span v-if="block.id" class="text-[10px] font-mono text-gray-600 ml-2">#{{ block.id }}</span>
+        </template>
+      </div>
+
+      <!-- Label editor -->
+      <div class="flex items-center" @click.stop>
+        <input
+          v-if="editingLabel"
+          ref="labelInput"
+          v-model="localLabel"
+          class="text-xs bg-gray-800 text-gray-200 border border-gray-700 rounded px-2 py-0.5 w-36 focus:outline-none focus:border-primary-500"
+          placeholder="rótulo do bloco..."
+          @blur="saveLabel"
+          @keydown.enter.prevent="saveLabel"
+          @keydown.escape="cancelLabel"
+        />
+        <UButton
+          v-else
+          :icon="block.label ? 'i-heroicons-pencil-square' : 'i-heroicons-tag'"
+          size="xs"
+          variant="ghost"
+          color="neutral"
+          @click="startEditLabel"
+        />
       </div>
 
       <UTooltip :text="block.active === false ? 'Bloco inativo — clique para ativar' : 'Bloco ativo — clique para desativar'">

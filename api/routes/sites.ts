@@ -26,12 +26,24 @@ import {
   parseContent,
   serializeContent,
 } from "../lib/content"
+import {
+  getModel,
+  applyModel,
+  defaultPageTemplate,
+  defaultCollectionItemTemplate,
+  resolveDefaultModel,
+} from "../lib/models"
 
 const JWT_SECRET = process.env.JWT_SECRET || "sirius_cms_dev_secret_change_in_production"
 
-async function getUser(jwt: any, token: string | undefined) {
+async function getUser(jwt: any, token: string | undefined, expectedSite?: string) {
   if (!token) return null
-  return await jwt.verify(token)
+  const user = await jwt.verify(token) as any
+  if (!user) return null
+  // URL site must match the site the user authenticated for — prevents
+  // cross-site access via cookie reuse / URL tampering.
+  if (expectedSite && user.site !== expectedSite) return null
+  return user
 }
 
 export const sitesRoutes = new Elysia({ prefix: "/sites" })
@@ -56,7 +68,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Content tree ──────────────────────────────────────────
   .get("/:site/tree", async ({ params, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -67,7 +79,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Settings ──────────────────────────────────────────────
   .get("/:site/settings", async ({ params, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -98,7 +110,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/settings",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -129,7 +141,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Page read ──────────────────────────────────────────────
   .get("/:site/page", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -146,7 +158,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/page",
     async ({ params, query, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -164,11 +176,11 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .post(
     "/:site/page",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
-      const { path: pagePath, title } = body as any
+      const { path: pagePath, title, model: modelName } = body as any
       const settings = await getSiteSettings(params.site)
       const version = getActiveVersion(settings)
       const clean = pagePath.replace(/^\/+|\/+$/g, "")
@@ -177,35 +189,40 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
       const existing = await resolvePageFile(params.site, version, clean)
       if (existing) { set.status = 409; return { error: "Página já existe." } }
 
+      // Resolve effective model: explicit pick → global "normal-page" default → hard fallback
+      const model = modelName
+        ? await getModel(params.site, modelName)
+        : await resolveDefaultModel(params.site)
+      const { data, needsContentMd } = model
+        ? applyModel(model, { title: pageTitle, slug: clean })
+        : defaultPageTemplate(clean)
+      const effectiveModelName = modelName || model?.name
+
       await writePage(params.site, version, clean, {
-        layout: "default",
+        ...data,
         title: pageTitle,
-        blocks: [
-          {
-            id: `contentmd-${Date.now().toString(36)}`,
-            componentName: "ContentMD",
-            isHero: false,
-            props: { pagePath: clean, fileName: "content.md" },
-          },
-        ],
+        ...(effectiveModelName ? { model: effectiveModelName } : {}),
       })
 
-      // Create a starter content.md so ContentMD has something to load
-      const dirPath = join(SITES_ROOT, params.site, version, clean)
-      await writeFile(
-        join(dirPath, "content.md"),
-        `# ${pageTitle}\n\n`,
-        "utf-8"
-      )
+      if (needsContentMd) {
+        const dirPath = join(SITES_ROOT, params.site, version, clean)
+        await writeFile(join(dirPath, "content.md"), `# ${pageTitle}\n\n`, "utf-8")
+      }
 
       return { success: true }
     },
-    { body: t.Object({ path: t.String(), title: t.Optional(t.String()) }) }
+    {
+      body: t.Object({
+        path: t.String(),
+        title: t.Optional(t.String()),
+        model: t.Optional(t.String()),
+      }),
+    }
   )
 
   // ── Page delete ──────────────────────────────────────────────
   .delete("/:site/page", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem deletar páginas." } }
 
@@ -219,7 +236,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Collection list ──────────────────────────────────────────────
   .get("/:site/collection", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -227,47 +244,85 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     const collectionPath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
 
     const items = await listCollectionItems(params.site, version, collectionPath)
-    return { success: true, items }
+
+    // Expose collection-level metadata (currently: itemModel) so the UI can
+    // pre-select the right model when creating a new item.
+    let collection: any = {}
+    for (const f of ["_collection.yml", "_collection.json"]) {
+      const colFile = join(SITES_ROOT, params.site, version, collectionPath, f)
+      if (existsSync(colFile)) {
+        const raw = await readFile(colFile, "utf-8")
+        collection = await parseContent(raw, extname(f))
+        break
+      }
+    }
+
+    return { success: true, items, collection }
   })
 
   // ── Collection item create ──────────────────────────────────────────────
   .post(
     "/:site/collection",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
-      const { collectionPath, slug, title } = body as any
+      const { collectionPath, slug, title, model: modelOverride } = body as any
       const settings = await getSiteSettings(params.site)
       const version = getActiveVersion(settings)
       const itemPath = `${collectionPath}/${slug}`.replace(/^\/+/, "")
+      const itemTitle = title || slug
 
       const existing = await resolvePageFile(params.site, version, itemPath)
       if (existing) { set.status = 409; return { error: "Item já existe." } }
 
+      // Resolve effective model: explicit override → collection's stored itemModel → default
+      let effectiveModelName: string | null = modelOverride || null
+      if (!effectiveModelName) {
+        const cleanColl = collectionPath.replace(/^\/+|\/+$/g, "")
+        for (const f of ["_collection.yml", "_collection.json"]) {
+          const colPath = join(SITES_ROOT, params.site, version, cleanColl, f)
+          if (existsSync(colPath)) {
+            const raw = await readFile(colPath, "utf-8")
+            const meta = await parseContent(raw, extname(f))
+            if (meta?.itemModel) effectiveModelName = String(meta.itemModel)
+            break
+          }
+        }
+      }
+
+      const model = effectiveModelName ? await getModel(params.site, effectiveModelName) : null
+      const { data, needsContentMd } = model
+        ? applyModel(model, { title: itemTitle, slug: itemPath })
+        : defaultCollectionItemTemplate()
+
       await writePage(params.site, version, itemPath, {
-        layout: "post",
-        title: title || slug,
-        date: new Date().toISOString().split("T")[0],
-        blocks: [
-          {
-            id: `contentmd-${Date.now().toString(36)}`,
-            componentName: "ContentMD",
-            isHero: false,
-            props: {},
-          },
-        ],
+        ...data,
+        title: itemTitle,
+        ...(effectiveModelName ? { model: effectiveModelName } : {}),
       })
+
+      if (needsContentMd) {
+        const dirPath = join(SITES_ROOT, params.site, version, itemPath)
+        await writeFile(join(dirPath, "content.md"), `# ${itemTitle}\n\n`, "utf-8")
+      }
 
       return { success: true, slug: itemPath }
     },
-    { body: t.Object({ collectionPath: t.String(), slug: t.String(), title: t.Optional(t.String()) }) }
+    {
+      body: t.Object({
+        collectionPath: t.String(),
+        slug: t.String(),
+        title: t.Optional(t.String()),
+        model: t.Optional(t.String()),
+      }),
+    }
   )
 
   // ── Collection item delete ──────────────────────────────────────────────
   .delete("/:site/collection", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem eliminar itens." } }
 
@@ -281,7 +336,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Collection order ──────────────────────────────────────────────
   .put("/:site/collection/order", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -295,7 +350,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Tree: create folder ──────────────────────────────────────────────
   .post("/:site/tree/folder", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
     const { path: folderPath } = body as any
@@ -309,10 +364,10 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Tree: create collection ──────────────────────────────────────────────
   .post("/:site/tree/collection", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
-    const { path: colPath, title } = body as any
+    const { path: colPath, title, itemModel } = body as any
     const settings = await getSiteSettings(params.site)
     const version = getActiveVersion(settings)
     const clean = colPath.replace(/^\/+|\/+$/g, "")
@@ -321,9 +376,12 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     if (existsSync(dirPath)) { set.status = 409; return { error: "Coleção já existe." } }
     await mkdir(dirPath, { recursive: true })
 
+    const collectionMeta: Record<string, any> = {}
+    if (itemModel) collectionMeta.itemModel = String(itemModel)
+
     await writeFile(
       join(dirPath, "_collection.yml"),
-      serializeContent({}, ".yml"),
+      serializeContent(collectionMeta, ".yml"),
       "utf-8"
     )
 
@@ -347,11 +405,17 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     )
 
     return { success: true }
-  }, { body: t.Object({ path: t.String(), title: t.Optional(t.String()) }) })
+  }, {
+    body: t.Object({
+      path: t.String(),
+      title: t.Optional(t.String()),
+      itemModel: t.Optional(t.String()),
+    }),
+  })
 
   // ── Tree: delete node ──────────────────────────────────────────────
   .delete("/:site/tree", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem eliminar." } }
     const settings = await getSiteSettings(params.site)
@@ -364,7 +428,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Tree: rename node ──────────────────────────────────────────────
   .post("/:site/tree/rename", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
     const { path: nodePath, newName } = body as any
@@ -395,7 +459,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Tree: copy node ──────────────────────────────────────────────
   .post("/:site/tree/copy", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
     const { path: nodePath, destination } = body as any
@@ -413,7 +477,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Tree: move node ──────────────────────────────────────────────
   .post("/:site/tree/move", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
     const { path: nodePath, destination, position, referenceNode } = body as any
@@ -449,7 +513,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Versions: create ─────────────────────────────────────────────────
   .post("/:site/versions", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem criar versões." } }
 
@@ -484,7 +548,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Publish ──────────────────────────────────────────────────────────
   .post("/:site/publish", async ({ params, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem publicar." } }
 
@@ -513,7 +577,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Global read ──────────────────────────────────────────────
   .get("/:site/global", async ({ params, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -540,7 +604,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/global/:key",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -563,7 +627,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Markdown read ──────────────────────────────────────────────
   .get("/:site/markdown", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -580,7 +644,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/markdown",
     async ({ params, query, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -597,7 +661,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Media: list ──────────────────────────────────────────────
   .get("/:site/media", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -608,7 +672,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Media: serve raw file ──────────────────────────────────────────────
   .get("/:site/media/serve", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const settings = await getSiteSettings(params.site)
@@ -623,7 +687,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .post(
     "/:site/media/upload",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -642,7 +706,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
   // ── Media: delete ──────────────────────────────────────────────
   .delete("/:site/media", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value) as any
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
     if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -656,7 +720,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/media/rename",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -672,7 +736,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/media/move",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -688,7 +752,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   .put(
     "/:site/media/copy",
     async ({ params, body, cookie: { cms_token }, jwt, set }) => {
-      const user = await getUser(jwt, cms_token?.value) as any
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
@@ -703,7 +767,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   // ── Analytics ─────────────────────────────────────────────────
   // ── Newsletter subscribers ─────────────────────────────────
   .get("/:site/newsletter", async ({ params, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const file = join(SITES_ROOT, params.site, "_newsletter", "subscribers.json")
@@ -717,7 +781,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   })
 
   .delete("/:site/newsletter", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const email = ((query as any).email as string || "").trim().toLowerCase()
@@ -736,7 +800,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
   })
 
   .get("/:site/analytics", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
-    const user = await getUser(jwt, cms_token?.value)
+    const user = await getUser(jwt, cms_token?.value, params.site)
     if (!user) { set.status = 401; return { error: "Não autenticado." } }
 
     const days = Math.min(parseInt((query as any).days as string) || 30, 90)

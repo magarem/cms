@@ -99,12 +99,15 @@ provide("cmsPublish", {
 // ── Expose role flag to any descendant (BlockEditor, etc.) ─
 provide("cmsIsAdmin", computed(() => user.value?.role === "admin"))
 
+const sidebarOpen = ref(true)
+
 // ── Nav ───────────────────────────────────────────────────
 const navItems = computed(() => {
   const base  = `/${site.value}`
   const items = [
     { label: "Dashboard",     icon: "i-heroicons-home",                   to: base, exact: true },
     { label: "Estatísticas",  icon: "i-heroicons-chart-bar",              to: `${base}/stats` },
+    { label: "Modelos",       icon: "i-heroicons-rectangle-group",        to: `${base}/models` },
     { label: "Global",        icon: "i-heroicons-cog-6-tooth",            to: `${base}/global` },
     { label: "Configurações", icon: "i-heroicons-adjustments-horizontal", to: `${base}/settings` },
     { label: "Newsletter",    icon: "i-heroicons-envelope",               to: `${base}/newsletter` },
@@ -124,11 +127,24 @@ function isActive(item: { to: string; exact?: boolean }) {
   <div class="flex h-screen overflow-hidden bg-gray-950 text-gray-100">
 
     <!-- ═══ Sidebar ════════════════════════════════════════════ -->
-    <aside class="w-56 flex-shrink-0 flex flex-col border-r border-gray-800 bg-gray-900">
+    <aside
+      :class="sidebarOpen ? 'w-56' : 'w-10'"
+      class="flex-shrink-0 flex flex-col border-r border-gray-800 bg-gray-900 overflow-hidden transition-[width] duration-200"
+    >
 
-      <!-- Logo + site -->
-      <div class="flex-shrink-0 border-b border-gray-800 px-4 py-3 space-y-2">
-        <!-- Line 1: icon + brand -->
+      <!-- Collapsed: just the open button centered -->
+      <div v-if="!sidebarOpen" class="flex-shrink-0 border-b border-gray-800 flex items-center justify-center py-3">
+        <button
+          class="text-gray-500 hover:text-white transition-colors"
+          title="Abrir menu"
+          @click="sidebarOpen = true"
+        >
+          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Open: full logo + site + close button -->
+      <div v-else class="flex-shrink-0 border-b border-gray-800 px-4 py-3 space-y-2">
         <div class="flex items-center gap-2 mb-4">
           <div class="relative w-6 h-6 flex-shrink-0">
             <div class="absolute inset-0 rounded-lg bg-primary-500 opacity-20 blur-sm" />
@@ -138,20 +154,26 @@ function isActive(item: { to: string; exact?: boolean }) {
               </svg>
             </div>
           </div>
-          <div class="flex items-baseline gap-1.5">
+          <div class="flex items-baseline gap-1.5 flex-1 min-w-0">
             <span class="text-xs font-black tracking-[0.18em] uppercase text-white leading-none">Sirius</span>
             <span class="text-[8px] font-semibold tracking-[0.25em] uppercase text-primary-400/70 leading-none">CMS</span>
           </div>
+          <button
+            class="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+            title="Fechar menu"
+            @click="sidebarOpen = false"
+          >
+            <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
+          </button>
         </div>
-        <!-- Line 2: site name -->
         <div class="flex items-center gap-1.5 ml-1">
           <div class="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
           <span class="text-[15px] font-mono text-gray-300 truncate leading-none">{{ site }}</span>
         </div>
       </div>
 
-      <!-- Page tree -->
-      <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+      <!-- Page tree — only when open -->
+      <nav v-if="sidebarOpen" class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
         <PageTreeSidebar :site="site" :key="`${site}-${activeVersion}`" />
 
         <div class="my-3 border-t border-gray-800" />
