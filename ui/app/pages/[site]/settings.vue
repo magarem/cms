@@ -93,7 +93,7 @@ async function createVersion() {
 
   <!-- Content -->
   <div class="flex-1 overflow-auto p-6">
-    <div class="max-w-xl space-y-5">
+    <div class="max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
 
       <!-- Versions card -->
       <UCard class="bg-gray-900 border-gray-800">
@@ -199,7 +199,7 @@ async function createVersion() {
         </p>
       </UCard>
 
-    </div>
+    </div><!-- /grid -->
   </div>
 
   <!-- Create version modal -->

@@ -5,7 +5,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!ready.value) await fetchMe()
 
-  if (!user.value) return navigateTo("/login")
+  if (!user.value) {
+    const site = to.params.site as string | undefined
+    const query: Record<string, string> = {}
+    if (site) query.site = site
+    if (to.path !== "/") query.redirect = to.fullPath
+    return navigateTo({ path: "/login", query })
+  }
 
   const site = to.params.site as string | undefined
   if (!site) return

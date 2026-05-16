@@ -1,11 +1,25 @@
 <script setup lang="ts">
 definePageMeta({ layout: "default" })
 
+const route = useRoute()
 const { login } = useAuth()
 const toast = useToast()
 
 const form = reactive({ site: "", username: "", password: "" })
 const loading = ref(false)
+const usernameInput = useTemplateRef<{ input?: HTMLInputElement } | HTMLInputElement>('usernameInput')
+
+onMounted(() => {
+  const querySite = route.query.site as string | undefined
+  if (querySite) {
+    form.site = querySite
+    nextTick(() => {
+      const el = usernameInput.value
+      const input = (el as any)?.input ?? (el instanceof HTMLElement ? el : null)
+      input?.focus()
+    })
+  }
+})
 
 async function handleLogin() {
   loading.value = true
@@ -13,7 +27,8 @@ async function handleLogin() {
     const res = await login(form.site, form.username, form.password)
     if (res.success) {
       toast.add({ title: "Bem-vindo!", color: "success" })
-      await navigateTo(`/${form.site}`)
+      const redirect = route.query.redirect as string | undefined
+      await navigateTo(redirect || `/${form.site}`)
     } else {
       toast.add({ title: res.error || "Erro ao entrar.", color: "error" })
     }
@@ -50,6 +65,7 @@ async function handleLogin() {
 
         <UFormField label="Utilizador" required>
           <UInput
+            ref="usernameInput"
             v-model="form.username"
             placeholder="admin"
             icon="i-heroicons-user"

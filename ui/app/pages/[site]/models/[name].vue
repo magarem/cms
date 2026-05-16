@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { VueDraggable } from "vue-draggable-plus"
 import type { ModelTarget } from "~/composables/useModels"
+import { stringify as yamlStringify, parse as yamlParse } from "yaml"
 
 definePageMeta({ layout: "cms" })
 
@@ -172,6 +173,41 @@ const formBlocks = computed({
   set: (v) => { blocks.value = v; dirty.value = true },
 })
 
+// ── Raw YAML editor ───────────────────────────────────────────
+const rawOpen  = ref(false)
+const rawText  = ref("")
+const rawError = ref("")
+
+function openRaw() {
+  const obj: Record<string, any> = {
+    name:        metaLabel.value || modelName,
+    description: metaDescription.value || undefined,
+    target:      metaTarget.value,
+  }
+  if (fields.value.length)  obj.fields = fields.value
+  if (blocks.value.length)  obj.blocks = blocks.value
+  rawText.value  = yamlStringify(obj, { lineWidth: 0 })
+  rawError.value = ""
+  rawOpen.value  = true
+}
+
+function applyRaw() {
+  try {
+    const parsed = yamlParse(rawText.value) as any
+    if (!parsed || typeof parsed !== "object") throw new Error("YAML inválido")
+    metaLabel.value       = parsed.name || parsed.label || modelName
+    metaDescription.value = parsed.description || ""
+    metaTarget.value      = parsed.target || "any"
+    fields.value          = Array.isArray(parsed.fields) ? parsed.fields : []
+    blocks.value          = Array.isArray(parsed.blocks) ? parsed.blocks : []
+    rawError.value = ""
+    rawOpen.value  = false
+    dirty.value    = true
+  } catch (e: any) {
+    rawError.value = e.message
+  }
+}
+
 useHead({ title: computed(() => `${metaLabel.value || modelName} — Modelo | Sirius CMS`) })
 </script>
 
@@ -189,6 +225,16 @@ useHead({ title: computed(() => `${metaLabel.value || modelName} — Modelo | Si
       <UBadge v-if="dirty && !readOnly" color="warning" variant="soft" size="xs" class="ml-1">não guardado</UBadge>
     </template>
     <template #actions>
+      <UButton
+        icon="i-heroicons-code-bracket"
+        size="sm"
+        variant="outline"
+        color="neutral"
+        title="Editar YAML"
+        @click="openRaw"
+      >
+        YAML
+      </UButton>
       <UButton
         v-if="!readOnly"
         icon="i-heroicons-check"
@@ -442,4 +488,37 @@ useHead({ title: computed(() => `${metaLabel.value || modelName} — Modelo | Si
     </div>
 
   </div>
+
+  <!-- Raw YAML editor modal -->
+  <UModal v-model:open="rawOpen" title="Editar YAML" :ui="{ content: 'max-w-3xl' }">
+    <template #body>
+      <div class="space-y-2">
+        <textarea
+          v-model="rawText"
+          class="w-full h-[65vh] font-mono text-xs bg-gray-950 text-green-300 border border-gray-700 rounded-lg p-4 resize-none focus:outline-none focus:border-primary-500 leading-relaxed"
+          spellcheck="false"
+          autocomplete="off"
+        />
+        <p v-if="rawError" class="text-xs text-red-400 font-mono bg-red-500/10 px-3 py-2 rounded">
+          {{ rawError }}
+        </p>
+        <p v-if="readOnly" class="text-xs text-yellow-500/80">
+          Modelo global — só leitura. As alterações não podem ser guardadas a partir daqui.
+        </p>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton variant="ghost" color="neutral" @click="rawOpen = false">Cancelar</UButton>
+        <UButton
+          v-if="!readOnly"
+          icon="i-heroicons-check"
+          @click="applyRaw"
+        >
+          Aplicar
+        </UButton>
+      </div>
+    </template>
+  </UModal>
+
 </template>

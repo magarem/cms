@@ -149,6 +149,47 @@ async function createItem() {
   }
 }
 
+// ── Rename item (file) ────────────────────────────────────────
+const renamingSlug  = ref<string | null>(null)
+const renameValue   = ref("")
+const renameSaving  = ref(false)
+
+function startRename(item: any) {
+  renamingSlug.value = item.slug
+  renameValue.value  = item.name   // just the last segment, e.g. "terapeuta-1"
+  nextTick(() => {
+    const el = document.getElementById(`rename-${item.slug}`)
+    el?.focus()
+    ;(el as HTMLInputElement)?.select()
+  })
+}
+
+function cancelRename() {
+  renamingSlug.value = null
+  renameValue.value  = ""
+}
+
+async function confirmRename(item: any) {
+  const newName = renameValue.value.trim()
+    .toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9-_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+
+  if (!newName || newName === item.name) { cancelRename(); return }
+  renameSaving.value = true
+  try {
+    await api.post(`/sites/${site}/tree/rename`, { path: item.slug, newName })
+    toast.add({ title: "Ficheiro renomeado.", color: "success", ui: { progress: "hidden" } })
+    cancelRename()
+    await refresh()
+  } catch (e: any) {
+    toast.add({ title: e.data?.error || "Erro ao renomear.", color: "error", ui: { progress: "hidden" } })
+  } finally {
+    renameSaving.value = false
+  }
+}
+
 // ── Delete item ───────────────────────────────────────────────
 const deletingSlug = ref<string | null>(null)
 
@@ -264,7 +305,36 @@ async function deleteItem(itemSlug: string) {
                     :to="`/${site}/pages/${item.slug}`"
                     class="text-sm text-white font-medium truncate leading-snug hover:text-primary-400 transition-colors block"
                   >{{ item.title }}</NuxtLink>
-                  <p class="text-[11px] text-gray-600 font-mono truncate mt-0.5">{{ item.name }}</p>
+
+                  <!-- Slug — click to rename -->
+                  <div class="mt-0.5 flex items-center gap-1 group/rename">
+                    <template v-if="renamingSlug === item.slug">
+                      <input
+                        :id="`rename-${item.slug}`"
+                        v-model="renameValue"
+                        class="text-[11px] font-mono text-gray-300 bg-gray-800 border border-primary-500/60 rounded px-1.5 py-0.5 w-full focus:outline-none"
+                        spellcheck="false"
+                        @keyup.enter="confirmRename(item)"
+                        @keyup.escape="cancelRename"
+                        @blur="confirmRename(item)"
+                      />
+                      <UIcon
+                        v-if="renameSaving"
+                        name="i-heroicons-arrow-path"
+                        class="w-3 h-3 animate-spin text-gray-500 flex-shrink-0"
+                      />
+                    </template>
+                    <template v-else>
+                      <span class="text-[11px] text-gray-600 font-mono truncate">{{ item.name }}</span>
+                      <button
+                        class="opacity-0 group-hover/rename:opacity-100 transition-opacity flex-shrink-0 text-gray-700 hover:text-gray-300"
+                        title="Renomear ficheiro"
+                        @click.stop="startRename(item)"
+                      >
+                        <UIcon name="i-heroicons-pencil" class="w-3 h-3" />
+                      </button>
+                    </template>
+                  </div>
                 </div>
 
                 <!-- Content date -->
