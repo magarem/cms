@@ -120,6 +120,8 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
       if (b.activeEditionVersion !== undefined) updates.activeEditionVersion = b.activeEditionVersion
       if (b.defaultSiteVersion !== undefined) updates.defaultSiteVersion = b.defaultSiteVersion
+      if (b.breadcrumbMode !== undefined) updates.breadcrumbMode = b.breadcrumbMode
+      if (b.blocksGap      !== undefined) updates.blocksGap      = b.blocksGap
 
       if (Object.keys(updates).length) {
         await saveSiteSettings(params.site, {
@@ -136,7 +138,15 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
       return { success: true }
     },
-    { body: t.Any() }
+    {
+      body: t.Object({
+        activeEditionVersion: t.Optional(t.String()),
+        defaultSiteVersion:   t.Optional(t.String()),
+        breadcrumbMode:       t.Optional(t.String()),
+        blocksGap:            t.Optional(t.String()),
+        cmsConfig:            t.Optional(t.Any()),
+      })
+    }
   )
 
   // ── Page read ──────────────────────────────────────────────
@@ -764,6 +774,95 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     { body: t.Object({ path: t.String() }) }
   )
 
+  // ── Component registry ───────────────────────────────────────
+  .get("/:site/components", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const registryPath = join(import.meta.dir, "..", "ui", "app", "data", "components.json")
+    if (!existsSync(registryPath)) { set.status = 404; return { error: "Registo de componentes não encontrado." } }
+
+    const raw = JSON.parse(await readFile(registryPath, "utf-8"))
+    const includeHidden = (query as any).includeHidden === "true"
+    const components = (raw.components || []).filter((c: any) => includeHidden || !c.cms_hidden)
+
+    return {
+      success: true,
+      components,
+      page_types: raw.page_types || [],
+      fieldTypes: raw._meta?.fieldTypes || {},
+    }
+  })
+
+  // ── AI: apply spec (batch page create/update) ─────────────────
+  .post(
+    "/:site/apply-spec",
+    async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
+      if (!user) { set.status = 401; return { error: "Não autenticado." } }
+      if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
+
+      const { pages } = body as any
+      if (!Array.isArray(pages) || pages.length === 0) {
+        set.status = 400; return { error: "Campo 'pages' é obrigatório e deve ser um array." }
+      }
+
+      const settings = await getSiteSettings(params.site)
+      const version = getActiveVersion(settings)
+      const results: { path: string; status: "created" | "updated" | "skipped" | "error"; error?: string }[] = []
+
+      for (const page of pages) {
+        const pagePath = String(page.path || "").replace(/^\/+|\/+$/g, "")
+        if (!pagePath) {
+          results.push({ path: "", status: "error", error: "path obrigatório" })
+          continue
+        }
+
+        try {
+          const existing = await resolvePageFile(params.site, version, pagePath)
+          if (existing && !page.overwrite) {
+            results.push({ path: pagePath, status: "skipped" })
+            continue
+          }
+
+          const pageTitle = page.title || pagePath.split("/").pop() || pagePath
+
+          const blocks = Array.isArray(page.blocks)
+            ? page.blocks.map((b: any, i: number) => ({
+                id: `${String(b.componentName).toLowerCase().replace(/[^a-z0-9]/g, "")}-${Date.now().toString(36)}-${i}`,
+                componentName: b.componentName,
+                isHero: b.isHero ?? false,
+                props: b.props ?? {},
+              }))
+            : []
+
+          const pageData: any = {
+            ...(page.data ?? {}),
+            title: pageTitle,
+            layout: page.data?.layout ?? "default",
+            blocks,
+          }
+
+          await writePage(params.site, version, pagePath, pageData)
+
+          if (page.markdown != null) {
+            const dirPath = join(SITES_ROOT, params.site, version, pagePath)
+            await mkdir(dirPath, { recursive: true })
+            await writeFile(join(dirPath, "content.md"), page.markdown, "utf-8")
+          }
+
+          results.push({ path: pagePath, status: existing ? "updated" : "created" })
+        } catch (err: any) {
+          results.push({ path: pagePath, status: "error", error: err.message })
+        }
+      }
+
+      const failed = results.filter(r => r.status === "error").length
+      return { success: failed === 0, results }
+    },
+    { body: t.Any() }
+  )
+
   // ── Analytics ─────────────────────────────────────────────────
   // ── Newsletter subscribers ─────────────────────────────────
   .get("/:site/newsletter", async ({ params, cookie: { cms_token }, jwt, set }) => {
@@ -798,6 +897,40 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
       set.status = 404; return { error: "Lista de subscribers não encontrada." }
     }
   })
+
+  .get("/:site/inscricoes", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const file = join(SITES_ROOT, params.site, "_inscricoes", "inscricoes.json")
+    try {
+      const raw = await readFile(file, "utf-8")
+      return { inscricoes: JSON.parse(raw) }
+    } catch {
+      return { inscricoes: [] }
+    }
+  })
+
+  .delete("/:site/inscricoes", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+    if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
+
+    const id = ((query as any).id as string || "").trim()
+    if (!id) { set.status = 400; return { error: "ID obrigatório." } }
+
+    const file = join(SITES_ROOT, params.site, "_inscricoes", "inscricoes.json")
+    try {
+      const raw = await readFile(file, "utf-8")
+      const inscricoes = JSON.parse(raw)
+      const filtered = inscricoes.filter((i: any) => i.id !== id)
+      if (filtered.length === inscricoes.length) { set.status = 404; return { error: "Inscrição não encontrada." } }
+      await writeFile(file, JSON.stringify(filtered, null, 2), "utf-8")
+      return { success: true }
+    } catch {
+      set.status = 404; return { error: "Ficheiro de inscrições não encontrado." }
+    }
+  }, { query: t.Object({ id: t.String() }) })
 
   .get("/:site/analytics", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
     const user = await getUser(jwt, cms_token?.value, params.site)
@@ -865,3 +998,58 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
       totals: { views: totalViews, visitors: uniqueVh.size },
     }
   })
+
+  // ── Instagram import ───────────────────────────────────────────────────────
+  .get("/:site/instagram-import", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const payload = await jwt.verify(cms_token?.value)
+    if (!payload) { set.status = 401; return { error: "Não autenticado" } }
+
+    const username = (query.username as string || "").replace(/^@/, "").trim()
+    if (!username) { set.status = 400; return { error: "Username obrigatório" } }
+
+    try {
+      // Try Instagram's unofficial profile JSON endpoint
+      const res = await fetch(
+        `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`,
+        {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "X-IG-App-ID": "936619743392459",
+            "Referer": `https://www.instagram.com/${username}/`,
+          },
+        }
+      )
+
+      if (!res.ok) {
+        set.status = 502
+        return { error: `Instagram respondeu com ${res.status}. O perfil pode ser privado ou o username incorreto.` }
+      }
+
+      const data = await res.json() as any
+      const edges = data?.data?.user?.edge_owner_to_timeline_media?.edges ?? []
+
+      if (!edges.length) {
+        return { items: [], warning: "Nenhuma publicação encontrada. O perfil pode ser privado." }
+      }
+
+      const items = edges.slice(0, 9).map((edge: any) => {
+        const node = edge.node
+        const caption = node.edge_media_to_caption?.edges?.[0]?.node?.text ?? ""
+        const isVideo = node.is_video
+        return {
+          src: isVideo ? (node.video_url ?? node.display_url) : node.display_url,
+          type: isVideo ? "video" : "image",
+          title: caption.split("\n")[0].slice(0, 80) || "",
+          description: "",
+          category: "",
+          alt: `${username} — Instagram`,
+        }
+      })
+
+      return { items }
+    } catch (e: any) {
+      set.status = 502
+      return { error: `Erro ao importar do Instagram: ${e?.message ?? e}` }
+    }
+  }, { query: t.Object({ username: t.String() }) })

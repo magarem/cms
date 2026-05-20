@@ -270,6 +270,23 @@ const targetOptions = [
   { value: "page", label: "Página" },
   { value: "collection-item", label: "Item de coleção" },
 ]
+
+const previewUrl = computed(() =>
+  `/${site}/preview?path=${encodeURIComponent(contentPath === 'home' ? '/' : '/' + contentPath)}`
+)
+
+const previewMenuItems = computed(() => [[
+  {
+    label: 'Mesma aba',
+    icon: 'i-heroicons-eye',
+    onSelect: () => navigateTo(previewUrl.value),
+  },
+  {
+    label: 'Nova aba',
+    icon: 'i-heroicons-arrow-top-right-on-square',
+    onSelect: () => window.open(previewUrl.value, '_blank'),
+  },
+]])
 </script>
 
 <template>
@@ -296,12 +313,17 @@ const targetOptions = [
       <UButton icon="i-heroicons-code-bracket" size="sm" variant="outline" color="neutral" :disabled="!form" @click="openRaw">
         Raw
       </UButton>
-      <UButton icon="i-heroicons-rectangle-group" size="sm" variant="outline" color="neutral" :disabled="!form" @click="openSaveAsModel">
+      <!-- <UButton icon="i-heroicons-rectangle-group" size="sm" variant="outline" color="neutral" :disabled="!form" @click="openSaveAsModel">
         Guardar como modelo
-      </UButton>
-      <NuxtLink :to="`/${site}/preview?path=${encodeURIComponent(contentPath === 'home' ? '/' : '/' + contentPath)}`">
-        <UButton icon="i-heroicons-eye" size="sm" variant="outline" color="neutral">Preview</UButton>
-      </NuxtLink>
+      </UButton> -->
+      <UButtonGroup>
+        <UButton icon="i-heroicons-eye" size="sm" variant="outline" color="neutral" @click="navigateTo(previewUrl)">
+          Preview
+        </UButton>
+        <UDropdownMenu :items="previewMenuItems">
+          <UButton icon="i-heroicons-chevron-down" size="sm" variant="outline" color="neutral" />
+        </UDropdownMenu>
+      </UButtonGroup>
     </template>
   </CmsTopbar>
 

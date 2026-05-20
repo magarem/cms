@@ -4,76 +4,205 @@
     "generatedAt": "2026-04-29",
     "description": "Source of truth for the CMS block builder. Each component lists its props with field types so the CMS can render the correct input widget.",
     "fieldTypes": {
-      "text":      "Single-line string input",
-      "textarea":  "Multi-line string input",
-      "markdown":  "Full markdown editor",
-      "number":    "Numeric input — only accepts numbers",
-      "boolean":   "Toggle switch (true/false)",
-      "select":    "Dropdown with fixed options list",
-      "url":       "URL string input with link validation",
-      "email":     "Email string input with format validation",
-      "image":     "Media picker — opens gallery, returns image path",
-      "video":     "Media picker — opens gallery, returns video path",
-      "media":     "Media picker — image OR video OR audio",
-      "icon":      "Icon picker — returns a PrimeIcons class string (e.g. pi-bolt)",
-      "date":      "Date picker — returns ISO date string",
-      "color":     "Color picker — returns hex string",
-      "path":      "CMS tree path picker — points to a page/folder inside data/",
-      "array":     "Repeatable list — each item uses itemSchema",
-      "object":    "Nested group of sub-fields"
+      "text": "Single-line string input",
+      "textarea": "Multi-line string input",
+      "markdown": "Full markdown editor",
+      "number": "Numeric input — only accepts numbers",
+      "boolean": "Toggle switch (true/false)",
+      "select": "Dropdown with fixed options list",
+      "url": "URL string input with link validation",
+      "email": "Email string input with format validation",
+      "image": "Media picker — opens gallery, returns image path",
+      "video": "Media picker — opens gallery, returns video path",
+      "media": "Media picker — image OR video OR audio",
+      "icon": "Icon picker — returns a PrimeIcons class string (e.g. pi-bolt)",
+      "date": "Date picker — returns ISO date string",
+      "color": "Color picker — returns hex string",
+      "path": "CMS tree path picker — points to a page/folder inside data/",
+      "array": "Repeatable list — each item uses itemSchema",
+      "object": "Nested group of sub-fields"
     }
   },
-
   "page_types": [
     {
       "name": "default",
       "label": "Default Page",
       "fields": [
-        { "name": "title",       "label": "Title",        "type": "text",     "required": true, "default": "" },
-        { "name": "layout",      "label": "Layout",       "type": "select",   "default": "default",
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "default",
           "options": [
-            { "value": "default",      "label": "Default" },
-            { "value": "post",         "label": "Post / Article" },
-            { "value": "topbar-glass", "label": "Glass Topbar" },
-            { "value": "landing",      "label": "Landing Page" }
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "post",
+              "label": "Post / Article"
+            },
+            {
+              "value": "topbar-glass",
+              "label": "Glass Topbar"
+            },
+            {
+              "value": "landing",
+              "label": "Landing Page"
+            }
           ]
         },
-        { "name": "description", "label": "Description",  "type": "textarea", "default": "" },
-        { "name": "image",       "label": "Cover Image",   "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Cover Image",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages",
+          "label": "Side Images",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages_position",
+          "label": "Side Images Position",
+          "type": "select",
+          "default": "right",
           "options": [
-            { "value": "right", "label": "Right" },
-            { "value": "left",  "label": "Left" }
+            {
+              "value": "right",
+              "label": "Right"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            }
           ]
         },
-        { "name": "date",        "label": "Date",         "type": "date",     "default": "" },
-        { "name": "seo",         "label": "SEO",          "type": "object",   "default": {},
+        {
+          "name": "date",
+          "label": "Date",
+          "type": "date",
+          "default": ""
+        },
+        {
+          "name": "seo",
+          "label": "SEO",
+          "type": "object",
+          "default": {},
           "fields": [
-            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
-            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
-            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
-            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
-            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
-            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+            {
+              "name": "meta_title",
+              "label": "Meta Title (override)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "meta_description",
+              "label": "Meta Description (160 chars)",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "keywords",
+              "label": "Keywords",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "og_image",
+              "label": "Social Image (OG)",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "canonical",
+              "label": "Canonical URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "robots",
+              "label": "Robots",
+              "type": "select",
+              "default": "index, follow",
               "options": [
-                { "value": "index, follow",     "label": "Index + Follow (default)" },
-                { "value": "noindex, follow",   "label": "No Index" },
-                { "value": "index, nofollow",   "label": "No Follow" },
-                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+                {
+                  "value": "index, follow",
+                  "label": "Index + Follow (default)"
+                },
+                {
+                  "value": "noindex, follow",
+                  "label": "No Index"
+                },
+                {
+                  "value": "index, nofollow",
+                  "label": "No Follow"
+                },
+                {
+                  "value": "noindex, nofollow",
+                  "label": "No Index + No Follow"
+                }
               ]
             },
-            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+            {
+              "name": "schema_type",
+              "label": "Schema.org Type",
+              "type": "select",
+              "default": "WebPage",
               "options": [
-                { "value": "WebPage",       "label": "WebPage" },
-                { "value": "Article",       "label": "Article" },
-                { "value": "BlogPosting",   "label": "Blog Post" },
-                { "value": "AboutPage",     "label": "About Page" },
-                { "value": "ContactPage",   "label": "Contact Page" },
-                { "value": "FAQPage",       "label": "FAQ Page" },
-                { "value": "ProductPage",   "label": "Product Page" },
-                { "value": "ServicePage",   "label": "Service Page" },
-                { "value": "CollectionPage","label": "Collection Page" }
+                {
+                  "value": "WebPage",
+                  "label": "WebPage"
+                },
+                {
+                  "value": "Article",
+                  "label": "Article"
+                },
+                {
+                  "value": "BlogPosting",
+                  "label": "Blog Post"
+                },
+                {
+                  "value": "AboutPage",
+                  "label": "About Page"
+                },
+                {
+                  "value": "ContactPage",
+                  "label": "Contact Page"
+                },
+                {
+                  "value": "FAQPage",
+                  "label": "FAQ Page"
+                },
+                {
+                  "value": "ProductPage",
+                  "label": "Product Page"
+                },
+                {
+                  "value": "ServicePage",
+                  "label": "Service Page"
+                },
+                {
+                  "value": "CollectionPage",
+                  "label": "Collection Page"
+                }
               ]
             }
           ]
@@ -84,47 +213,167 @@
       "name": "post",
       "label": "Post / Article",
       "fields": [
-        { "name": "title",       "label": "Title",            "type": "text",     "required": true, "default": "" },
-        { "name": "layout",      "label": "Layout",           "type": "select",   "default": "post",
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "post",
           "options": [
-            { "value": "default",      "label": "Default" },
-            { "value": "post",         "label": "Post / Article" },
-            { "value": "topbar-glass", "label": "Glass Topbar" },
-            { "value": "landing",      "label": "Landing Page" }
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "post",
+              "label": "Post / Article"
+            },
+            {
+              "value": "topbar-glass",
+              "label": "Glass Topbar"
+            },
+            {
+              "value": "landing",
+              "label": "Landing Page"
+            }
           ]
         },
-        { "name": "author",      "label": "Author",           "type": "text",     "default": "" },
-        { "name": "date",        "label": "Publication Date", "type": "date",     "default": "" },
-        { "name": "image",       "label": "Cover Image",      "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+        {
+          "name": "author",
+          "label": "Author",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "date",
+          "label": "Publication Date",
+          "type": "date",
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Cover Image",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages",
+          "label": "Side Images",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages_position",
+          "label": "Side Images Position",
+          "type": "select",
+          "default": "right",
           "options": [
-            { "value": "right", "label": "Right" },
-            { "value": "left",  "label": "Left" }
+            {
+              "value": "right",
+              "label": "Right"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            }
           ]
         },
-        { "name": "description", "label": "Description",      "type": "textarea", "default": "" },
-        { "name": "seo",         "label": "SEO",              "type": "object",   "default": {},
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "seo",
+          "label": "SEO",
+          "type": "object",
+          "default": {},
           "fields": [
-            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
-            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
-            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
-            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
-            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
-            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+            {
+              "name": "meta_title",
+              "label": "Meta Title (override)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "meta_description",
+              "label": "Meta Description (160 chars)",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "keywords",
+              "label": "Keywords",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "og_image",
+              "label": "Social Image (OG)",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "canonical",
+              "label": "Canonical URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "robots",
+              "label": "Robots",
+              "type": "select",
+              "default": "index, follow",
               "options": [
-                { "value": "index, follow",     "label": "Index + Follow (default)" },
-                { "value": "noindex, follow",   "label": "No Index" },
-                { "value": "index, nofollow",   "label": "No Follow" },
-                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+                {
+                  "value": "index, follow",
+                  "label": "Index + Follow (default)"
+                },
+                {
+                  "value": "noindex, follow",
+                  "label": "No Index"
+                },
+                {
+                  "value": "index, nofollow",
+                  "label": "No Follow"
+                },
+                {
+                  "value": "noindex, nofollow",
+                  "label": "No Index + No Follow"
+                }
               ]
             },
-            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "Article",
+            {
+              "name": "schema_type",
+              "label": "Schema.org Type",
+              "type": "select",
+              "default": "Article",
               "options": [
-                { "value": "Article",     "label": "Article" },
-                { "value": "BlogPosting", "label": "Blog Post" },
-                { "value": "NewsArticle", "label": "News Article" },
-                { "value": "WebPage",     "label": "WebPage" }
+                {
+                  "value": "Article",
+                  "label": "Article"
+                },
+                {
+                  "value": "BlogPosting",
+                  "label": "Blog Post"
+                },
+                {
+                  "value": "NewsArticle",
+                  "label": "News Article"
+                },
+                {
+                  "value": "WebPage",
+                  "label": "WebPage"
+                }
               ]
             }
           ]
@@ -135,35 +384,115 @@
       "name": "topbar-glass",
       "label": "Glass Topbar (Hero)",
       "fields": [
-        { "name": "title",  "label": "Title",  "type": "text", "required": true, "default": "" },
-        { "name": "layout", "label": "Layout", "type": "select", "default": "topbar-glass",
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "topbar-glass",
           "options": [
-            { "value": "default",      "label": "Default" },
-            { "value": "post",         "label": "Post / Article" },
-            { "value": "topbar-glass", "label": "Glass Topbar" },
-            { "value": "landing",      "label": "Landing Page" }
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "post",
+              "label": "Post / Article"
+            },
+            {
+              "value": "topbar-glass",
+              "label": "Glass Topbar"
+            },
+            {
+              "value": "landing",
+              "label": "Landing Page"
+            }
           ]
         },
-        { "name": "seo", "label": "SEO", "type": "object", "default": {},
+        {
+          "name": "seo",
+          "label": "SEO",
+          "type": "object",
+          "default": {},
           "fields": [
-            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
-            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
-            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
-            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
-            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
-            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+            {
+              "name": "meta_title",
+              "label": "Meta Title (override)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "meta_description",
+              "label": "Meta Description (160 chars)",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "keywords",
+              "label": "Keywords",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "og_image",
+              "label": "Social Image (OG)",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "canonical",
+              "label": "Canonical URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "robots",
+              "label": "Robots",
+              "type": "select",
+              "default": "index, follow",
               "options": [
-                { "value": "index, follow",     "label": "Index + Follow (default)" },
-                { "value": "noindex, follow",   "label": "No Index" },
-                { "value": "index, nofollow",   "label": "No Follow" },
-                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+                {
+                  "value": "index, follow",
+                  "label": "Index + Follow (default)"
+                },
+                {
+                  "value": "noindex, follow",
+                  "label": "No Index"
+                },
+                {
+                  "value": "index, nofollow",
+                  "label": "No Follow"
+                },
+                {
+                  "value": "noindex, nofollow",
+                  "label": "No Index + No Follow"
+                }
               ]
             },
-            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+            {
+              "name": "schema_type",
+              "label": "Schema.org Type",
+              "type": "select",
+              "default": "WebPage",
               "options": [
-                { "value": "WebPage",   "label": "WebPage" },
-                { "value": "WebSite",   "label": "WebSite" },
-                { "value": "AboutPage", "label": "About Page" }
+                {
+                  "value": "WebPage",
+                  "label": "WebPage"
+                },
+                {
+                  "value": "WebSite",
+                  "label": "WebSite"
+                },
+                {
+                  "value": "AboutPage",
+                  "label": "About Page"
+                }
               ]
             }
           ]
@@ -174,45 +503,155 @@
       "name": "landing",
       "label": "Landing Page",
       "fields": [
-        { "name": "title",       "label": "Title",       "type": "text",     "required": true, "default": "" },
-        { "name": "layout",      "label": "Layout",      "type": "select",   "default": "landing",
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Layout",
+          "type": "select",
+          "default": "landing",
           "options": [
-            { "value": "default",      "label": "Default" },
-            { "value": "post",         "label": "Post / Article" },
-            { "value": "topbar-glass", "label": "Glass Topbar" },
-            { "value": "landing",      "label": "Landing Page" }
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "post",
+              "label": "Post / Article"
+            },
+            {
+              "value": "topbar-glass",
+              "label": "Glass Topbar"
+            },
+            {
+              "value": "landing",
+              "label": "Landing Page"
+            }
           ]
         },
-        { "name": "description", "label": "Description", "type": "textarea", "default": "" },
-        { "name": "image",       "label": "Cover Image",  "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages",          "label": "Side Images",          "type": "image-array", "default": [], "group": "page-images" },
-        { "name": "sideimages_position", "label": "Side Images Position", "type": "select",     "default": "right",
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Cover Image",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages",
+          "label": "Side Images",
+          "type": "image-array",
+          "default": [],
+          "group": "page-images"
+        },
+        {
+          "name": "sideimages_position",
+          "label": "Side Images Position",
+          "type": "select",
+          "default": "right",
           "options": [
-            { "value": "right", "label": "Right" },
-            { "value": "left",  "label": "Left" }
+            {
+              "value": "right",
+              "label": "Right"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            }
           ]
         },
-        { "name": "seo", "label": "SEO", "type": "object", "default": {},
+        {
+          "name": "seo",
+          "label": "SEO",
+          "type": "object",
+          "default": {},
           "fields": [
-            { "name": "meta_title",       "label": "Meta Title (override)",       "type": "text",     "default": "" },
-            { "name": "meta_description", "label": "Meta Description (160 chars)","type": "textarea", "default": "" },
-            { "name": "keywords",         "label": "Keywords",                    "type": "text",     "default": "" },
-            { "name": "og_image",         "label": "Social Image (OG)",           "type": "image",    "default": "" },
-            { "name": "canonical",        "label": "Canonical URL",               "type": "url",      "default": "" },
-            { "name": "robots",           "label": "Robots",                      "type": "select",   "default": "index, follow",
+            {
+              "name": "meta_title",
+              "label": "Meta Title (override)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "meta_description",
+              "label": "Meta Description (160 chars)",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "keywords",
+              "label": "Keywords",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "og_image",
+              "label": "Social Image (OG)",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "canonical",
+              "label": "Canonical URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "robots",
+              "label": "Robots",
+              "type": "select",
+              "default": "index, follow",
               "options": [
-                { "value": "index, follow",     "label": "Index + Follow (default)" },
-                { "value": "noindex, follow",   "label": "No Index" },
-                { "value": "index, nofollow",   "label": "No Follow" },
-                { "value": "noindex, nofollow", "label": "No Index + No Follow" }
+                {
+                  "value": "index, follow",
+                  "label": "Index + Follow (default)"
+                },
+                {
+                  "value": "noindex, follow",
+                  "label": "No Index"
+                },
+                {
+                  "value": "index, nofollow",
+                  "label": "No Follow"
+                },
+                {
+                  "value": "noindex, nofollow",
+                  "label": "No Index + No Follow"
+                }
               ]
             },
-            { "name": "schema_type", "label": "Schema.org Type", "type": "select", "default": "WebPage",
+            {
+              "name": "schema_type",
+              "label": "Schema.org Type",
+              "type": "select",
+              "default": "WebPage",
               "options": [
-                { "value": "WebPage",     "label": "WebPage" },
-                { "value": "WebSite",     "label": "WebSite" },
-                { "value": "ServicePage", "label": "Service Page" },
-                { "value": "AboutPage",   "label": "About Page" }
+                {
+                  "value": "WebPage",
+                  "label": "WebPage"
+                },
+                {
+                  "value": "WebSite",
+                  "label": "WebSite"
+                },
+                {
+                  "value": "ServicePage",
+                  "label": "Service Page"
+                },
+                {
+                  "value": "AboutPage",
+                  "label": "About Page"
+                }
               ]
             }
           ]
@@ -220,9 +659,7 @@
       ]
     }
   ],
-
   "components": [
-
     {
       "name": "AppContainer",
       "file": "components/AppContainer.vue",
@@ -235,14 +672,22 @@
           "type": "select",
           "default": "content",
           "options": [
-            { "value": "site",    "label": "Site — 1440px" },
-            { "value": "content", "label": "Content — 1200px" },
-            { "value": "copy",    "label": "Copy — 800px" }
+            {
+              "value": "site",
+              "label": "Site — 1440px"
+            },
+            {
+              "value": "content",
+              "label": "Content — 1200px"
+            },
+            {
+              "value": "copy",
+              "label": "Copy — 800px"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "PageHeader",
       "file": "components/PageHeader.vue",
@@ -286,9 +731,18 @@
           "type": "select",
           "default": "content",
           "options": [
-            { "value": "site",    "label": "Site — 1440px" },
-            { "value": "content", "label": "Content — 1200px" },
-            { "value": "copy",    "label": "Copy — 800px" }
+            {
+              "value": "site",
+              "label": "Site — 1440px"
+            },
+            {
+              "value": "content",
+              "label": "Content — 1200px"
+            },
+            {
+              "value": "copy",
+              "label": "Copy — 800px"
+            }
           ]
         },
         {
@@ -297,49 +751,116 @@
           "type": "select",
           "default": "center",
           "options": [
-            { "value": "left",   "label": "Left" },
-            { "value": "center", "label": "Center" },
-            { "value": "right",  "label": "Right" }
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "HeroSlideShow",
       "file": "components/HeroSlideShow.vue",
       "category": "block",
       "description": "Full-screen hero with auto-playing image/video slideshow, gradient overlay, badge, split title, description, and dual CTA buttons.",
       "props": [
-        { "name": "badge",          "label": "Badge Label",              "type": "text",     "description": "Small badge above the title", "default": "" },
-        { "name": "badgeIcon",      "label": "Badge Icon",               "type": "icon",     "default": "" },
-        { "name": "titlePrefix",    "label": "Title — Normal Part",      "type": "text",     "default": "" },
-        { "name": "titleHighlight", "label": "Title — Highlighted Part", "type": "text",     "description": "Rendered in the primary brand color", "default": "" },
-        { "name": "description",    "label": "Description",              "type": "textarea", "default": "" },
+        {
+          "name": "badge",
+          "label": "Badge Label",
+          "type": "text",
+          "description": "Small badge above the title",
+          "default": ""
+        },
+        {
+          "name": "badgeIcon",
+          "label": "Badge Icon",
+          "type": "icon",
+          "default": ""
+        },
+        {
+          "name": "titlePrefix",
+          "label": "Title — Normal Part",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "titleHighlight",
+          "label": "Title — Highlighted Part",
+          "type": "text",
+          "description": "Rendered in the primary brand color",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "default": ""
+        },
         {
           "name": "slides",
           "label": "Slides (imagens ou vídeos)",
           "type": "image-array",
           "default": []
         },
-        { "name": "slideDuration", "label": "Slide Duration (ms)", "type": "number", "default": 5000 },
+        {
+          "name": "slideDuration",
+          "label": "Slide Duration (seconds)",
+          "type": "number",
+          "default": 5
+        },
         {
           "name": "cWidth",
           "label": "Content Width",
           "type": "select",
           "default": "content",
           "options": [
-            { "value": "site",    "label": "Site — 1440px" },
-            { "value": "content", "label": "Content — 1200px" }
+            {
+              "value": "site",
+              "label": "Site — 1440px"
+            },
+            {
+              "value": "content",
+              "label": "Content — 1200px"
+            }
           ]
         },
-        { "name": "btnLabel", "label": "Primary Button Label",          "type": "text", "default": "Saber Mais" },
-        { "name": "btnLink",  "label": "Primary Button Link",           "type": "url",  "default": "" },
-        { "name": "ctaLabel", "label": "CTA Button Label (Buy/Purchase)","type": "text", "description": "Leave empty to hide the button", "default": "Comprar Agora" },
-        { "name": "ctaLink",  "label": "CTA Button Link",               "type": "url",  "description": "Purchase/checkout URL — leave empty to hide", "default": "" }
+        {
+          "name": "btnLabel",
+          "label": "Primary Button Label",
+          "type": "text",
+          "default": "Saber Mais"
+        },
+        {
+          "name": "btnLink",
+          "label": "Primary Button Link",
+          "type": "url",
+          "default": ""
+        },
+        {
+          "name": "ctaLabel",
+          "label": "CTA Button Label (Buy/Purchase)",
+          "type": "text",
+          "description": "Leave empty to hide the button",
+          "default": "Comprar Agora"
+        },
+        {
+          "name": "ctaLink",
+          "label": "CTA Button Link",
+          "type": "url",
+          "description": "Purchase/checkout URL — leave empty to hide",
+          "default": ""
+        }
       ]
     },
-
     {
       "name": "CallToAction",
       "file": "components/CallToAction.vue",
@@ -351,10 +872,30 @@
           "label": "CTA Configuration",
           "type": "object",
           "fields": [
-            { "name": "title",      "label": "Title",       "type": "text",     "default": "Pronto para dar vida à tua ideia?" },
-            { "name": "subtitle",   "label": "Subtitle",    "type": "textarea", "default": "" },
-            { "name": "buttonText", "label": "Button Text", "type": "text",     "default": "Iniciar Projeto" },
-            { "name": "buttonLink", "label": "Button URL",  "type": "url",      "default": "/contact" }
+            {
+              "name": "title",
+              "label": "Title",
+              "type": "text",
+              "default": "Pronto para dar vida à tua ideia?"
+            },
+            {
+              "name": "subtitle",
+              "label": "Subtitle",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "buttonText",
+              "label": "Button Text",
+              "type": "text",
+              "default": "Iniciar Projeto"
+            },
+            {
+              "name": "buttonLink",
+              "label": "Button URL",
+              "type": "url",
+              "default": "/contact"
+            }
           ]
         }
       ]
@@ -377,9 +918,18 @@
           "type": "select",
           "default": "content",
           "options": [
-            { "value": "full",    "label": "Full bleed" },
-            { "value": "site",    "label": "Site — 1440px" },
-            { "value": "content", "label": "Content — 1200px" }
+            {
+              "value": "full",
+              "label": "Full bleed"
+            },
+            {
+              "value": "site",
+              "label": "Site — 1440px"
+            },
+            {
+              "value": "content",
+              "label": "Content — 1200px"
+            }
           ]
         },
         {
@@ -388,8 +938,14 @@
           "type": "select",
           "default": "horizontal",
           "options": [
-            { "value": "horizontal", "label": "Horizontal (55vh)" },
-            { "value": "full",       "label": "Full screen (100vh)" }
+            {
+              "value": "horizontal",
+              "label": "Horizontal (55vh)"
+            },
+            {
+              "value": "full",
+              "label": "Full screen (100vh)"
+            }
           ]
         },
         {
@@ -412,7 +968,7 @@
           "required": true,
           "description": "Points to a folder inside data/. All sub-folders become cards automatically."
         },
-         {
+        {
           "name": "title",
           "label": "Título da secção",
           "type": "text",
@@ -423,14 +979,21 @@
           "label": "Subtítulo da secção",
           "type": "text",
           "default": ""
-        }, {
+        },
+        {
           "name": "titlePosition",
           "label": "Posição do título",
           "type": "select",
           "default": "outside",
           "options": [
-            { "value": "outside", "label": "Fora da imagem" },
-            { "value": "inside",  "label": "Dentro da imagem" }
+            {
+              "value": "outside",
+              "label": "Fora da imagem"
+            },
+            {
+              "value": "inside",
+              "label": "Dentro da imagem"
+            }
           ]
         },
         {
@@ -439,8 +1002,14 @@
           "type": "select",
           "default": "vertical",
           "options": [
-            { "value": "vertical",   "label": "Vertical (imagem em cima)" },
-            { "value": "horizontal", "label": "Horizontal (imagem à esquerda)" }
+            {
+              "value": "vertical",
+              "label": "Vertical (imagem em cima)"
+            },
+            {
+              "value": "horizontal",
+              "label": "Horizontal (imagem à esquerda)"
+            }
           ]
         },
         {
@@ -449,12 +1018,30 @@
           "type": "select",
           "default": "auto",
           "options": [
-            { "value": "auto", "label": "Auto (proporção natural)" },
-            { "value": "xs",   "label": "XS — 128px / 112px" },
-            { "value": "sm",   "label": "SM — 192px / 144px" },
-            { "value": "md",   "label": "MD — 256px / 192px" },
-            { "value": "lg",   "label": "LG — 320px / 256px" },
-            { "value": "xl",   "label": "XL — 384px / 320px" }
+            {
+              "value": "auto",
+              "label": "Auto (proporção natural)"
+            },
+            {
+              "value": "xs",
+              "label": "XS — 128px / 112px"
+            },
+            {
+              "value": "sm",
+              "label": "SM — 192px / 144px"
+            },
+            {
+              "value": "md",
+              "label": "MD — 256px / 192px"
+            },
+            {
+              "value": "lg",
+              "label": "LG — 320px / 256px"
+            },
+            {
+              "value": "xl",
+              "label": "XL — 384px / 320px"
+            }
           ]
         },
         {
@@ -463,9 +1050,18 @@
           "type": "select",
           "default": "left",
           "options": [
-            { "value": "left",   "label": "Esquerda" },
-            { "value": "center", "label": "Centro" },
-            { "value": "right",  "label": "Direita" }
+            {
+              "value": "left",
+              "label": "Esquerda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Direita"
+            }
           ]
         },
         {
@@ -480,12 +1076,30 @@
           "type": "select",
           "default": 3,
           "options": [
-            { "value": 1, "label": "1 por linha" },
-            { "value": 2, "label": "2 por linha" },
-            { "value": 3, "label": "3 por linha" },
-            { "value": 4, "label": "4 por linha" },
-            { "value": 5, "label": "5 por linha" },
-            { "value": 6, "label": "6 por linha" }
+            {
+              "value": 1,
+              "label": "1 por linha"
+            },
+            {
+              "value": 2,
+              "label": "2 por linha"
+            },
+            {
+              "value": 3,
+              "label": "3 por linha"
+            },
+            {
+              "value": 4,
+              "label": "4 por linha"
+            },
+            {
+              "value": 5,
+              "label": "5 por linha"
+            },
+            {
+              "value": 6,
+              "label": "6 por linha"
+            }
           ]
         },
         {
@@ -493,7 +1107,8 @@
           "label": "Limite de cards (0 = sem limite)",
           "type": "number",
           "default": 0
-        }, {
+        },
+        {
           "name": "showTitle",
           "label": "Mostrar título",
           "type": "boolean",
@@ -546,11 +1161,36 @@
           "type": "array",
           "default": [],
           "itemSchema": [
-            { "name": "icon",        "label": "Icon",        "type": "icon",     "default": "pi-bolt" },
-            { "name": "title",       "label": "Title",       "type": "text",     "required": true },
-            { "name": "description", "label": "Description", "type": "textarea", "default": "" },
-            { "name": "ctaText",     "label": "Link Text",   "type": "text",     "default": "Saber Mais" },
-            { "name": "to",          "label": "Link URL",    "type": "url",      "default": "/" }
+            {
+              "name": "icon",
+              "label": "Icon",
+              "type": "icon",
+              "default": "pi-bolt"
+            },
+            {
+              "name": "title",
+              "label": "Title",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "description",
+              "label": "Description",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "ctaText",
+              "label": "Link Text",
+              "type": "text",
+              "default": "Saber Mais"
+            },
+            {
+              "name": "to",
+              "label": "Link URL",
+              "type": "url",
+              "default": "/"
+            }
           ]
         },
         {
@@ -559,14 +1199,22 @@
           "type": "select",
           "default": "w-full",
           "options": [
-            { "value": "site", "label": "100%" },
-            { "value": "content",   "label": "content" },
-            { "value": "article",   "label": "article" }
+            {
+              "value": "site",
+              "label": "100%"
+            },
+            {
+              "value": "content",
+              "label": "content"
+            },
+            {
+              "value": "article",
+              "label": "article"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "SocialProof",
       "file": "components/SocialProof.vue",
@@ -591,12 +1239,28 @@
               "type": "select",
               "default": "text",
               "options": [
-                { "value": "text",  "label": "Text (brand name)" },
-                { "value": "image", "label": "Image (logo file)" }
+                {
+                  "value": "text",
+                  "label": "Text (brand name)"
+                },
+                {
+                  "value": "image",
+                  "label": "Image (logo file)"
+                }
               ]
             },
-            { "name": "name", "label": "Brand Name (for text logos)", "type": "text",  "default": "" },
-            { "name": "url",  "label": "Logo Image (for image logos)", "type": "image", "default": "" }
+            {
+              "name": "name",
+              "label": "Brand Name (for text logos)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "url",
+              "label": "Logo Image (for image logos)",
+              "type": "image",
+              "default": ""
+            }
           ]
         },
         {
@@ -605,29 +1269,50 @@
           "type": "select",
           "default": "w-full",
           "options": [
-            { "value": "w-full", "label": "Full width" },
-            { "value": "cw-1",   "label": "Wide — 900px" }
+            {
+              "value": "w-full",
+              "label": "Full width"
+            },
+            {
+              "value": "cw-1",
+              "label": "Wide — 900px"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "VideosShowcase",
       "file": "components/Depoimentos.vue",
       "category": "block",
       "description": "Vídeos de depoimentos em grelha (3 por linha) ou carrossel horizontal.",
       "props": [
-        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
-        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo",
+          "type": "textarea",
+          "default": ""
+        },
         {
           "name": "layout",
           "label": "Layout",
           "type": "select",
           "default": "grid",
           "options": [
-            { "value": "grid",   "label": "Grelha (3 por linha)" },
-            { "value": "scroll", "label": "Carrossel horizontal" }
+            {
+              "value": "grid",
+              "label": "Grelha (3 por linha)"
+            },
+            {
+              "value": "scroll",
+              "label": "Carrossel horizontal"
+            }
           ]
         },
         {
@@ -636,8 +1321,14 @@
           "type": "select",
           "default": "horizontal",
           "options": [
-            { "value": "horizontal", "label": "Horizontal (16:9)" },
-            { "value": "vertical",   "label": "Vertical (9:16 — Shorts)" }
+            {
+              "value": "horizontal",
+              "label": "Horizontal (16:9)"
+            },
+            {
+              "value": "vertical",
+              "label": "Vertical (9:16 — Shorts)"
+            }
           ]
         },
         {
@@ -646,51 +1337,24 @@
           "type": "array",
           "default": [],
           "itemSchema": [
-            { "name": "videoId", "label": "YouTube Video ID", "type": "text", "default": "" },
-            { "name": "name",    "label": "Nome",             "type": "text", "default": "" },
-            { "name": "label",   "label": "Etiqueta",         "type": "text", "default": "" }
-          ]
-        }
-      ]
-    },
-
-    {
-      "name": "Testimonials",
-      "file": "components/Testimonials.vue",
-      "category": "block",
-      "description": "YouTube video testimonials — grid or horizontal scroll with navigation buttons.",
-      "props": [
-        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
-        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
-        {
-          "name": "layout",
-          "label": "Layout",
-          "type": "select",
-          "default": "grid",
-          "options": [
-            { "value": "grid",   "label": "Grelha (3 por linha)" },
-            { "value": "scroll", "label": "Linha única com scroll" }
-          ]
-        },
-        {
-          "name": "theme",
-          "label": "Tema",
-          "type": "select",
-          "default": "dark",
-          "options": [
-            { "value": "dark",  "label": "Escuro" },
-            { "value": "light", "label": "Claro" }
-          ]
-        },
-        {
-          "name": "videos",
-          "label": "Vídeos",
-          "type": "array",
-          "default": [],
-          "itemSchema": [
-            { "name": "videoId", "label": "YouTube Video ID", "type": "text", "default": "" },
-            { "name": "name",    "label": "Nome",             "type": "text", "default": "" },
-            { "name": "label",   "label": "Etiqueta",         "type": "text", "default": "" }
+            {
+              "name": "videoId",
+              "label": "YouTube Video ID",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "name",
+              "label": "Nome",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Etiqueta",
+              "type": "text",
+              "default": ""
+            }
           ]
         }
       ]
@@ -713,10 +1377,30 @@
           "type": "array",
           "required": true,
           "itemSchema": [
-            { "name": "icon",  "label": "Icon",  "type": "icon",     "required": true },
-            { "name": "label", "label": "Label", "type": "text",     "required": true },
-            { "name": "value", "label": "Value", "type": "text",     "required": true },
-            { "name": "href",  "label": "Link",  "type": "url",      "default": "" }
+            {
+              "name": "icon",
+              "label": "Icon",
+              "type": "icon",
+              "required": true
+            },
+            {
+              "name": "label",
+              "label": "Label",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "value",
+              "label": "Value",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "href",
+              "label": "Link",
+              "type": "url",
+              "default": ""
+            }
           ]
         },
         {
@@ -725,23 +1409,58 @@
           "type": "array",
           "required": true,
           "itemSchema": [
-            { "name": "name",        "label": "Field Key (internal)",  "type": "text",     "required": true },
-            { "name": "label",       "label": "Field Label",           "type": "text",     "required": true },
+            {
+              "name": "name",
+              "label": "Field Key (internal)",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "label",
+              "label": "Field Label",
+              "type": "text",
+              "required": true
+            },
             {
               "name": "type",
               "label": "Field Type",
               "type": "select",
               "default": "text",
               "options": [
-                { "value": "text",     "label": "Text" },
-                { "value": "email",    "label": "Email" },
-                { "value": "textarea", "label": "Textarea" },
-                { "value": "number",   "label": "Number" },
-                { "value": "tel",      "label": "Phone" }
+                {
+                  "value": "text",
+                  "label": "Text"
+                },
+                {
+                  "value": "email",
+                  "label": "Email"
+                },
+                {
+                  "value": "textarea",
+                  "label": "Textarea"
+                },
+                {
+                  "value": "number",
+                  "label": "Number"
+                },
+                {
+                  "value": "tel",
+                  "label": "Phone"
+                }
               ]
             },
-            { "name": "placeholder", "label": "Placeholder",           "type": "text",    "default": "" },
-            { "name": "required",    "label": "Required",              "type": "boolean", "default": false }
+            {
+              "name": "placeholder",
+              "label": "Placeholder",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "required",
+              "label": "Required",
+              "type": "boolean",
+              "default": false
+            }
           ]
         },
         {
@@ -750,9 +1469,24 @@
           "type": "object",
           "required": true,
           "fields": [
-            { "name": "label", "label": "Button Label", "type": "text", "default": "Enviar" },
-            { "name": "icon",  "label": "Button Icon",  "type": "icon", "default": "" },
-            { "name": "terms", "label": "Terms Text",   "type": "text", "default": "" }
+            {
+              "name": "label",
+              "label": "Button Label",
+              "type": "text",
+              "default": "Enviar"
+            },
+            {
+              "name": "icon",
+              "label": "Button Icon",
+              "type": "icon",
+              "default": ""
+            },
+            {
+              "name": "terms",
+              "label": "Terms Text",
+              "type": "text",
+              "default": ""
+            }
           ]
         },
         {
@@ -761,10 +1495,30 @@
           "type": "object",
           "required": true,
           "fields": [
-            { "name": "title",       "label": "Title",          "type": "text", "default": "Mensagem enviada!" },
-            { "name": "message",     "label": "Message",        "type": "textarea", "default": "" },
-            { "name": "icon",        "label": "Icon",           "type": "icon", "default": "pi-check" },
-            { "name": "buttonLabel", "label": "Back Button Text","type": "text", "default": "Voltar" }
+            {
+              "name": "title",
+              "label": "Title",
+              "type": "text",
+              "default": "Mensagem enviada!"
+            },
+            {
+              "name": "message",
+              "label": "Message",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "icon",
+              "label": "Icon",
+              "type": "icon",
+              "default": "pi-check"
+            },
+            {
+              "name": "buttonLabel",
+              "label": "Back Button Text",
+              "type": "text",
+              "default": "Voltar"
+            }
           ]
         }
       ]
@@ -784,29 +1538,89 @@
         }
       ]
     },
-
     {
       "name": "SiteHeaderLogo",
       "file": "components/SiteHeaderLogo.vue",
       "category": "layout",
       "description": "Logo / brand mark — usable standalone in footer or any block area.",
       "props": [
-        { "name": "brandName",  "label": "Brand Name",  "type": "text",   "default": "SIRIUS" },
-        { "name": "signature",  "label": "Signature",   "type": "text",   "default": "STUDIO" },
+        {
+          "name": "brandName",
+          "label": "Nome da marca",
+          "type": "text",
+          "default": "SIRIUS"
+        },
+        {
+          "name": "signature",
+          "label": "Assinatura",
+          "type": "text",
+          "default": "STUDIO",
+          "description": "Tagline pequena abaixo do nome"
+        },
+        {
+          "name": "image",
+          "label": "Imagem do logo",
+          "type": "image",
+          "default": "",
+          "description": "Substitui o logo de texto quando definido"
+        },
+        {
+          "name": "logoPadding",
+          "label": "Espaço vertical (%)",
+          "type": "number",
+          "default": 20,
+          "description": "0 = logo ocupa toda a altura da topbar; 20 = 60% da altura; 40 = 20% da altura"
+        },
+        {
+          "name": "align",
+          "label": "Alinhamento horizontal",
+          "type": "select",
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": "Esquerda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Direita"
+            }
+          ]
+        },
         {
           "name": "variation",
-          "label": "Logo Variant",
+          "label": "Estilo do logo",
           "type": "select",
           "default": "signature",
           "options": [
-            { "value": "signature", "label": "Text only" },
-            { "value": "icon-text", "label": "Icon + Text" },
-            { "value": "minimal",   "label": "Icon only" }
+            {
+              "value": "signature",
+              "label": "Texto + linha (signature)"
+            },
+            {
+              "value": "icon-text",
+              "label": "Ícone + texto"
+            },
+            {
+              "value": "pill",
+              "label": "Pílula (ícone + nome em cápsula)"
+            },
+            {
+              "value": "stacked",
+              "label": "Empilhado (ícone em cima, texto em baixo)"
+            },
+            {
+              "value": "minimal",
+              "label": "Só ícone"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "SiteHeaderMenu",
       "file": "components/SiteHeaderMenu.vue",
@@ -815,36 +1629,93 @@
       "description": "Navigation menu inside SiteHeader. Menu items come from _topbar.json.",
       "props": [
         {
+          "name": "align",
+          "label": "Alinhamento horizontal",
+          "type": "select",
+          "default": "center",
+          "options": [
+            {
+              "value": "left",
+              "label": "Esquerda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Direita"
+            }
+          ]
+        },
+        {
           "name": "menuItems",
           "label": "Menu Items",
           "type": "array",
           "default": [],
           "itemSchema": [
-            { "name": "label", "label": "Label", "type": "text", "required": true },
-            { "name": "path",  "label": "URL",   "type": "url",  "required": true }
+            {
+              "name": "label",
+              "label": "Label",
+              "type": "text",
+              "required": true
+            },
+            {
+              "name": "path",
+              "label": "URL",
+              "type": "url",
+              "required": true
+            }
           ]
         }
       ]
     },
-
     {
       "name": "ContentBlock",
       "file": "components/ContentBlock.vue",
       "category": "block",
       "description": "Two-column section with text content on one side and an image on the other. Supports badge, title, body text, feature icons, and image side control.",
       "props": [
-        { "name": "badge",     "label": "Badge Label",  "type": "text",     "description": "Small tag above the title", "default": "" },
-        { "name": "title",     "label": "Title",        "type": "text",     "required": true, "default": "" },
-        { "name": "text",      "label": "Body Text",    "type": "textarea", "default": "" },
-        { "name": "image",     "label": "Image",        "type": "image",    "default": "" },
+        {
+          "name": "badge",
+          "label": "Badge Label",
+          "type": "text",
+          "description": "Small tag above the title",
+          "default": ""
+        },
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "text",
+          "label": "Body Text",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Image",
+          "type": "image",
+          "default": ""
+        },
         {
           "name": "imageSide",
           "label": "Image Side",
           "type": "select",
           "default": "right",
           "options": [
-            { "value": "right", "label": "Right" },
-            { "value": "left",  "label": "Left" }
+            {
+              "value": "right",
+              "label": "Right"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            }
           ]
         },
         {
@@ -853,68 +1724,171 @@
           "description": "Small icon + label pills shown below the text",
           "type": "array",
           "itemSchema": [
-            { "name": "icon",  "label": "Icon",  "type": "icon", "default": "" },
-            { "name": "label", "label": "Label", "type": "text", "default": "" }
+            {
+              "name": "icon",
+              "label": "Icon",
+              "type": "icon",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Label",
+              "type": "text",
+              "default": ""
+            }
           ],
           "default": []
         },
-        { "name": "pagePath", "label": "Page Path", "type": "path", "cms_hidden": true, "default": "" }
+        {
+          "name": "pagePath",
+          "label": "Page Path",
+          "type": "path",
+          "cms_hidden": true,
+          "default": ""
+        }
       ]
     },
-
     {
       "name": "Curriculum",
       "file": "components/Curriculum.vue",
       "category": "block",
       "description": "Numbered module/curriculum grid with an optional CTA banner at the bottom.",
       "props": [
-        { "name": "title",    "label": "Title",    "type": "text",     "required": true, "default": "" },
-        { "name": "subtitle", "label": "Subtitle", "type": "text",     "default": "" },
-        { "name": "modules",  "label": "Modules",  "description": "Plain list of module names — one per line", "default": [] },
-        { "name": "ctaTitle", "label": "CTA Title",        "type": "text",     "default": "" },
-        { "name": "ctaText",  "label": "CTA Description",  "type": "textarea", "default": "" },
-        { "name": "ctaLabel", "label": "CTA Button Label", "type": "text",     "description": "Leave empty to hide the CTA banner", "default": "" },
-        { "name": "ctaLink",  "label": "CTA Button Link",  "type": "url",      "default": "/inscricao" }
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtitle",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "modules",
+          "label": "Modules",
+          "description": "Plain list of module names — one per line",
+          "default": []
+        },
+        {
+          "name": "ctaTitle",
+          "label": "CTA Title",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "ctaText",
+          "label": "CTA Description",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "ctaLabel",
+          "label": "CTA Button Label",
+          "type": "text",
+          "description": "Leave empty to hide the CTA banner",
+          "default": ""
+        },
+        {
+          "name": "ctaLink",
+          "label": "CTA Button Link",
+          "type": "url",
+          "default": "/inscricao"
+        }
       ]
     },
-
     {
       "name": "Instructor",
       "file": "components/Instructor.vue",
       "category": "block",
       "description": "Instructor/author profile section with photo, bio, credentials list, and an optional footer badge.",
       "props": [
-        { "name": "label",          "label": "Section Label",      "type": "text",         "description": "Small label above the name (e.g. 'Your Instructor')", "default": "Seu Instrutor" },
-        { "name": "name",           "label": "Name",               "type": "text",         "required": true, "default": "" },
-        { "name": "image",          "label": "Photo",              "type": "image",        "default": "" },
-        { "name": "bio",            "label": "Bio / Quote",        "type": "textarea",     "description": "Displayed as a styled blockquote", "default": "" },
+        {
+          "name": "label",
+          "label": "Section Label",
+          "type": "text",
+          "description": "Small label above the name (e.g. 'Your Instructor')",
+          "default": "Seu Instrutor"
+        },
+        {
+          "name": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "image",
+          "label": "Photo",
+          "type": "image",
+          "default": ""
+        },
+        {
+          "name": "bio",
+          "label": "Bio / Quote",
+          "type": "textarea",
+          "description": "Displayed as a styled blockquote",
+          "default": ""
+        },
         {
           "name": "credentials",
           "label": "Credentials / Highlights",
           "description": "List of bullet points shown with a decorative icon",
           "default": []
         },
-        { "name": "footerBadge",    "label": "Footer Badge Text",    "type": "text", "description": "Small text below the credentials (e.g. lineage, certification)", "default": "" },
-        { "name": "footerSubtitle", "label": "Footer Subtitle",      "type": "text", "description": "Italic subtitle next to the badge (e.g. city, school)", "default": "" },
-        { "name": "pagePath",       "label": "Page Path",            "type": "path", "cms_hidden": true, "default": "" }
+        {
+          "name": "footerBadge",
+          "label": "Footer Badge Text",
+          "type": "text",
+          "description": "Small text below the credentials (e.g. lineage, certification)",
+          "default": ""
+        },
+        {
+          "name": "footerSubtitle",
+          "label": "Footer Subtitle",
+          "type": "text",
+          "description": "Italic subtitle next to the badge (e.g. city, school)",
+          "default": ""
+        },
+        {
+          "name": "pagePath",
+          "label": "Page Path",
+          "type": "path",
+          "cms_hidden": true,
+          "default": ""
+        }
       ]
     },
-
     {
       "name": "Menu",
       "file": "components/Menu.vue",
       "category": "layout",
+      "cms_hidden": true,
       "description": "Navigation menu — horizontal or vertical list of links.",
       "props": [
-        { "name": "title", "label": "Título", "type": "text", "default": "" },
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
         {
           "name": "type",
           "label": "Tipo",
           "type": "select",
           "default": "horizontal",
           "options": [
-            { "value": "horizontal", "label": "Horizontal" },
-            { "value": "vertical",   "label": "Vertical" }
+            {
+              "value": "horizontal",
+              "label": "Horizontal"
+            },
+            {
+              "value": "vertical",
+              "label": "Vertical"
+            }
           ]
         },
         {
@@ -923,67 +1897,233 @@
           "type": "array",
           "default": [],
           "itemSchema": [
-            { "name": "label",   "label": "Texto",             "type": "text",    "default": "" },
-            { "name": "link",    "label": "Link",              "type": "url",     "default": "" },
-            { "name": "newpage", "label": "Abrir em nova aba", "type": "boolean", "default": false }
+            {
+              "name": "label",
+              "label": "Texto",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "link",
+              "label": "Link",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "newpage",
+              "label": "Abrir em nova aba",
+              "type": "boolean",
+              "default": false
+            }
           ]
         }
       ]
     },
-
     {
       "name": "ContactInfo",
       "file": "components/ContactInfo.vue",
       "category": "block",
       "description": "Contact details: WhatsApp, phone, email, and address with icons.",
       "props": [
-        { "name": "title",    "label": "Título",    "type": "text", "default": "" },
-        { "name": "whatsapp", "label": "WhatsApp",  "type": "text", "default": "" },
-        { "name": "phone",    "label": "Telefone",  "type": "text", "default": "" },
-        { "name": "email",    "label": "Email",     "type": "email","default": "" },
-        { "name": "address",  "label": "Endereço",  "type": "textarea", "default": "" },
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "whatsapp",
+          "label": "WhatsApp",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "phone",
+          "label": "Telefone",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "email",
+          "label": "Email",
+          "type": "email",
+          "default": ""
+        },
+        {
+          "name": "address",
+          "label": "Endereço",
+          "type": "textarea",
+          "default": ""
+        },
         {
           "name": "layout",
           "label": "Layout",
           "type": "select",
           "default": "vertical",
           "options": [
-            { "value": "vertical",   "label": "Vertical" },
-            { "value": "horizontal", "label": "Horizontal" }
+            {
+              "value": "vertical",
+              "label": "Vertical"
+            },
+            {
+              "value": "horizontal",
+              "label": "Horizontal"
+            }
           ]
         }
       ]
     },
-
     {
       "name": "NewsletterSubscribe",
       "file": "components/NewsletterSubscribe.vue",
       "category": "layout",
       "description": "Newsletter subscription box with title, subtitle, and email input.",
       "props": [
-        { "name": "title",      "label": "Título",       "type": "text",     "default": "Subscreva a nossa newsletter" },
-        { "name": "subtitle",   "label": "Subtítulo",    "type": "textarea", "default": "Receba as novidades diretamente no seu email." },
-        { "name": "buttonText", "label": "Texto do botão", "type": "text",   "default": "Subscrever" },
-        { "name": "actionUrl",  "label": "URL de destino (POST)", "type": "url", "default": "" }
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": "Subscreva a nossa newsletter"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo",
+          "type": "textarea",
+          "default": "Receba as novidades diretamente no seu email."
+        },
+        {
+          "name": "buttonText",
+          "label": "Texto do botão",
+          "type": "text",
+          "default": "Subscrever"
+        },
+        {
+          "name": "actionUrl",
+          "label": "URL de destino (POST)",
+          "type": "url",
+          "default": ""
+        }
       ]
     },
-
+    {
+      "name": "FooterLogoBrand",
+      "file": "components/FooterLogoBrand.vue",
+      "category": "layout",
+      "cms_hidden": true,
+      "description": "Footer brand block: site name, slogan, short description and social media icon links.",
+      "props": [
+        {
+          "name": "brandName",
+          "label": "Nome da marca",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "slogan",
+          "label": "Slogan",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição curta",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "socialLinks",
+          "label": "Redes sociais",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "platform",
+              "label": "Plataforma",
+              "type": "select",
+              "default": "instagram",
+              "options": [
+                {
+                  "value": "instagram",
+                  "label": "Instagram"
+                },
+                {
+                  "value": "facebook",
+                  "label": "Facebook"
+                },
+                {
+                  "value": "youtube",
+                  "label": "YouTube"
+                },
+                {
+                  "value": "linkedin",
+                  "label": "LinkedIn"
+                },
+                {
+                  "value": "twitter",
+                  "label": "Twitter / X"
+                },
+                {
+                  "value": "tiktok",
+                  "label": "TikTok"
+                },
+                {
+                  "value": "whatsapp",
+                  "label": "WhatsApp"
+                },
+                {
+                  "value": "github",
+                  "label": "GitHub"
+                }
+              ]
+            },
+            {
+              "name": "url",
+              "label": "URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Legenda",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "SocialLinks",
       "file": "components/SocialLinks.vue",
       "category": "layout",
       "description": "Social media icon links with title, subtitle, and horizontal/vertical layout.",
       "props": [
-        { "name": "title",    "label": "Título",    "type": "text",     "default": "" },
-        { "name": "subtitle", "label": "Subtítulo", "type": "textarea", "default": "" },
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo",
+          "type": "textarea",
+          "default": ""
+        },
         {
           "name": "layout",
           "label": "Visualização",
           "type": "select",
           "default": "horizontal",
           "options": [
-            { "value": "horizontal", "label": "Horizontal (ícones)" },
-            { "value": "vertical",   "label": "Vertical (ícone + nome)" }
+            {
+              "value": "horizontal",
+              "label": "Horizontal (ícones)"
+            },
+            {
+              "value": "vertical",
+              "label": "Vertical (ícone + nome)"
+            }
           ]
         },
         {
@@ -998,40 +2138,155 @@
               "type": "select",
               "default": "instagram",
               "options": [
-                { "value": "instagram", "label": "Instagram" },
-                { "value": "facebook",  "label": "Facebook" },
-                { "value": "youtube",   "label": "YouTube" },
-                { "value": "linkedin",  "label": "LinkedIn" },
-                { "value": "twitter",   "label": "Twitter / X" },
-                { "value": "tiktok",    "label": "TikTok" },
-                { "value": "whatsapp",  "label": "WhatsApp" },
-                { "value": "github",    "label": "GitHub" },
-                { "value": "pinterest", "label": "Pinterest" },
-                { "value": "telegram",  "label": "Telegram" },
-                { "value": "discord",   "label": "Discord" },
-                { "value": "reddit",    "label": "Reddit" }
+                {
+                  "value": "instagram",
+                  "label": "Instagram"
+                },
+                {
+                  "value": "facebook",
+                  "label": "Facebook"
+                },
+                {
+                  "value": "youtube",
+                  "label": "YouTube"
+                },
+                {
+                  "value": "linkedin",
+                  "label": "LinkedIn"
+                },
+                {
+                  "value": "twitter",
+                  "label": "Twitter / X"
+                },
+                {
+                  "value": "tiktok",
+                  "label": "TikTok"
+                },
+                {
+                  "value": "whatsapp",
+                  "label": "WhatsApp"
+                },
+                {
+                  "value": "github",
+                  "label": "GitHub"
+                },
+                {
+                  "value": "pinterest",
+                  "label": "Pinterest"
+                },
+                {
+                  "value": "telegram",
+                  "label": "Telegram"
+                },
+                {
+                  "value": "discord",
+                  "label": "Discord"
+                },
+                {
+                  "value": "reddit",
+                  "label": "Reddit"
+                }
               ]
             },
-            { "name": "url",   "label": "URL",              "type": "url",  "default": "" },
-            { "name": "label", "label": "Nome personalizado (opcional)", "type": "text", "default": "" }
+            {
+              "name": "url",
+              "label": "URL",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Nome personalizado (opcional)",
+              "type": "text",
+              "default": ""
+            }
           ]
         }
       ]
     },
-
     {
       "name": "Textbox",
       "file": "components/Textbox.vue",
       "category": "block",
       "description": "Content block with title, subtitle, image gallery, and rich text body.",
       "props": [
-        { "name": "title",    "label": "Título",    "type": "text",        "default": "" },
-        { "name": "subtitle", "label": "Subtítulo", "type": "textarea",    "default": "" },
-        { "name": "images",   "label": "Imagens",   "type": "image-array", "default": [] },
-        { "name": "body",     "label": "Texto",     "type": "markdown",    "default": "" }
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "images",
+          "label": "Imagens",
+          "type": "image-array",
+          "default": []
+        },
+        {
+          "name": "body",
+          "label": "Texto",
+          "type": "markdown",
+          "default": ""
+        },
+        {
+          "name": "size",
+          "label": "Tamanho",
+          "type": "select",
+          "default": "md",
+          "options": [
+            {
+              "value": "sm",
+              "label": "Pequeno (560px)"
+            },
+            {
+              "value": "md",
+              "label": "Médio (800px)"
+            },
+            {
+              "value": "lg",
+              "label": "Largo (1100px)"
+            },
+            {
+              "value": "full",
+              "label": "Completo (100%)"
+            }
+          ]
+        },
+        {
+          "name": "maxWidth",
+          "label": "Largura personalizada",
+          "type": "text",
+          "default": "",
+          "description": "Substitui o tamanho acima. ex: 720px, 60ch"
+        },
+        {
+          "name": "align",
+          "label": "Alinhamento",
+          "type": "select",
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": "Esquerda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Direita"
+            }
+          ]
+        }
       ]
     },
-
     {
       "name": "Hero",
       "file": "components/Hero.vue",
@@ -1101,14 +2356,746 @@
         }
       ]
     },
-
+    {
+      "name": "MediaGallery",
+      "file": "components/MediaGallery.vue",
+      "category": "block",
+      "description": "Galeria de imagens e vídeos em grelha, masonry (Pinterest) ou carrossel, com lightbox, filtros e legenda.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": "Galeria"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Tipo de layout",
+          "type": "select",
+          "default": "grid",
+          "options": [
+            {
+              "label": "Grelha",
+              "value": "grid"
+            },
+            {
+              "label": "Masonry (Pinterest)",
+              "value": "masonry"
+            },
+            {
+              "label": "Carrossel",
+              "value": "carousel"
+            },
+            {
+              "label": "Instagram",
+              "value": "instagram"
+            }
+          ]
+        },
+        {
+          "name": "columns",
+          "label": "Colunas (2–5)",
+          "type": "number",
+          "default": 3
+        },
+        {
+          "name": "gap",
+          "label": "Espaçamento",
+          "type": "select",
+          "default": "md",
+          "options": [
+            {
+              "label": "Nenhum",
+              "value": "none"
+            },
+            {
+              "label": "Pequeno",
+              "value": "sm"
+            },
+            {
+              "label": "Médio",
+              "value": "md"
+            },
+            {
+              "label": "Grande",
+              "value": "lg"
+            }
+          ]
+        },
+        {
+          "name": "aspectRatio",
+          "label": "Proporção das células (grid)",
+          "type": "select",
+          "default": "square",
+          "options": [
+            {
+              "label": "Quadrado",
+              "value": "square"
+            },
+            {
+              "label": "Paisagem",
+              "value": "landscape"
+            },
+            {
+              "label": "Retrato",
+              "value": "portrait"
+            },
+            {
+              "label": "Original",
+              "value": "auto"
+            }
+          ]
+        },
+        {
+          "name": "showCaption",
+          "label": "Mostrar legenda",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "captionStyle",
+          "label": "Estilo da legenda",
+          "type": "select",
+          "default": "hover",
+          "options": [
+            {
+              "label": "Ao passar o rato",
+              "value": "hover"
+            },
+            {
+              "label": "Sempre visível",
+              "value": "always"
+            },
+            {
+              "label": "Abaixo da imagem",
+              "value": "below"
+            }
+          ]
+        },
+        {
+          "name": "lightbox",
+          "label": "Lightbox ao clicar",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "showFilter",
+          "label": "Filtros por categoria",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "limitVisible",
+          "label": "Itens visíveis (0 = todos)",
+          "type": "number",
+          "default": 0
+        },
+        {
+          "name": "items",
+          "label": "Itens da galeria",
+          "type": "array",
+          "default": [],
+          "instagram_import": true,
+          "folder_import": true,
+          "itemSchema": [
+            {
+              "name": "src",
+              "label": "Imagem / URL de vídeo (YouTube, Vimeo ou mp4)",
+              "type": "image"
+            },
+            {
+              "name": "type",
+              "label": "Tipo de media",
+              "type": "select",
+              "default": "image",
+              "options": [
+                {
+                  "label": "Imagem",
+                  "value": "image"
+                },
+                {
+                  "label": "Vídeo",
+                  "value": "video"
+                }
+              ]
+            },
+            {
+              "name": "title",
+              "label": "Título",
+              "type": "text"
+            },
+            {
+              "name": "description",
+              "label": "Descrição",
+              "type": "textarea"
+            },
+            {
+              "name": "category",
+              "label": "Categoria (filtro)",
+              "type": "text"
+            },
+            {
+              "name": "alt",
+              "label": "Texto alternativo",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FaqList",
+      "file": "components/FaqList.vue",
+      "category": "block",
+      "description": "Perguntas frequentes em acordeão ou grelha de cartões.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "Perguntas Frequentes"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": "FAQ"
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Modo de exibição",
+          "type": "select",
+          "default": "accordion",
+          "options": [
+            {
+              "value": "accordion",
+              "label": "Acordeão (expandir/fechar)"
+            },
+            {
+              "value": "grid",
+              "label": "Grelha de cartões (todas visíveis)"
+            }
+          ]
+        },
+        {
+          "name": "columns",
+          "label": "Colunas",
+          "type": "select",
+          "default": "1",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 coluna"
+            },
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas (só grelha)"
+            }
+          ]
+        },
+        {
+          "name": "allowMultiple",
+          "label": "Permitir múltiplos itens abertos (acordeão)",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "items",
+          "label": "Perguntas & Respostas",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "question",
+              "label": "Pergunta",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "answer",
+              "label": "Resposta",
+              "type": "textarea",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PriceList",
+      "file": "components/PriceList.vue",
+      "category": "block",
+      "description": "Lista de itens com preços organizada por categorias — menus de restaurante, catálogos de produtos, tabelas de serviços.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "Menu"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "currency",
+          "label": "Símbolo de moeda",
+          "type": "text",
+          "default": "€"
+        },
+        {
+          "name": "pricePosition",
+          "label": "Posição da moeda",
+          "type": "select",
+          "default": "after",
+          "options": [
+            {
+              "value": "after",
+              "label": "Depois (12,50 €)"
+            },
+            {
+              "value": "before",
+              "label": "Antes (€ 12,50)"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "label": "Modo de exibição",
+          "type": "select",
+          "default": "list",
+          "options": [
+            {
+              "value": "list",
+              "label": "Lista (nome + preço + descrição)"
+            },
+            {
+              "value": "compact",
+              "label": "Compacto (só nome + preço)"
+            },
+            {
+              "value": "grid",
+              "label": "Grelha de cartões"
+            }
+          ]
+        },
+        {
+          "name": "columns",
+          "label": "Colunas",
+          "type": "select",
+          "default": "2",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 coluna"
+            },
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            }
+          ]
+        },
+        {
+          "name": "showImages",
+          "label": "Mostrar imagens dos itens",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "categories",
+          "label": "Categorias",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "name",
+              "label": "Nome da categoria",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição da categoria",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "icon",
+              "label": "Ícone da categoria",
+              "type": "icon",
+              "default": ""
+            },
+            {
+              "name": "items",
+              "label": "Itens",
+              "type": "array",
+              "default": [],
+              "itemSchema": [
+                {
+                  "name": "name",
+                  "label": "Nome",
+                  "type": "text",
+                  "default": ""
+                },
+                {
+                  "name": "description",
+                  "label": "Descrição",
+                  "type": "textarea",
+                  "default": ""
+                },
+                {
+                  "name": "price",
+                  "label": "Preço",
+                  "type": "text",
+                  "default": ""
+                },
+                {
+                  "name": "image",
+                  "label": "Imagem",
+                  "type": "image",
+                  "default": ""
+                },
+                {
+                  "name": "badge",
+                  "label": "Badge (ex: Popular, Veg, Novo, Chef, Picante)",
+                  "type": "text",
+                  "default": ""
+                },
+                {
+                  "name": "featured",
+                  "label": "Destacado",
+                  "type": "boolean",
+                  "default": false
+                },
+                {
+                  "name": "available",
+                  "label": "Disponível",
+                  "type": "boolean",
+                  "default": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CustomerReviews",
+      "file": "components/CustomerReviews.vue",
+      "category": "block",
+      "description": "Showcase de avaliações/testemunhos de clientes em grelha ou carrossel.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "O que os nossos clientes dizem"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": "Testemunhos"
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "layout",
+          "label": "Modo de exibição",
+          "type": "select",
+          "default": "grid",
+          "options": [
+            {
+              "value": "grid",
+              "label": "Grelha"
+            },
+            {
+              "value": "carousel",
+              "label": "Carrossel"
+            }
+          ]
+        },
+        {
+          "name": "columns",
+          "label": "Colunas (grelha / carrossel)",
+          "type": "select",
+          "default": "3",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 coluna"
+            },
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
+          ]
+        },
+        {
+          "name": "limit",
+          "label": "Limite de avaliações visíveis (0 = todas)",
+          "type": "number",
+          "default": 6
+        },
+        {
+          "name": "showRating",
+          "label": "Mostrar avaliação global",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "autoplay",
+          "label": "Autoplay (carrossel)",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "autoplayDelay",
+          "label": "Intervalo autoplay (ms)",
+          "type": "number",
+          "default": 5000
+        },
+        {
+          "name": "reviews",
+          "label": "Avaliações",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "name",
+              "label": "Nome",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "role",
+              "label": "Cargo / Função",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "stars",
+              "label": "Estrelas (1–5)",
+              "type": "select",
+              "default": "5",
+              "options": [
+                {
+                  "value": "5",
+                  "label": "★★★★★  5"
+                },
+                {
+                  "value": "4",
+                  "label": "★★★★☆  4"
+                },
+                {
+                  "value": "3",
+                  "label": "★★★☆☆  3"
+                },
+                {
+                  "value": "2",
+                  "label": "★★☆☆☆  2"
+                },
+                {
+                  "value": "1",
+                  "label": "★☆☆☆☆  1"
+                }
+              ]
+            },
+            {
+              "name": "text",
+              "label": "Texto da avaliação",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "avatar",
+              "label": "Foto do cliente",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "video",
+              "label": "URL do vídeo (YouTube ou MP4)",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "source",
+              "label": "Plataforma de origem",
+              "type": "select",
+              "default": "",
+              "options": [
+                {
+                  "value": "",
+                  "label": "— Nenhuma —"
+                },
+                {
+                  "value": "google",
+                  "label": "Google"
+                },
+                {
+                  "value": "facebook",
+                  "label": "Facebook"
+                },
+                {
+                  "value": "trustpilot",
+                  "label": "Trustpilot"
+                },
+                {
+                  "value": "tripadvisor",
+                  "label": "Tripadvisor"
+                }
+              ]
+            },
+            {
+              "name": "date",
+              "label": "Data (ex: Jan 2025)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "verified",
+              "label": "Avaliação verificada",
+              "type": "boolean",
+              "default": false
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "SiteHeaderExtra",
       "file": "components/SiteHeaderExtra.vue",
       "category": "layout",
-      "cms_hidden": true,
-      "description": "Header extras (dark mode toggle, CTA button). Internal use only."
+      "description": "Extras do cabeçalho: toggle de tema, botão CTA, ícones de WhatsApp e telefone.",
+      "props": [
+        {
+          "name": "align",
+          "label": "Alinhamento",
+          "type": "select",
+          "default": "right",
+          "options": [
+            { "value": "left",   "label": "Esquerda" },
+            { "value": "center", "label": "Centro"   },
+            { "value": "right",  "label": "Direita"  }
+          ]
+        },
+        {
+          "name": "showDarkToggle",
+          "label": "Botão de tema escuro",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "ctaShow",
+          "label": "Mostrar botão CTA",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "ctaLabel",
+          "label": "Texto do botão CTA",
+          "type": "text",
+          "default": "Começar"
+        },
+        {
+          "name": "ctaLink",
+          "label": "Link do botão CTA",
+          "type": "url",
+          "default": "",
+          "description": "URL de destino do botão. Deixe vazio para um botão sem link."
+        },
+        {
+          "name": "ctaNewTab",
+          "label": "Abrir link numa nova aba",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "ctaStyle",
+          "label": "Estilo do botão CTA",
+          "type": "select",
+          "default": "filled",
+          "options": [
+            { "value": "filled",  "label": "Preenchido (bg-primary)" },
+            { "value": "outline", "label": "Contorno (border)"       }
+          ]
+        },
+        {
+          "name": "whatsapp",
+          "label": "WhatsApp",
+          "type": "text",
+          "default": "",
+          "description": "Número com código do país, apenas dígitos. Ex: 351912345678"
+        },
+        {
+          "name": "phone",
+          "label": "Telefone",
+          "type": "text",
+          "default": "",
+          "description": "Número de telefone para ligação directa. Ex: +351 912 345 678"
+        },
+        {
+          "name": "showContactOnMobile",
+          "label": "Mostrar contactos no mobile",
+          "type": "boolean",
+          "default": false,
+          "description": "Por defeito os ícones de WhatsApp e telefone estão ocultos no mobile."
+        }
+      ]
+    },
+    {
+      "name": "InscricaoForm",
+      "file": "paravyoma2/app/components/InscricaoForm.vue",
+      "category": "block",
+      "description": "Formulário de inscrição em 3 etapas para novos alunos (exclusivo Paravyoma Yoga).",
+      "props": []
     }
-
   ]
 }

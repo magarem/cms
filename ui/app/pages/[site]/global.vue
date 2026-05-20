@@ -65,6 +65,21 @@ watchEffect(() => {
   }
 })
 
+const previewUrl = `/${site}/preview?path=/`
+
+const previewMenuItems = [[
+  {
+    label: 'Mesma aba',
+    icon: 'i-heroicons-eye',
+    onSelect: () => navigateTo(previewUrl),
+  },
+  {
+    label: 'Nova aba',
+    icon: 'i-heroicons-arrow-top-right-on-square',
+    onSelect: () => window.open(previewUrl, '_blank'),
+  },
+]]
+
 async function save() {
   if (!activeKey.value) return
   saving.value = true
@@ -91,11 +106,14 @@ async function save() {
       <span v-if="activeKey" class="text-gray-500 text-xs font-mono ml-1">{{ activeKey }}</span>
     </template>
     <template #actions>
-      <NuxtLink :to="`/${site}/preview?path=/`">
-        <UButton icon="i-heroicons-eye" size="sm" color="neutral" variant="ghost">
+      <UButtonGroup>
+        <UButton icon="i-heroicons-eye" size="sm" variant="outline" color="neutral" @click="navigateTo(previewUrl)">
           Preview
         </UButton>
-      </NuxtLink>
+        <UDropdownMenu :items="previewMenuItems">
+          <UButton icon="i-heroicons-chevron-down" size="sm" variant="outline" color="neutral" />
+        </UDropdownMenu>
+      </UButtonGroup>
       <UButton v-if="activeKey" icon="i-heroicons-check" size="sm" :loading="saving" @click="save">
         Salvar
       </UButton>

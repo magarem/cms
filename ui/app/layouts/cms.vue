@@ -93,6 +93,7 @@ function fmtDate(iso: string) {
 provide("cmsPublish", {
   publishing:       readonly(publishing),
   activeVersion,
+  siteUrl:          previewUrl,
   openPublishModal: () => { showPublishModal.value = true },
 })
 
@@ -111,6 +112,7 @@ const navItems = computed(() => {
     { label: "Global",        icon: "i-heroicons-cog-6-tooth",            to: `${base}/global` },
     { label: "Configurações", icon: "i-heroicons-adjustments-horizontal", to: `${base}/settings` },
     { label: "Newsletter",    icon: "i-heroicons-envelope",               to: `${base}/newsletter` },
+    { label: "Inscrições",   icon: "i-heroicons-clipboard-document-list", to: `${base}/inscricoes` },
   ]
   if (user.value?.role === "admin")
     items.push({ label: "Usuários", icon: "i-heroicons-users", to: `${base}/users`, exact: false })
@@ -187,6 +189,19 @@ function isActive(item: { to: string; exact?: boolean }) {
         >
           <UIcon name="i-heroicons-photo" class="w-4 h-4 flex-shrink-0" />
           Media
+        </NuxtLink>
+
+        <NuxtLink
+          :to="`/${site}/assistant`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/assistant`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <svg viewBox="0 0 20 20" class="w-4 h-4 flex-shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2 L11.5 8.5 L18 10 L11.5 11.5 L10 18 L8.5 11.5 L2 10 L8.5 8.5 Z" fill="currentColor" />
+          </svg>
+          Assistente
         </NuxtLink>
 
         <div class="my-3 border-t border-gray-800" />

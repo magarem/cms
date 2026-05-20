@@ -6,8 +6,22 @@ const { user, logout } = useAuth()
 const cmsPublish = inject<{
   publishing:       Readonly<Ref<boolean>>
   activeVersion:    ComputedRef<string>
+  siteUrl:          ComputedRef<string>
   openPublishModal: () => void
 }>("cmsPublish")
+
+const publishMenuItems = computed(() => [[
+  {
+    label: 'Publicar',
+    icon: 'i-heroicons-rocket-launch',
+    onSelect: () => cmsPublish?.openPublishModal(),
+  },
+  {
+    label: 'Abrir site',
+    icon: 'i-heroicons-arrow-top-right-on-square',
+    onSelect: () => cmsPublish?.siteUrl.value && window.open(cmsPublish.siteUrl.value, '_blank'),
+  },
+]])
 </script>
 
 <template>
@@ -24,17 +38,21 @@ const cmsPublish = inject<{
     </div>
 
     <!-- Publish button (admin only) -->
-    <UButton
-      v-if="user?.role === 'admin' && cmsPublish"
-      icon="i-heroicons-rocket-launch"
-      size="sm"
-      color="success"
-      variant="soft"
-      :loading="cmsPublish.publishing.value"
-      @click="cmsPublish.openPublishModal()"
-    >
-      Publicar
-    </UButton>
+    <UButtonGroup v-if="user?.role === 'admin' && cmsPublish">
+      <UButton
+        icon="i-heroicons-rocket-launch"
+        size="sm"
+        color="success"
+        variant="soft"
+        :loading="cmsPublish.publishing.value"
+        @click="cmsPublish.openPublishModal()"
+      >
+        Publicar
+      </UButton>
+      <UDropdownMenu :items="publishMenuItems">
+        <UButton icon="i-heroicons-chevron-down" size="sm" color="success" variant="soft" />
+      </UDropdownMenu>
+    </UButtonGroup>
 
     <!-- User -->
     <div class="flex items-center gap-2 shrink-0 pl-3 border-l border-gray-800">
