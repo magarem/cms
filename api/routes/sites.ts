@@ -986,7 +986,55 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     { body: t.Any() }
   )
 
-  // ── Analytics ─────────────────────────────────────────────────
+  // ── Newsletter — public subscribe ────────────────────────────
+  .post("/:site/newsletter/subscribe", async ({ params, body, set }) => {
+    const { email, name } = body as any
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      set.status = 400; return { error: "Email inválido." }
+    }
+    const dir = join(SITES_ROOT, params.site, "_newsletter")
+    const file = join(dir, "subscribers.json")
+    await mkdir(dir, { recursive: true })
+    let subscribers: any[] = []
+    try { subscribers = JSON.parse(await readFile(file, "utf-8")) } catch { /* first subscriber */ }
+    if (!subscribers.find((s: any) => s.email === email.toLowerCase().trim())) {
+      subscribers.push({ email: email.toLowerCase().trim(), name: name || "", subscribedAt: new Date().toISOString() })
+      await writeFile(file, JSON.stringify(subscribers, null, 2), "utf-8")
+    }
+    return { success: true }
+  }, { body: t.Any() })
+
+  // ── Form submissions — public submit ─────────────────────────
+  .post("/:site/inscricoes", async ({ params, body, set }) => {
+    const { name, email, formId, ...rest } = body as any
+    if (!email || typeof email !== "string") { set.status = 400; return { error: "Email obrigatório." } }
+    const dir = join(SITES_ROOT, params.site, "_inscricoes")
+    const file = join(dir, "inscricoes.json")
+    await mkdir(dir, { recursive: true })
+    let inscricoes: any[] = []
+    try { inscricoes = JSON.parse(await readFile(file, "utf-8")) } catch { /* first entry */ }
+    const entry = { id: crypto.randomUUID(), submittedAt: new Date().toISOString(), name, email, formId, ...rest }
+    inscricoes.push(entry)
+    await writeFile(file, JSON.stringify(inscricoes, null, 2), "utf-8")
+    return { success: true, id: entry.id }
+  }, { body: t.Any() })
+
+  // ── Analytics — public event tracking ────────────────────────
+  .post("/:site/analytics", async ({ params, body, request }) => {
+    const { path: pagePath, ref, ua, ip } = body as any
+    const dir = join(SITES_ROOT, params.site, "_analytics")
+    await mkdir(dir, { recursive: true })
+    const date = new Date().toISOString().slice(0, 10)
+    const file = join(dir, `${date}.jsonl`)
+    const userAgent = ua || request.headers.get("user-agent") || ""
+    const isMobile = /mobile|android/i.test(userAgent)
+    const isTablet = /tablet|ipad/i.test(userAgent)
+    const device = isTablet ? "tablet" : isMobile ? "mobile" : "desktop"
+    const vh = createHash("sha256").update(`${ip || ""}|${userAgent}|${date}`).digest("hex").slice(0, 16)
+    await appendFile(file, JSON.stringify({ path: pagePath || "/", ref: ref || "", d: device, vh, ts: Date.now() }) + "\n", "utf-8")
+    return { success: true }
+  }, { body: t.Any() })
+
   // ── Newsletter subscribers ─────────────────────────────────
   .get("/:site/newsletter", async ({ params, cookie: { cms_token }, jwt, set }) => {
     const user = await getUser(jwt, cms_token?.value, params.site)
