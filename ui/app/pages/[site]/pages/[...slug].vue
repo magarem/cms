@@ -458,6 +458,9 @@ function fmtRevSize(bytes: number) {
   return `${(bytes / 1024).toFixed(1)} KB`
 }
 
+// ── SEO panel ─────────────────────────────────────────────────
+const seoOpen = ref(false)
+
 // ── Delete page ───────────────────────────────────────────────
 const deleteOpen = ref(false)
 const deleting   = ref(false)
@@ -538,6 +541,7 @@ const publishMenuItems = computed(() => [[
     <template #actions>
       <!-- Secondary actions -->
       <UButton icon="i-heroicons-clock" size="sm" variant="ghost" color="neutral" :disabled="!form" @click="openHistory" />
+      <UButton icon="i-heroicons-magnifying-glass-circle" size="sm" variant="ghost" color="neutral" :disabled="!form" title="SEO" @click="seoOpen = true" />
       <UButton icon="i-heroicons-code-bracket" size="sm" variant="ghost" color="neutral" :disabled="!form" @click="openRaw" />
       <UButton v-if="contentPath !== 'home'" icon="i-heroicons-trash" size="sm" variant="ghost" color="error" :disabled="!form" @click="deleteOpen = true" />
 
@@ -817,6 +821,75 @@ const publishMenuItems = computed(() => [[
           </div>
         </div>
 
+      </div>
+    </template>
+  </USlideover>
+
+  <!-- SEO panel -->
+  <USlideover v-model:open="seoOpen" title="SEO" side="right" :ui="{ content: 'max-w-md' }">
+    <template #body>
+      <div v-if="form" class="p-4 space-y-5">
+
+        <!-- Meta title -->
+        <UFormField label="Meta título">
+          <template #hint>
+            <span :class="(form.seo?.title?.length || 0) > 60 ? 'text-red-400' : 'text-gray-500'">
+              {{ form.seo?.title?.length || 0 }}/60
+            </span>
+          </template>
+          <UInput
+            :model-value="form.seo?.title || ''"
+            placeholder="Título para motores de busca"
+            class="w-full"
+            @update:model-value="form.seo = { ...form.seo, title: $event }"
+          />
+          <p class="text-xs text-gray-500 mt-1">Deixe vazio para usar o título da página.</p>
+        </UFormField>
+
+        <!-- Meta description -->
+        <UFormField label="Meta descrição">
+          <template #hint>
+            <span :class="(form.seo?.description?.length || 0) > 160 ? 'text-red-400' : 'text-gray-500'">
+              {{ form.seo?.description?.length || 0 }}/160
+            </span>
+          </template>
+          <UTextarea
+            :model-value="form.seo?.description || ''"
+            placeholder="Descrição para motores de busca"
+            :rows="3"
+            class="w-full"
+            @update:model-value="form.seo = { ...form.seo, description: $event }"
+          />
+        </UFormField>
+
+        <!-- OG Image -->
+        <UFormField label="Imagem OG">
+          <PropField
+            field-key="ogImage"
+            :model-value="form.seo?.ogImage || ''"
+            :schema="{ type: 'image', label: 'Imagem OG' }"
+            @update:model-value="form.seo = { ...form.seo, ogImage: $event }"
+          />
+          <p class="text-xs text-gray-500 mt-1">Imagem partilhada em redes sociais (1200×630px recomendado).</p>
+        </UFormField>
+
+        <!-- noIndex -->
+        <UFormField label="Ocultar dos motores de busca">
+          <div class="flex items-center gap-2">
+            <UToggle
+              :model-value="form.seo?.noIndex || false"
+              @update:model-value="form.seo = { ...form.seo, noIndex: $event }"
+            />
+            <span class="text-sm text-gray-400">{{ form.seo?.noIndex ? 'Página oculta (noindex)' : 'Página indexável' }}</span>
+          </div>
+        </UFormField>
+
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-2 px-4 py-3">
+        <UButton variant="ghost" color="neutral" @click="seoOpen = false">Fechar</UButton>
+        <UButton icon="i-heroicons-check" :loading="saving" @click="save(); seoOpen = false">Guardar</UButton>
       </div>
     </template>
   </USlideover>
