@@ -45,7 +45,9 @@ export async function startServer(): Promise<ServerHandle> {
   const testRoot = await mkdtemp(join(tmpdir(), "sirius-test-"))
   await createTestSite(testRoot, SITE)
 
-  const proc = Bun.spawn(["bun", "index.ts"], {
+  // Use full path so it works in non-interactive SSH sessions where ~/.bun/bin isn't in $PATH
+  const bunBin = process.execPath  // the bun binary that's running this test
+  const proc = Bun.spawn([bunBin, "index.ts"], {
     cwd: API_DIR,
     env: { ...process.env, SIRIUS_STORAGE_ROOT: testRoot, PORT: String(port), NODE_ENV: "test" },
     stdout: "ignore",
