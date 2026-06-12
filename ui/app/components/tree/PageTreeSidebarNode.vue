@@ -39,6 +39,7 @@ const linkTo = computed(() => {
 })
 
 const nodeIcon = computed(() => {
+  if (props.node.slug === "home") return "i-heroicons-home"
   if (props.node.type === "collection") return "i-heroicons-rectangle-stack"
   if (props.node.type === "page") return hasChildren.value ? "i-heroicons-folder-open" : "i-heroicons-document-text"
   return "i-heroicons-folder"
@@ -238,6 +239,36 @@ async function submitMove() {
   }
 }
 
+// Duplicate modal
+const showDuplicate = ref(false)
+const duplicating   = ref(false)
+const duplicateName = ref("")
+
+function openDuplicate() {
+  const base = props.node.slug.split("/").pop() || props.node.name
+  duplicateName.value = `${base}-copia`
+  showDuplicate.value = true
+}
+
+async function submitDuplicate() {
+  const name = duplicateName.value.trim()
+  if (!name) return
+  duplicating.value = true
+  try {
+    await api.post(`/sites/${props.site}/tree/duplicate`, {
+      path: props.node.slug,
+      newName: name,
+    })
+    toast.add({ title: "Página duplicada.", color: "success" })
+    showDuplicate.value = false
+    await refreshTree()
+  } catch (e: any) {
+    toast.add({ title: e.data?.error || "Erro ao duplicar.", color: "error" })
+  } finally {
+    duplicating.value = false
+  }
+}
+
 // Delete
 const showDelete = ref(false)
 const deleting = ref(false)
@@ -258,6 +289,7 @@ async function submitDelete() {
 
 const menuItems = computed(() => [[
   { label: "Renomear",       icon: "i-heroicons-pencil",              onSelect: openRename },
+  { label: "Duplicar",       icon: "i-heroicons-square-2-stack",      onSelect: openDuplicate },
   { label: "Copiar para...", icon: "i-heroicons-document-duplicate",  onSelect: openCopy },
   { label: "Mover para...",  icon: "i-heroicons-arrows-right-left",   onSelect: openMove },
 ], [
@@ -391,6 +423,27 @@ const menuItems = computed(() => [[
       <div class="flex justify-end gap-2">
         <UButton variant="ghost" color="neutral" @click="showRename = false">Cancelar</UButton>
         <UButton :loading="renaming" :disabled="!newName.trim()" @click="submitRename">Renomear</UButton>
+      </div>
+    </template>
+  </UModal>
+
+  <!-- Duplicate modal -->
+  <UModal v-model:open="showDuplicate" title="Duplicar página">
+    <template #body>
+      <UFormField label="Nome da cópia" hint="Slug único na mesma pasta">
+        <UInput
+          v-model="duplicateName"
+          placeholder="nome-da-copia"
+          class="w-full font-mono"
+          autofocus
+          @keydown.enter="submitDuplicate"
+        />
+      </UFormField>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton variant="ghost" color="neutral" @click="showDuplicate = false">Cancelar</UButton>
+        <UButton icon="i-heroicons-square-2-stack" :loading="duplicating" @click="submitDuplicate">Duplicar</UButton>
       </div>
     </template>
   </UModal>

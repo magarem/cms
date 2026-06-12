@@ -559,6 +559,25 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     return { success: true }
   }, { body: t.Object({ path: t.String(), destination: t.String() }) })
 
+  // ── Tree: duplicate node (same parent, new name) ────────────────
+  .post("/:site/tree/duplicate", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+    if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
+    const { path: nodePath, newName } = body as any
+    const safeName = (newName as string).trim().replace(/[^a-z0-9_\-]/gi, "_").replace(/^_+|_+$/g, "") || "copia"
+    const settings = await getSiteSettings(params.site)
+    const version = getActiveVersion(settings)
+    const src = join(SITES_ROOT, params.site, version, nodePath.replace(/^\/+|\/+$/g, ""))
+    const dest = join(dirname(src), safeName)
+    if (!existsSync(src)) { set.status = 404; return { error: "Não encontrado." } }
+    if (existsSync(dest)) { set.status = 409; return { error: "Já existe uma página com esse nome." } }
+    await cp(src, dest, { recursive: true })
+    // Remove revision history from the copy — it starts fresh
+    await rm(join(dest, "_revisions"), { recursive: true, force: true })
+    return { success: true }
+  }, { body: t.Object({ path: t.String(), newName: t.String() }) })
+
   // ── Tree: move node ──────────────────────────────────────────────
   .post("/:site/tree/move", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
     const user = await getUser(jwt, cms_token?.value, params.site) as any
