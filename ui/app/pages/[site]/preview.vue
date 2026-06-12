@@ -99,7 +99,27 @@ function openInTab() {
 // Sync iframe navigation → update path selector
 onMounted(() => {
   const onMessage = (e: MessageEvent) => {
-    if (e.data?.type === 'sirius:navigate') selectedPath.value = e.data.path
+    if (e.data?.type === 'sirius:navigate') {
+      selectedPath.value = e.data.path
+    } else if (e.data?.type === 'sirius:editBlock') {
+      const raw = e.data.pagePath || selectedPath.value.replace(/^\//, '')
+      const normalised = (!raw || raw === '/') ? 'home' : raw.replace(/^\//, '')
+      const params = new URLSearchParams()
+      if (e.data.blockId != null) params.set('block', e.data.blockId)
+      if (e.data.blockIndex != null) params.set('blockIndex', e.data.blockIndex)
+      if (e.data.arrayProp != null) params.set('arrayProp', e.data.arrayProp)
+      if (e.data.arrayIndex != null) params.set('arrayIndex', String(e.data.arrayIndex))
+      const targetUrl = `/${site}/pages/${normalised}?${params.toString()}`
+      console.log('[CMS preview] sirius:editBlock received', e.data, '→ navigate', targetUrl)
+      navigateTo(targetUrl)
+    } else if (e.data?.type === 'sirius:gotoCollection') {
+      navigateTo(`/${site}/collections/${e.data.collectionPath}`)
+    } else if (e.data?.type === 'sirius:gotoGlobal') {
+      const p = new URLSearchParams({ section: e.data.section })
+      if (e.data.blockId != null)    p.set('block', e.data.blockId)
+      if (e.data.blockIndex != null) p.set('blockIndex', e.data.blockIndex)
+      navigateTo(`/${site}/global?${p.toString()}`)
+    }
   }
   window.addEventListener('message', onMessage)
   onUnmounted(() => window.removeEventListener('message', onMessage))

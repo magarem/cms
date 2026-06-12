@@ -57,7 +57,7 @@ const breadcrumbs = computed(() => {
 })
 
 function selectFile(item: any) {
-  emit("select", item.name)
+  emit("select", item.path)
   open.value = false
 }
 
@@ -101,7 +101,8 @@ async function handleFileSelected(event: Event) {
 
     const { name } = await res.json()
     await fetchItems()
-    emit("select", name)
+    const fullPath = browsePath.value ? `${browsePath.value}/${name}` : name
+    emit("select", fullPath)
     open.value = false
   } catch (e: any) {
     uploadError.value = e.message || "Erro ao fazer upload"

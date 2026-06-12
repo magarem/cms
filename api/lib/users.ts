@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 import bcrypt from "bcryptjs"
-import { SITES_ROOT } from "./content"
+import { SITES_ROOT, withFileLock } from "./content"
 
 function usersFile(site: string) {
   return join(SITES_ROOT, site, "users.json")
@@ -14,6 +14,7 @@ export interface User {
   passwordHash: string
   role: "admin" | "editor" | "viewer"
   sites: string[]
+  email?: string
 }
 
 export async function readUsers(site: string): Promise<{ users: User[] }> {
@@ -22,34 +23,48 @@ export async function readUsers(site: string): Promise<{ users: User[] }> {
 }
 
 export async function writeUsers(site: string, data: { users: User[] }): Promise<void> {
-  await mkdir(join(SITES_ROOT, site), { recursive: true })
-  await writeFile(usersFile(site), JSON.stringify(data, null, 2))
+  const file = usersFile(site)
+  return withFileLock(file, async () => {
+    await mkdir(join(SITES_ROOT, site), { recursive: true })
+    await writeFile(file, JSON.stringify(data, null, 2))
+  })
 }
 
 async function ensureUsersFile(site: string) {
   const file = usersFile(site)
   if (existsSync(file)) return
-  await mkdir(join(SITES_ROOT, site), { recursive: true })
-  const hash = await bcrypt.hash("admin123", 10)
-  await writeFile(
-    file,
-    JSON.stringify(
-      {
-        users: [
-          {
-            id: crypto.randomUUID(),
-            username: "admin",
-            passwordHash: hash,
-            role: "admin",
-            sites: ["*"],
-          },
-        ],
-      },
-      null,
-      2
+  return withFileLock(file, async () => {
+    if (existsSync(file)) return  // re-check inside lock
+    await mkdir(join(SITES_ROOT, site), { recursive: true })
+    const password = Buffer.from(crypto.getRandomValues(new Uint8Array(18))).toString("base64url")
+    const hash = await bcrypt.hash(password, 10)
+    await writeFile(
+      file,
+      JSON.stringify(
+        {
+          users: [
+            {
+              id: crypto.randomUUID(),
+              username: "admin",
+              passwordHash: hash,
+              role: "admin",
+              sites: ["*"],
+            },
+          ],
+        },
+        null,
+        2
+      )
     )
-  )
-  console.log(`✅ Default admin user created for site "${site}": admin / admin123`)
+    console.log(`
+╔══════════════════════════════════════════════════════════╗
+║  NOVO SITE: conta admin criada para "${site}"
+║  Utilizador : admin
+║  Password   : ${password}
+║  ⚠️  Muda esta password após o primeiro login!
+╚══════════════════════════════════════════════════════════╝
+`)
+  })
 }
 
 export async function findUser(site: string, username: string): Promise<User | undefined> {

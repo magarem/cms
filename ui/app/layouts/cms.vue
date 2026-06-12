@@ -42,26 +42,13 @@ async function switchVersion(v: string) {
   }
 }
 
-// ── Create new version modal ──────────────────────────────
-const showNewVersionModal = ref(false)
-const newVersionName      = ref("")
-const creatingVersion     = ref(false)
+// ── Create new version (handled by CmsFooter, layout refreshes on event) ──
 
-async function createVersion() {
-  const name = newVersionName.value.trim()
-  if (!name) return
-  creatingVersion.value = true
-  try {
-    await api.post(`/sites/${site.value}/versions`, { name, from: activeVersion.value })
-    toast.add({ title: `Versão "${name}" criada a partir de ${activeVersion.value}.`, color: "success" })
-    showNewVersionModal.value = false
-    newVersionName.value = ""
-    await refreshSettings()
-  } catch (e: any) {
-    toast.add({ title: e.data?.error || "Erro ao criar versão.", color: "error" })
-  } finally {
-    creatingVersion.value = false
-  }
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleString("pt-PT", {
+    day: "2-digit", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  })
 }
 
 // ── Publish ───────────────────────────────────────────────
@@ -80,13 +67,6 @@ async function publish() {
   } finally {
     publishing.value = false
   }
-}
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleString("pt-PT", {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  })
 }
 
 // ── Expose publish to CmsTopbar via inject ────────────────
@@ -113,6 +93,7 @@ const navItems = computed(() => {
     { label: "Configurações", icon: "i-heroicons-adjustments-horizontal", to: `${base}/settings` },
     { label: "Newsletter",    icon: "i-heroicons-envelope",               to: `${base}/newsletter` },
     { label: "Inscrições",   icon: "i-heroicons-clipboard-document-list", to: `${base}/inscricoes` },
+    { label: "Backups",      icon: "i-heroicons-archive-box",             to: `${base}/backups` },
   ]
   if (user.value?.role === "admin")
     items.push({ label: "Usuários", icon: "i-heroicons-users", to: `${base}/users`, exact: false })
@@ -126,7 +107,8 @@ function isActive(item: { to: string; exact?: boolean }) {
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden bg-gray-950 text-gray-100">
+  <div class="flex flex-col h-screen overflow-hidden bg-gray-950 text-gray-100">
+  <div class="flex flex-1 overflow-hidden min-h-0">
 
     <!-- ═══ Sidebar ════════════════════════════════════════════ -->
     <aside
@@ -224,83 +206,21 @@ function isActive(item: { to: string; exact?: boolean }) {
     <!-- Main content -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <slot />
-
-      <!-- ── Footer ─────────────────────────────────────────── -->
-      <div class="h-9 flex-shrink-0 flex items-center gap-3 px-4 border-t border-gray-800 bg-gray-900/60 text-gray-500">
-
-        <!-- Version selector -->
-        <span class="text-[9px] uppercase tracking-widest text-gray-600">Versão</span>
-        <USelect
-          :model-value="activeVersion"
-          :items="editableVersions"
-          size="xs"
-          class="w-24"
-          :loading="switchingVersion"
-          :disabled="switchingVersion || editableVersions.length <= 1"
-          @update:model-value="switchVersion"
-        />
-        <UButton
-          v-if="user?.role === 'admin'"
-          icon="i-heroicons-plus"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          class="!p-1 -ml-1"
-          title="Nova versão"
-          @click="showNewVersionModal = true"
-        />
-
-        <div class="flex-1" />
-
-        <!-- Last published -->
-        <div v-if="lastPublished" class="flex items-center gap-1.5 text-[10px]">
-          <UIcon name="i-heroicons-clock" class="w-3 h-3 opacity-50" />
-          <span>{{ fmtDate(lastPublished) }}</span>
-          <span v-if="publishedFrom" class="font-mono text-gray-700">({{ publishedFrom }})</span>
-        </div>
-
-      </div>
     </div>
   </div>
 
-  <!-- ═══ New version modal ══════════════════════════════════ -->
-  <UModal v-model:open="showNewVersionModal" title="Nova versão de conteúdo">
-    <template #body>
-      <div class="space-y-4">
-        <p class="text-sm text-gray-300">
-          Será criada uma cópia da versão
-          <span class="font-mono text-white bg-gray-800 px-1.5 py-0.5 rounded text-xs">{{ activeVersion }}</span>
-          com o nome que indicar.
-        </p>
-        <UFormField label="Nome da nova versão">
-          <UInput
-            v-model="newVersionName"
-            placeholder="ex: v2"
-            class="w-full font-mono"
-            autofocus
-            @keyup.enter="createVersion"
-          />
-        </UFormField>
-        <p class="text-xs text-gray-600">Use apenas letras minúsculas, números e hífens.</p>
-      </div>
-    </template>
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <UButton variant="ghost" color="neutral" @click="showNewVersionModal = false" :disabled="creatingVersion">
-          Cancelar
-        </UButton>
-        <UButton
-          icon="i-heroicons-plus-circle"
-          color="primary"
-          :loading="creatingVersion"
-          :disabled="!newVersionName.trim()"
-          @click="createVersion"
-        >
-          Criar versão
-        </UButton>
-      </div>
-    </template>
-  </UModal>
+  <!-- ── Footer — spans full width (sidebar + main) ────────── -->
+  <CmsFooter
+    :site="site"
+    :active-version="activeVersion"
+    :editable-versions="editableVersions"
+    :switching-version="switchingVersion"
+    :last-published="lastPublished"
+    :published-from="publishedFrom"
+    :is-admin="user?.role === 'admin'"
+    @switch-version="switchVersion"
+    @versions-updated="refreshSettings"
+  />
 
   <!-- ═══ Publish modal ══════════════════════════════════════ -->
   <UModal v-model:open="showPublishModal" title="Publicar site">
@@ -356,4 +276,5 @@ function isActive(item: { to: string; exact?: boolean }) {
       </div>
     </template>
   </UModal>
+  </div>
 </template>

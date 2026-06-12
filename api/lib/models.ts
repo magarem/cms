@@ -1,7 +1,7 @@
 import { readFile, writeFile, readdir, mkdir, rm } from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { join, extname, basename } from "node:path"
-import { SITES_ROOT, parseContent, serializeContent } from "./content"
+import { SITES_ROOT, parseContent, serializeContent, withFileLock } from "./content"
 
 export type ModelTarget = "page" | "collection-item" | "any"
 
@@ -176,18 +176,20 @@ export async function saveModel(
   if (!slug) throw new Error("Nome do modelo inválido.")
 
   const dir = siteModelsDir(site)
-  await mkdir(dir, { recursive: true })
+  const modelFile = join(dir, `${slug}.yml`)
 
-  const file: ModelFile = {
-    name: model.label || model.name || slug,
-    description: model.description || "",
-    target: normalizeTarget(model.target),
-    ...(Array.isArray(model.fields) ? { fields: model.fields } : {}),
-    ...(Array.isArray(model.blocks) ? { blocks: model.blocks } : {}),
-  }
-  await writeFile(join(dir, `${slug}.yml`), serializeContent(file, ".yml"), "utf-8")
-
-  return toPageModel(file, slug, "site")
+  return withFileLock(modelFile, async () => {
+    await mkdir(dir, { recursive: true })
+    const file: ModelFile = {
+      name: model.label || model.name || slug,
+      description: model.description || "",
+      target: normalizeTarget(model.target),
+      ...(Array.isArray(model.fields) ? { fields: model.fields } : {}),
+      ...(Array.isArray(model.blocks) ? { blocks: model.blocks } : {}),
+    }
+    await writeFile(modelFile, serializeContent(file, ".yml"), "utf-8")
+    return toPageModel(file, slug, "site")
+  })
 }
 
 export async function deleteModel(site: string, name: string): Promise<void> {

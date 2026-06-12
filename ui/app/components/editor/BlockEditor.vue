@@ -74,6 +74,8 @@ function addBlock(componentName: string) {
         <BlockCard
           v-for="(block, i) in blocks"
           :key="block.id || i"
+          :data-block-id="block.id"
+          :data-block-index="i"
           :block="block"
           :index="i"
           :site="site"

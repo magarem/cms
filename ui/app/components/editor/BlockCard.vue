@@ -7,6 +7,7 @@ interface Block {
   label?: string
   isHero?: boolean
   active?: boolean
+  flex?: number
   props?: Record<string, any>
 }
 
@@ -51,6 +52,10 @@ function cancelLabel() {
 
 function setIsHero(v: boolean) {
   emit("update:block", { ...props.block, isHero: v })
+}
+
+function setFlex(v: number) {
+  emit("update:block", { ...props.block, flex: v || 1 })
 }
 
 function setActive(v: boolean) {
@@ -273,7 +278,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
         <UIcon name="i-heroicons-bars-2" class="w-4 h-4" />
       </div>
 
-      <div class="flex-1 min-w-0 cursor-pointer select-none" @click="expanded = !expanded">
+      <div class="flex-1 min-w-0 cursor-pointer select-none" data-block-toggle @click="expanded = !expanded">
         <template v-if="block.label">
           <div class="text-sm font-semibold text-white leading-tight truncate">{{ block.label }}</div>
           <div class="text-[10px] text-gray-500 leading-tight">{{ block.componentName }}</div>
@@ -323,6 +328,20 @@ watch(mdPending, () => nextTick(recalcTextareaH))
         </button>
       </UTooltip>
 
+      <UTooltip text="Flex: largura relativa do bloco no cabeçalho">
+        <div class="flex items-center gap-1" @click.stop>
+          <span class="text-[10px] text-gray-600 uppercase">Flex</span>
+          <input
+            type="number"
+            min="0"
+            step="0.5"
+            :value="block.flex ?? 1"
+            class="w-12 text-xs bg-gray-800 text-gray-200 border border-gray-700 rounded px-1.5 py-0.5 focus:outline-none focus:border-primary-500 text-center"
+            @change="setFlex(+($event.target as HTMLInputElement).value)"
+          />
+        </div>
+      </UTooltip>
+
       <div class="flex items-center gap-1.5">
         <span class="text-[10px] text-gray-600 uppercase">Hero</span>
         <USwitch :model-value="block.isHero || false" size="xs" @update:model-value="setIsHero" />
@@ -347,7 +366,7 @@ watch(mdPending, () => nextTick(recalcTextareaH))
     </div>
 
     <!-- Expanded form -->
-    <div v-if="expanded" class="border-t border-gray-800 p-4 space-y-4">
+    <div v-if="expanded" data-block-body class="border-t border-gray-800 p-4 space-y-4">
       <!-- Regular props for non-ContentMD blocks -->
       <PropForm
         v-if="!isContentMD"

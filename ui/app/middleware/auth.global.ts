@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path === "/login") return
+  if (to.path === "/login" || to.path === "/reset-password") return
 
   const { user, ready, fetchMe, logout } = useAuth()
 
@@ -21,5 +21,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // URL-tampering attempt: clear the session and force re-authentication.
   if (user.value.site !== site) {
     await logout()
+    return navigateTo({ path: "/login", query: { site, redirect: to.fullPath } })
   }
 })

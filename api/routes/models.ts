@@ -7,8 +7,30 @@ import {
   deleteModel,
   sanitizeName,
 } from "../lib/models"
+import { JWT_SECRET } from "../lib/config"
 
-const JWT_SECRET = process.env.JWT_SECRET || "sirius_cms_dev_secret_change_in_production"
+const ModelFieldSchema = t.Object(
+  {
+    name: t.String(),
+    type: t.String(),
+    label: t.Optional(t.String()),
+    required: t.Optional(t.Boolean()),
+    default: t.Optional(t.Any()),
+    options: t.Optional(t.Array(t.Object({ value: t.Any(), label: t.String() }))),
+    fields: t.Optional(t.Array(t.Any())),
+  },
+  { additionalProperties: true }
+)
+
+const BlockTemplateSchema = t.Object(
+  {
+    componentName: t.String(),
+    isHero: t.Optional(t.Boolean()),
+    label: t.Optional(t.String()),
+    props: t.Optional(t.Record(t.String(), t.Any())),
+  },
+  { additionalProperties: true }
+)
 
 async function getUser(jwt: any, token: string | undefined, expectedSite?: string) {
   if (!token) return null
@@ -46,7 +68,7 @@ export const modelsRoutes = new Elysia({ prefix: "/sites" })
       if (!user) { set.status = 401; return { error: "Não autenticado." } }
       if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
 
-      const { name, label, description, target, template, fields, blocks } = body as any
+      const { name, label, description, target, template, fields, blocks } = body
       const clean = sanitizeName(name)
       if (!clean) { set.status = 400; return { error: "Nome inválido." } }
 
@@ -68,9 +90,9 @@ export const modelsRoutes = new Elysia({ prefix: "/sites" })
         label: t.Optional(t.String()),
         description: t.Optional(t.String()),
         target: t.Optional(t.Union([t.Literal("page"), t.Literal("collection-item"), t.Literal("any")])),
-        template: t.Optional(t.Any()),
-        fields: t.Optional(t.Any()),
-        blocks: t.Optional(t.Any()),
+        template: t.Optional(t.Object({ blocks: t.Optional(t.Array(t.Any())) }, { additionalProperties: true })),
+        fields: t.Optional(t.Array(ModelFieldSchema)),
+        blocks: t.Optional(t.Array(BlockTemplateSchema)),
       }),
     }
   )

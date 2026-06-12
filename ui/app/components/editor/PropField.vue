@@ -52,7 +52,7 @@ function infer(key: string, val: any): FieldType {
 const SCHEMA_TYPE_MAP: Record<string, FieldType> = {
   text: "text", email: "text", path: "url",
   textarea: "textarea", markdown: "markdown",
-  number: "number", boolean: "toggle",
+  number: "number", boolean: "toggle", toggle: "toggle",
   select: "select", url: "url",
   image: "image", video: "image", media: "image",
   "image-array": "media-array",
@@ -165,6 +165,87 @@ const draggableObjectArray = computed({
 
 const objectItemsExpanded = ref<Record<number, boolean>>({})
 
+// ── Instagram import ──────────────────────────────────────────────────────
+const igUsername    = ref("")
+const igLoading     = ref(false)
+const igError       = ref("")
+const igDialogOpen  = ref(false)
+
+async function importFromInstagram() {
+  const username = igUsername.value.replace(/^@/, "").trim()
+  if (!username) return
+  igLoading.value = true
+  igError.value   = ""
+  try {
+    const api = useApi()
+    const site = editorSite.value
+    const res  = await api.get(`/sites/${site}/instagram-import?username=${encodeURIComponent(username)}`) as any
+    if (res.error) { igError.value = res.error; return }
+    const imported = res.items ?? []
+    emit("update:modelValue", [...(props.modelValue || []), ...imported])
+    igDialogOpen.value = false
+    igUsername.value   = ""
+  } catch (e: any) {
+    igError.value = e?.message ?? "Erro desconhecido"
+  } finally {
+    igLoading.value = false
+  }
+}
+
+// ── Folder import ────────────────────────────────────────────────────────
+const folderDialogOpen  = ref(false)
+const folderPath        = ref("")          // current browsed path
+const folderItems       = ref<any[]>([])
+const folderLoading     = ref(false)
+const folderError       = ref("")
+
+const folderBreadcrumbs = computed(() => {
+  if (!folderPath.value) return []
+  return folderPath.value.split("/").reduce((acc: {label: string; path: string}[], seg, i, arr) => {
+    acc.push({ label: seg, path: arr.slice(0, i + 1).join("/") })
+    return acc
+  }, [])
+})
+
+async function browseFolder(path = "") {
+  folderLoading.value = true
+  folderError.value   = ""
+  folderPath.value    = path
+  try {
+    const api  = useApi()
+    const site = editorSite.value
+    const res  = await api.get(`/sites/${site}/media?path=${encodeURIComponent(path)}`) as any
+    folderItems.value = res.items ?? []
+  } catch (e: any) {
+    folderError.value = e?.message ?? "Erro ao listar pasta"
+  } finally {
+    folderLoading.value = false
+  }
+}
+
+function openFolderImport() {
+  folderDialogOpen.value = true
+  browseFolder("")
+}
+
+const folderImages = computed(() =>
+  folderItems.value.filter(f => f.type === "file" && f.isImage)
+)
+
+function importFolderImages() {
+  const newItems = folderImages.value.map(f => ({
+    src: f.path,
+    type: "image",
+    title: f.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "),
+    description: "",
+    category: "",
+    alt: f.name,
+  }))
+  emit("update:modelValue", [...(props.modelValue || []), ...newItems])
+  folderDialogOpen.value = false
+  folderPath.value       = ""
+}
+
 const zoomSrc = ref<string | null>(null)
 
 function openZoom(src: string) { zoomSrc.value = src }
@@ -267,8 +348,15 @@ onMounted(() => {
   <!-- Object array -->
   <div v-else-if="type === 'object-array'" class="space-y-2">
     <VueDraggable v-model="draggableObjectArray" handle=".obj-drag-handle" :animation="150" class="space-y-2">
-      <div v-for="(item, i) in draggableObjectArray" :key="i" class="border border-gray-700 rounded-lg overflow-hidden">
+      <div
+        v-for="(item, i) in draggableObjectArray"
+        :key="i"
+        :data-array-prop="fieldKey"
+        :data-array-index="i"
+        class="border border-gray-700 rounded-lg overflow-hidden"
+      >
         <button
+          data-array-item-toggle
           class="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-750 text-xs text-gray-400"
           @click="objectItemsExpanded[i] = !objectItemsExpanded[i]"
         >
@@ -285,14 +373,155 @@ onMounted(() => {
             @click.stop="removeObjectItem(i)"
           />
         </button>
-        <div v-if="objectItemsExpanded[i]" class="p-3 bg-gray-900">
+        <div v-if="objectItemsExpanded[i]" data-array-item-body class="p-3 bg-gray-900">
           <PropForm :model-value="item" :schema-defs="itemSchemaDefs" @update:model-value="updateObjectItem(i, $event)" />
         </div>
       </div>
     </VueDraggable>
-    <UButton icon="i-heroicons-plus" size="xs" variant="ghost" color="neutral" @click="addObjectItem">
-      Adicionar item
-    </UButton>
+    <div class="flex items-center gap-2 flex-wrap">
+      <UButton icon="i-heroicons-plus" size="xs" variant="ghost" color="neutral" @click="addObjectItem">
+        Adicionar item
+      </UButton>
+      <UButton
+        v-if="schema?.instagram_import"
+        size="xs"
+        variant="soft"
+        color="primary"
+        icon="i-heroicons-arrow-down-tray"
+        @click="igDialogOpen = true"
+      >
+        Importar do Instagram
+      </UButton>
+      <UButton
+        v-if="schema?.folder_import"
+        size="xs"
+        variant="soft"
+        color="neutral"
+        icon="i-heroicons-folder-open"
+        @click="openFolderImport"
+      >
+        Importar pasta
+      </UButton>
+    </div>
+
+    <!-- Folder import dialog -->
+    <Teleport to="body">
+      <Transition name="zoom-modal">
+        <div
+          v-if="folderDialogOpen"
+          class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          @click.self="folderDialogOpen = false"
+        >
+          <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-3 max-h-[80vh] flex flex-col" @click.stop>
+
+            <!-- Header -->
+            <div class="flex items-center gap-2 shrink-0">
+              <i class="pi pi-folder-open text-lg text-yellow-400" />
+              <h3 class="text-sm font-semibold text-white flex-1">Importar pasta de media</h3>
+              <button class="text-gray-500 hover:text-white" @click="folderDialogOpen = false">
+                <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
+              </button>
+            </div>
+
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-1 text-xs text-gray-400 shrink-0 flex-wrap">
+              <button class="hover:text-white transition-colors" @click="browseFolder('')">Raiz</button>
+              <template v-for="(crumb, i) in folderBreadcrumbs" :key="crumb.path">
+                <span class="text-gray-600">/</span>
+                <button class="hover:text-white transition-colors" @click="browseFolder(crumb.path)">{{ crumb.label }}</button>
+              </template>
+            </div>
+
+            <!-- File list -->
+            <div class="flex-1 overflow-y-auto space-y-1 min-h-0">
+              <div v-if="folderLoading" class="flex justify-center py-8">
+                <i class="pi pi-spinner pi-spin text-gray-500 text-xl" />
+              </div>
+              <p v-else-if="folderError" class="text-xs text-red-400 px-1">{{ folderError }}</p>
+              <template v-else>
+                <!-- Folders -->
+                <button
+                  v-for="item in folderItems.filter(f => f.type === 'folder')"
+                  :key="item.path"
+                  class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800 text-sm text-gray-300 hover:text-white transition-colors text-left"
+                  @click="browseFolder(item.path)"
+                >
+                  <i class="pi pi-folder text-yellow-400 shrink-0" />
+                  <span class="flex-1 truncate">{{ item.name }}</span>
+                  <i class="pi pi-angle-right text-gray-600 text-xs" />
+                </button>
+                <!-- Images -->
+                <div
+                  v-for="item in folderImages"
+                  :key="item.path"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/50 text-xs text-gray-400"
+                >
+                  <i class="pi pi-image text-blue-400 shrink-0" />
+                  <span class="flex-1 truncate">{{ item.name }}</span>
+                </div>
+                <p v-if="!folderLoading && !folderItems.length" class="text-xs text-gray-600 italic px-2 py-4 text-center">Pasta vazia</p>
+              </template>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between shrink-0 pt-1 border-t border-gray-800">
+              <span class="text-xs text-gray-500">
+                {{ folderImages.length }} imagem(ns) nesta pasta
+              </span>
+              <div class="flex gap-2">
+                <UButton size="sm" variant="ghost" color="neutral" @click="folderDialogOpen = false">Cancelar</UButton>
+                <UButton
+                  size="sm"
+                  color="primary"
+                  :disabled="!folderImages.length"
+                  @click="importFolderImages"
+                >
+                  Importar {{ folderImages.length }} foto(s)
+                </UButton>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Instagram import dialog -->
+    <Teleport to="body">
+      <Transition name="zoom-modal">
+        <div
+          v-if="igDialogOpen"
+          class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          @click.self="igDialogOpen = false"
+        >
+          <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4" @click.stop>
+            <div class="flex items-center gap-2">
+              <i class="pi pi-instagram text-xl text-pink-400" />
+              <h3 class="text-sm font-semibold text-white">Importar do Instagram</h3>
+              <button class="ml-auto text-gray-500 hover:text-white" @click="igDialogOpen = false">
+                <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
+              </button>
+            </div>
+            <p class="text-xs text-gray-400">Insere o username do perfil público para importar as últimas 9 fotos.</p>
+            <UInput
+              v-model="igUsername"
+              placeholder="@username"
+              :disabled="igLoading"
+              @keyup.enter="importFromInstagram"
+            />
+            <p v-if="igError" class="text-xs text-red-400">{{ igError }}</p>
+            <div class="flex gap-2 justify-end">
+              <UButton size="sm" variant="ghost" color="neutral" :disabled="igLoading" @click="igDialogOpen = false">
+                Cancelar
+              </UButton>
+              <UButton size="sm" color="primary" :loading="igLoading" :disabled="!igUsername || igLoading" @click="importFromInstagram">
+                Importar 9 fotos
+              </UButton>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 
   <!-- Nested object -->

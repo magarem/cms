@@ -66,6 +66,14 @@
           "default": ""
         },
         {
+          "name": "linkImage",
+          "label": "Imagem do Link",
+          "type": "image",
+          "default": "",
+          "description": "Aparece apenas nos cartões de listagem. Se vazio, usa a imagem de capa.",
+          "group": "page-images"
+        },
+        {
           "name": "image",
           "label": "Cover Image",
           "type": "image-array",
@@ -255,6 +263,14 @@
           "label": "Publication Date",
           "type": "date",
           "default": ""
+        },
+        {
+          "name": "linkImage",
+          "label": "Imagem do Link",
+          "type": "image",
+          "default": "",
+          "description": "Aparece apenas nos cartões de listagem. Se vazio, usa a imagem de capa.",
+          "group": "page-images"
         },
         {
           "name": "image",
@@ -539,6 +555,14 @@
           "label": "Description",
           "type": "textarea",
           "default": ""
+        },
+        {
+          "name": "linkImage",
+          "label": "Imagem do Link",
+          "type": "image",
+          "default": "",
+          "description": "Aparece apenas nos cartões de listagem. Se vazio, usa a imagem de capa.",
+          "group": "page-images"
         },
         {
           "name": "image",
@@ -1187,11 +1211,61 @@
             },
             {
               "name": "to",
-              "label": "Link URL",
+              "label": "Card URL",
               "type": "url",
               "default": "/"
+            },
+            {
+              "name": "ctaLink",
+              "label": "CTA Button URL (override)",
+              "type": "url",
+              "default": ""
             }
           ]
+        },
+        {
+          "name": "colsPerRow",
+          "label": "Columns per row",
+          "type": "select",
+          "default": 3,
+          "options": [
+            {
+              "value": 1,
+              "label": "1"
+            },
+            {
+              "value": 2,
+              "label": "2"
+            },
+            {
+              "value": 3,
+              "label": "3"
+            },
+            {
+              "value": 4,
+              "label": "4"
+            },
+            {
+              "value": 5,
+              "label": "5"
+            },
+            {
+              "value": 6,
+              "label": "6"
+            }
+          ]
+        },
+        {
+          "name": "showIcons",
+          "label": "Show Icons",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showLinkText",
+          "label": "Show Link Text",
+          "type": "toggle",
+          "default": true
         },
         {
           "name": "cWidth",
@@ -1330,6 +1404,13 @@
               "label": "Vertical (9:16 — Shorts)"
             }
           ]
+        },
+        {
+          "name": "zoomOnClick",
+          "label": "Abrir em modal ao clicar",
+          "type": "toggle",
+          "default": false,
+          "description": "Mostra thumbnail com botão de play; ao clicar abre o vídeo em ecrã completo"
         },
         {
           "name": "videos",
@@ -1618,6 +1699,140 @@
               "label": "Só ícone"
             }
           ]
+        },
+        {
+          "name": "logoFont",
+          "label": "Fonte do nome",
+          "type": "select",
+          "default": "var(--font-serif)",
+          "options": [
+            {
+              "value": "var(--font-sans)",
+              "label": "— Tema: Sans"
+            },
+            {
+              "value": "var(--font-serif)",
+              "label": "— Tema: Serif (padrão)"
+            },
+            {
+              "value": "'Inter', sans-serif",
+              "label": "Inter"
+            },
+            {
+              "value": "'Roboto', sans-serif",
+              "label": "Roboto"
+            },
+            {
+              "value": "'Open Sans', sans-serif",
+              "label": "Open Sans"
+            },
+            {
+              "value": "'Lato', sans-serif",
+              "label": "Lato"
+            },
+            {
+              "value": "'Montserrat', sans-serif",
+              "label": "Montserrat"
+            },
+            {
+              "value": "'Poppins', sans-serif",
+              "label": "Poppins"
+            },
+            {
+              "value": "'Raleway', sans-serif",
+              "label": "Raleway"
+            },
+            {
+              "value": "'Nunito', sans-serif",
+              "label": "Nunito"
+            },
+            {
+              "value": "'DM Sans', sans-serif",
+              "label": "DM Sans"
+            },
+            {
+              "value": "'Outfit', sans-serif",
+              "label": "Outfit"
+            },
+            {
+              "value": "'Plus Jakarta Sans', sans-serif",
+              "label": "Plus Jakarta Sans"
+            },
+            {
+              "value": "'Manrope', sans-serif",
+              "label": "Manrope"
+            },
+            {
+              "value": "'Josefin Sans', sans-serif",
+              "label": "Josefin Sans"
+            },
+            {
+              "value": "'Oswald', sans-serif",
+              "label": "Oswald"
+            },
+            {
+              "value": "'Bebas Neue', sans-serif",
+              "label": "Bebas Neue"
+            },
+            {
+              "value": "'Ubuntu', sans-serif",
+              "label": "Ubuntu"
+            },
+            {
+              "value": "'Merriweather', serif",
+              "label": "Merriweather"
+            },
+            {
+              "value": "'Playfair Display', serif",
+              "label": "Playfair Display"
+            },
+            {
+              "value": "'Lora', serif",
+              "label": "Lora"
+            },
+            {
+              "value": "'Cormorant Garamond', serif",
+              "label": "Cormorant Garamond"
+            },
+            {
+              "value": "'EB Garamond', serif",
+              "label": "EB Garamond"
+            },
+            {
+              "value": "'Cinzel', serif",
+              "label": "Cinzel"
+            },
+            {
+              "value": "'Dancing Script', cursive",
+              "label": "Dancing Script"
+            },
+            {
+              "value": "'Pacifico', cursive",
+              "label": "Pacifico"
+            },
+            {
+              "value": "'Caveat', cursive",
+              "label": "Caveat"
+            },
+            {
+              "value": "'Space Grotesk', sans-serif",
+              "label": "Space Grotesk"
+            },
+            {
+              "value": "'Space Mono', monospace",
+              "label": "Space Mono"
+            },
+            {
+              "value": "'JetBrains Mono', monospace",
+              "label": "JetBrains Mono"
+            }
+          ]
+        },
+        {
+          "name": "logoFontSize",
+          "label": "Tamanho da fonte (ex: 2rem, 32px)",
+          "type": "text",
+          "default": ""
         }
       ]
     },
@@ -1649,6 +1864,140 @@
           ]
         },
         {
+          "name": "menuFont",
+          "label": "Fonte do menu",
+          "type": "select",
+          "default": "var(--font-sans)",
+          "options": [
+            {
+              "value": "var(--font-sans)",
+              "label": "— Tema: Sans (padrão)"
+            },
+            {
+              "value": "var(--font-serif)",
+              "label": "— Tema: Serif"
+            },
+            {
+              "value": "'Inter', sans-serif",
+              "label": "Inter"
+            },
+            {
+              "value": "'Roboto', sans-serif",
+              "label": "Roboto"
+            },
+            {
+              "value": "'Open Sans', sans-serif",
+              "label": "Open Sans"
+            },
+            {
+              "value": "'Lato', sans-serif",
+              "label": "Lato"
+            },
+            {
+              "value": "'Montserrat', sans-serif",
+              "label": "Montserrat"
+            },
+            {
+              "value": "'Poppins', sans-serif",
+              "label": "Poppins"
+            },
+            {
+              "value": "'Raleway', sans-serif",
+              "label": "Raleway"
+            },
+            {
+              "value": "'Nunito', sans-serif",
+              "label": "Nunito"
+            },
+            {
+              "value": "'DM Sans', sans-serif",
+              "label": "DM Sans"
+            },
+            {
+              "value": "'Outfit', sans-serif",
+              "label": "Outfit"
+            },
+            {
+              "value": "'Plus Jakarta Sans', sans-serif",
+              "label": "Plus Jakarta Sans"
+            },
+            {
+              "value": "'Manrope', sans-serif",
+              "label": "Manrope"
+            },
+            {
+              "value": "'Josefin Sans', sans-serif",
+              "label": "Josefin Sans"
+            },
+            {
+              "value": "'Oswald', sans-serif",
+              "label": "Oswald"
+            },
+            {
+              "value": "'Bebas Neue', sans-serif",
+              "label": "Bebas Neue"
+            },
+            {
+              "value": "'Ubuntu', sans-serif",
+              "label": "Ubuntu"
+            },
+            {
+              "value": "'Merriweather', serif",
+              "label": "Merriweather"
+            },
+            {
+              "value": "'Playfair Display', serif",
+              "label": "Playfair Display"
+            },
+            {
+              "value": "'Lora', serif",
+              "label": "Lora"
+            },
+            {
+              "value": "'Cormorant Garamond', serif",
+              "label": "Cormorant Garamond"
+            },
+            {
+              "value": "'EB Garamond', serif",
+              "label": "EB Garamond"
+            },
+            {
+              "value": "'Cinzel', serif",
+              "label": "Cinzel"
+            },
+            {
+              "value": "'Dancing Script', cursive",
+              "label": "Dancing Script"
+            },
+            {
+              "value": "'Pacifico', cursive",
+              "label": "Pacifico"
+            },
+            {
+              "value": "'Caveat', cursive",
+              "label": "Caveat"
+            },
+            {
+              "value": "'Space Grotesk', sans-serif",
+              "label": "Space Grotesk"
+            },
+            {
+              "value": "'Space Mono', monospace",
+              "label": "Space Mono"
+            },
+            {
+              "value": "'JetBrains Mono', monospace",
+              "label": "JetBrains Mono"
+            }
+          ]
+        },
+        {
+          "name": "menuFontSize",
+          "label": "Tamanho da fonte (ex: 14px, 1rem)",
+          "type": "text",
+          "default": ""
+        },
+        {
           "name": "menuItems",
           "label": "Menu Items",
           "type": "array",
@@ -1674,7 +2023,7 @@
       "name": "ContentBlock",
       "file": "components/ContentBlock.vue",
       "category": "block",
-      "description": "Two-column section with text content on one side and an image on the other. Supports badge, title, body text, feature icons, and image side control.",
+      "description": "Two-column section with text content on one side and media on the other. Supports badge, title, body text (Markdown), feature icons, image side control, and video (YouTube, Vimeo, or local).",
       "props": [
         {
           "name": "badge",
@@ -1697,9 +2046,10 @@
           "default": ""
         },
         {
-          "name": "image",
-          "label": "Image",
-          "type": "image",
+          "name": "media",
+          "label": "Media",
+          "type": "media",
+          "description": "Image path or YouTube/Vimeo URL. Videos show a play button and open in a lightbox.",
           "default": ""
         },
         {
@@ -2013,6 +2363,20 @@
       "description": "Footer brand block: site name, slogan, short description and social media icon links.",
       "props": [
         {
+          "name": "logo",
+          "label": "Imagem do logótipo",
+          "type": "image",
+          "default": "",
+          "description": "Se definida, substitui o texto do nome da marca."
+        },
+        {
+          "name": "logoHeight",
+          "label": "Altura do logótipo",
+          "type": "text",
+          "default": "60px",
+          "description": "Altura CSS (ex: 60px, 4rem)"
+        },
+        {
           "name": "brandName",
           "label": "Nome da marca",
           "type": "text",
@@ -2219,7 +2583,7 @@
         {
           "name": "subtitle",
           "label": "Subtítulo",
-          "type": "textarea",
+          "type": "text",
           "default": ""
         },
         {
@@ -3021,9 +3385,18 @@
           "type": "select",
           "default": "right",
           "options": [
-            { "value": "left",   "label": "Esquerda" },
-            { "value": "center", "label": "Centro"   },
-            { "value": "right",  "label": "Direita"  }
+            {
+              "value": "left",
+              "label": "Esquerda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Direita"
+            }
           ]
         },
         {
@@ -3063,8 +3436,14 @@
           "type": "select",
           "default": "filled",
           "options": [
-            { "value": "filled",  "label": "Preenchido (bg-primary)" },
-            { "value": "outline", "label": "Contorno (border)"       }
+            {
+              "value": "filled",
+              "label": "Preenchido (bg-primary)"
+            },
+            {
+              "value": "outline",
+              "label": "Contorno (border)"
+            }
           ]
         },
         {
@@ -3094,8 +3473,593 @@
       "name": "InscricaoForm",
       "file": "paravyoma2/app/components/InscricaoForm.vue",
       "category": "block",
-      "description": "Formulário de inscrição em 3 etapas para novos alunos (exclusivo Paravyoma Yoga).",
-      "props": []
+      "description": "Formulário de inscrição em 3 etapas (exclusivo Paravyoma Yoga). Todos os textos, preços e métodos de pagamento são editáveis.",
+      "props": [
+        {
+          "name": "badgeText",
+          "label": "Cabeçalho — etiqueta",
+          "type": "text",
+          "default": "Formação Profissional 2026"
+        },
+        {
+          "name": "badgeIcon",
+          "label": "Cabeçalho — ícone (PrimeIcons, ex: pi-star-fill)",
+          "type": "text",
+          "default": "pi-star-fill"
+        },
+        {
+          "name": "title",
+          "label": "Cabeçalho — título",
+          "type": "text",
+          "default": "Inscrição em Yogaterapia"
+        },
+        {
+          "name": "subtitle",
+          "label": "Cabeçalho — subtítulo",
+          "type": "text",
+          "default": "Preencha o formulário abaixo para garantir a sua vaga."
+        },
+        {
+          "name": "stepLabel",
+          "label": "Indicador de passo — prefixo",
+          "type": "text",
+          "default": "Passo"
+        },
+        {
+          "name": "stepOfLabel",
+          "label": "Indicador de passo — conector",
+          "type": "text",
+          "default": "de"
+        },
+        {
+          "name": "step1Title",
+          "label": "Passo 1 — título",
+          "type": "text",
+          "default": "Dados pessoais"
+        },
+        {
+          "name": "nomeLabel",
+          "label": "Passo 1 — rótulo Nome",
+          "type": "text",
+          "default": "Nome completo"
+        },
+        {
+          "name": "nomePlaceholder",
+          "label": "Passo 1 — placeholder Nome",
+          "type": "text",
+          "default": "O seu nome completo"
+        },
+        {
+          "name": "emailLabel",
+          "label": "Passo 1 — rótulo Email",
+          "type": "text",
+          "default": "Email"
+        },
+        {
+          "name": "emailPlaceholder",
+          "label": "Passo 1 — placeholder Email",
+          "type": "text",
+          "default": "seu@email.com"
+        },
+        {
+          "name": "whatsappLabel",
+          "label": "Passo 1 — rótulo WhatsApp",
+          "type": "text",
+          "default": "WhatsApp"
+        },
+        {
+          "name": "whatsappPlaceholder",
+          "label": "Passo 1 — placeholder WhatsApp",
+          "type": "text",
+          "default": "(00) 00000-0000"
+        },
+        {
+          "name": "step2Title",
+          "label": "Passo 2 — título",
+          "type": "text",
+          "default": "Dados complementares"
+        },
+        {
+          "name": "nascimentoLabel",
+          "label": "Passo 2 — rótulo Nascimento",
+          "type": "text",
+          "default": "Data de nascimento"
+        },
+        {
+          "name": "cpfLabel",
+          "label": "Passo 2 — rótulo CPF",
+          "type": "text",
+          "default": "CPF"
+        },
+        {
+          "name": "cpfPlaceholder",
+          "label": "Passo 2 — placeholder CPF",
+          "type": "text",
+          "default": "000.000.000-00"
+        },
+        {
+          "name": "enderecoLabel",
+          "label": "Passo 2 — rótulo Endereço",
+          "type": "text",
+          "default": "Endereço completo"
+        },
+        {
+          "name": "enderecoPlaceholder",
+          "label": "Passo 2 — placeholder Endereço",
+          "type": "text",
+          "default": "Rua, número, cidade, estado"
+        },
+        {
+          "name": "step3Title",
+          "label": "Passo 3 — título",
+          "type": "text",
+          "default": "Método de pagamento"
+        },
+        {
+          "name": "pricingRows",
+          "label": "Passo 3 — linhas de preço (na caixa de valores)",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "label",
+              "label": "Rótulo (esquerda)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "value",
+              "label": "Valor (direita)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "style",
+              "label": "Estilo",
+              "type": "select",
+              "default": "normal",
+              "options": [
+                {
+                  "value": "normal",
+                  "label": "Normal"
+                },
+                {
+                  "value": "strikethrough",
+                  "label": "Riscado (preço antigo)"
+                },
+                {
+                  "value": "highlight",
+                  "label": "Destaque (cor primária)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "promoText",
+          "label": "Passo 3 — texto promocional (abaixo da caixa de preços)",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "paymentOptions",
+          "label": "Passo 3 — métodos de pagamento",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "id",
+              "label": "Identificador (ex: pix, cartao, boleto)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Rótulo visível",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "detalhe",
+              "label": "Detalhe / descrição (opcional)",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        },
+        {
+          "name": "defaultPaymentMethod",
+          "label": "Método de pagamento padrão (id)",
+          "type": "text",
+          "default": "pix"
+        },
+        {
+          "name": "nextLabel",
+          "label": "Botão — Próximo",
+          "type": "text",
+          "default": "Próximo"
+        },
+        {
+          "name": "backLabel",
+          "label": "Botão — Voltar",
+          "type": "text",
+          "default": "Voltar"
+        },
+        {
+          "name": "submitLabel",
+          "label": "Botão — Finalizar",
+          "type": "text",
+          "default": "Finalizar"
+        },
+        {
+          "name": "submittingLabel",
+          "label": "Botão — Enviando (estado loading)",
+          "type": "text",
+          "default": "A enviar…"
+        },
+        {
+          "name": "errNomeRequired",
+          "label": "Erro — Nome obrigatório",
+          "type": "text",
+          "default": "Por favor, preencha o seu nome."
+        },
+        {
+          "name": "errEmailRequired",
+          "label": "Erro — Email obrigatório",
+          "type": "text",
+          "default": "Por favor, preencha o seu email."
+        },
+        {
+          "name": "errWhatsappRequired",
+          "label": "Erro — WhatsApp obrigatório",
+          "type": "text",
+          "default": "Por favor, preencha o seu WhatsApp."
+        },
+        {
+          "name": "errGeneric",
+          "label": "Erro — Falha de envio (genérica)",
+          "type": "text",
+          "default": "Erro ao processar inscrição. Tente novamente."
+        },
+        {
+          "name": "successTitle",
+          "label": "Sucesso — título",
+          "type": "text",
+          "default": "Inscrição enviada!"
+        },
+        {
+          "name": "successMessage",
+          "label": "Sucesso — mensagem",
+          "type": "textarea",
+          "default": "Recebemos a sua inscrição. Em breve entraremos em contacto pelo email e WhatsApp indicados para confirmar os próximos passos."
+        },
+        {
+          "name": "successButtonLabel",
+          "label": "Sucesso — texto do botão",
+          "type": "text",
+          "default": "Voltar ao início"
+        },
+        {
+          "name": "successButtonLink",
+          "label": "Sucesso — link do botão",
+          "type": "url",
+          "default": "/"
+        },
+        {
+          "name": "reassuranceText",
+          "label": "Rodapé — nota de segurança",
+          "type": "text",
+          "default": "Os seus dados estão seguros e nunca serão partilhados."
+        }
+      ]
+    },
+    {
+      "name": "ProductShop",
+      "file": "components/ProductShop.vue",
+      "category": "block",
+      "description": "Grelha de produtos para lojas e e-commerce — suporta filtros por categoria, pesquisa, preços promocionais e estado de stock.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "Loja"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "currency",
+          "label": "Símbolo de moeda",
+          "type": "text",
+          "default": "€"
+        },
+        {
+          "name": "pricePosition",
+          "label": "Posição da moeda",
+          "type": "select",
+          "default": "after",
+          "options": [
+            {
+              "value": "after",
+              "label": "Depois (45 €)"
+            },
+            {
+              "value": "before",
+              "label": "Antes (€ 45)"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "label": "Modo de exibição",
+          "type": "select",
+          "default": "grid",
+          "options": [
+            {
+              "value": "grid",
+              "label": "Grelha de cartões"
+            },
+            {
+              "value": "list",
+              "label": "Lista horizontal"
+            }
+          ]
+        },
+        {
+          "name": "columns",
+          "label": "Colunas (grelha)",
+          "type": "select",
+          "default": "3",
+          "options": [
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
+          ]
+        },
+        {
+          "name": "showFilters",
+          "label": "Mostrar filtros por categoria",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "showSearch",
+          "label": "Mostrar barra de pesquisa",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "showBuyButton",
+          "label": "Mostrar botão de compra",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "ctaLink",
+          "label": "Link de compra (fallback para todos os produtos)",
+          "type": "url",
+          "default": ""
+        },
+        {
+          "name": "ctaLabel",
+          "label": "Texto do botão",
+          "type": "text",
+          "default": "Comprar"
+        },
+        {
+          "name": "ctaTarget",
+          "label": "Abrir link em",
+          "type": "select",
+          "default": "_self",
+          "options": [
+            {
+              "value": "_self",
+              "label": "Mesma janela"
+            },
+            {
+              "value": "_blank",
+              "label": "Nova janela / aba"
+            }
+          ]
+        },
+        {
+          "name": "products",
+          "label": "Produtos",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "name",
+              "label": "Nome do produto",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "price",
+              "label": "Preço",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "oldPrice",
+              "label": "Preço original (riscado, para promoções)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "image",
+              "label": "Imagem",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "category",
+              "label": "Categoria",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "link",
+              "label": "Link de compra (URL)",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "badge",
+              "label": "Badge",
+              "type": "select",
+              "default": "",
+              "options": [
+                {
+                  "value": "",
+                  "label": "Sem badge"
+                },
+                {
+                  "value": "Novo",
+                  "label": "Novo"
+                },
+                {
+                  "value": "Promoção",
+                  "label": "Promoção"
+                },
+                {
+                  "value": "Destaque",
+                  "label": "Destaque"
+                },
+                {
+                  "value": "Exclusivo",
+                  "label": "Exclusivo"
+                },
+                {
+                  "value": "Esgotado",
+                  "label": "Esgotado"
+                }
+              ]
+            },
+            {
+              "name": "available",
+              "label": "Disponível",
+              "type": "toggle",
+              "default": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MercadoLivreShop",
+      "file": "components/MercadoLivreShop.vue",
+      "category": "block",
+      "description": "Catálogo de produtos do Mercado Livre. Use uma URL de loja social (/social/usuario) para importar a lista inteira automaticamente, ou cole URLs de produtos individuais.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "socialUrl",
+          "label": "URL da loja social (ex: https://www.mercadolivre.com.br/social/usuario) — quando preenchida, importa a lista de afiliados automaticamente e ignora a lista de produtos abaixo.",
+          "type": "url",
+          "default": ""
+        },
+        {
+          "name": "showPrice",
+          "label": "Mostrar preço",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showBadge",
+          "label": "Mostrar etiquetas (MAIS VENDIDO, etc)",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showShipping",
+          "label": "Mostrar info de envio (Frete grátis)",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "columns",
+          "label": "Colunas",
+          "type": "select",
+          "default": "3",
+          "options": [
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
+          ]
+        },
+        {
+          "name": "ctaText",
+          "label": "Texto do botão",
+          "type": "text",
+          "default": "Ver no Mercado Livre"
+        },
+        {
+          "name": "products",
+          "label": "Produtos (usado apenas se URL da loja social estiver vazia)",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "mercadolivreUrl",
+              "label": "URL do produto no Mercado Livre",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "active",
+              "label": "Ativo",
+              "type": "toggle",
+              "default": true
+            }
+          ]
+        }
+      ]
     }
   ]
 }

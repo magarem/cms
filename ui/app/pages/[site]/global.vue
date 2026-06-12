@@ -26,16 +26,20 @@ const STYLE_DEFAULTS = {
   vendorName: '',
   vendorUrl: '',
   copyrightAlign: 'justify',
+  showDarkToggle: true,
 }
 
 const STYLE_SCHEMA: Record<string, PropSchema> = {
-  bgColor:      { name: 'bgColor',      label: 'Cor de fundo',                    type: 'color' },
-  textColor:    { name: 'textColor',    label: 'Cor do texto',                    type: 'color' },
-  minHeight:    { name: 'minHeight',    label: 'Altura mínima (ex: 200px)',        type: 'text' },
-  blockPadding: { name: 'blockPadding', label: 'Padding dos blocos (ex: 24px)',   type: 'text' },
+  bgColor:      { name: 'bgColor',      label: 'Cor de fundo',                   type: 'color' },
+  textColor:    { name: 'textColor',    label: 'Cor do texto',                   type: 'color' },
+  minHeight:    { name: 'minHeight',    label: 'Altura mínima (ex: 200px)',       type: 'text' },
+  blockPadding: { name: 'blockPadding', label: 'Padding dos blocos (ex: 24px)',  type: 'text' },
+}
+
+const FOOTER_STYLE_SCHEMA: Record<string, PropSchema> = {
   copyright:    { name: 'copyright',    label: 'Linha de copyright',              type: 'text' },
-  vendorName:     { name: 'vendorName',     label: 'Vendor (nome)',                   type: 'text' },
-  vendorUrl:      { name: 'vendorUrl',      label: 'Vendor (link)',                   type: 'url' },
+  vendorName:     { name: 'vendorName',     label: 'Vendor (nome)',               type: 'text' },
+  vendorUrl:      { name: 'vendorUrl',      label: 'Vendor (link)',               type: 'url' },
   copyrightAlign: { name: 'copyrightAlign', label: 'Alinhamento da linha de copyright', type: 'select',
     options: [
       { value: 'justify', label: 'Justify (copyright ← → vendor)' },
@@ -43,6 +47,32 @@ const STYLE_SCHEMA: Record<string, PropSchema> = {
       { value: 'center',  label: 'Centro' },
       { value: 'right',   label: 'Direita' },
     ]
+  },
+  showDarkToggle: { name: 'showDarkToggle', label: 'Botão claro/escuro no rodapé', type: 'toggle' },
+}
+
+const activeStyleSchema = computed(() =>
+  activeKey.value === 'footer'
+    ? { ...STYLE_SCHEMA, ...FOOTER_STYLE_SCHEMA }
+    : STYLE_SCHEMA
+)
+
+const stylePanelLabel = computed(() => {
+  if (activeKey.value === 'footer') return 'Estilo do rodapé'
+  if (activeKey.value === 'topbar') return 'Estilo do cabeçalho'
+  return 'Estilo'
+})
+
+const THEME_SCHEMA: Record<string, PropSchema> = {
+  defaultColorMode: {
+    name: 'defaultColorMode',
+    label: 'Modo de cor padrão',
+    type: 'select',
+    options: [
+      { value: 'system', label: 'Sistema (preferência do utilizador)' },
+      { value: 'light',  label: 'Claro' },
+      { value: 'dark',   label: 'Escuro' },
+    ],
   },
 }
 
@@ -60,10 +90,41 @@ watch(activeKey, (key) => {
 })
 
 watchEffect(() => {
-  if (globalKeys.value.length && !activeKey.value) {
+  if (!globalKeys.value.length) return
+  const requested = route.query.section as string | undefined
+  if (requested && globalKeys.value.includes(requested)) {
+    activeKey.value = requested
+  } else if (!activeKey.value) {
     activeKey.value = globalKeys.value[0]
   }
 })
+
+// Scroll to + expand a specific block when ?block= / ?blockIndex= is in the URL
+watch(editData, (val) => {
+  if (!val || !Array.isArray(val.blocks)) return
+  const targetId    = route.query.block      as string | undefined
+  const targetIndex = route.query.blockIndex as string | undefined
+  if (!targetId && targetIndex == null) return
+  nextTick(() => setTimeout(() => {
+    const el = (
+      (targetId    ? document.querySelector(`[data-block-id="${targetId}"]`)       : null) ||
+      (targetIndex != null ? document.querySelector(`[data-block-index="${targetIndex}"]`) : null)
+    ) as HTMLElement | null
+    if (!el) return
+    document.querySelectorAll('[data-block-index]').forEach((card) => {
+      if (card === el) return
+      if (card.querySelector('[data-block-body]')) {
+        (card.querySelector('[data-block-toggle]') as HTMLElement | null)?.click()
+      }
+    })
+    if (!el.querySelector('[data-block-body]')) {
+      (el.querySelector('[data-block-toggle]') as HTMLElement | null)?.click()
+    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    el.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-gray-950')
+    setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-gray-950'), 3000)
+  }, 200))
+}, { once: true })
 
 const previewUrl = `/${site}/preview?path=/`
 
@@ -156,7 +217,7 @@ async function save() {
             >
               <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
                 <UIcon name="i-heroicons-paint-brush" class="w-4 h-4 text-gray-500" />
-                Estilo do rodapé
+                {{ stylePanelLabel }}
               </div>
               <UIcon
                 :name="styleOpen ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -164,7 +225,7 @@ async function save() {
               />
             </button>
             <div v-if="styleOpen" class="p-4 bg-gray-950 grid grid-cols-2 gap-4">
-              <div v-for="(schema, key) in STYLE_SCHEMA" :key="key">
+              <div v-for="(schema, key) in activeStyleSchema" :key="key">
                 <label class="block text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">
                   {{ schema.label }}
                 </label>
@@ -184,6 +245,30 @@ async function save() {
             :site="site"
             :content-path="`_global/${activeKey}`"
           />
+        </template>
+
+        <!-- Theme key: dedicated defaultColorMode panel + color vars -->
+        <template v-else-if="activeKey === 'theme'">
+          <div class="mb-6 border border-gray-800 rounded-xl overflow-hidden">
+            <div class="flex items-center gap-2 px-4 py-3 bg-gray-900 text-sm font-medium text-gray-300">
+              <UIcon name="i-heroicons-swatch" class="w-4 h-4 text-gray-500" />
+              Configuração de cor
+            </div>
+            <div class="p-4 bg-gray-950">
+              <div v-for="(schema, key) in THEME_SCHEMA" :key="key">
+                <label class="block text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">
+                  {{ schema.label }}
+                </label>
+                <PropField
+                  :field-key="key"
+                  :model-value="editData[key] ?? schema.options?.[0]?.value ?? ''"
+                  :schema="schema"
+                  @update:model-value="editData = { ...editData, [key]: $event }"
+                />
+              </div>
+            </div>
+          </div>
+          <PropForm v-model="editData" :skip-keys="Object.keys(THEME_SCHEMA)" />
         </template>
 
         <PropForm v-else v-model="editData" />

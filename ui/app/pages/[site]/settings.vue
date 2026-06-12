@@ -16,6 +16,8 @@ const googleAnalyticsId    = ref("")
 const siteVersions         = ref<string[]>(["v1"])
 const activeEditionVersion = ref("v1")
 const defaultSiteVersion   = ref("v1")
+const breadcrumbMode       = ref("complete")
+const blocksGap            = ref("md")
 
 const editableVersions = computed(() => siteVersions.value.filter(v => v !== "production"))
 
@@ -26,6 +28,8 @@ watch(data, (val) => {
   siteVersions.value         = val.settings?.siteVersions || ["v1"]
   activeEditionVersion.value = val.settings?.activeEditionVersion || "v1"
   defaultSiteVersion.value   = val.settings?.defaultSiteVersion || "v1"
+  breadcrumbMode.value       = val.settings?.breadcrumbMode || "complete"
+  blocksGap.value            = val.settings?.blocksGap      || "md"
 }, { immediate: true })
 
 // ── Save settings ─────────────────────────────────────────
@@ -37,6 +41,8 @@ async function save() {
     await api.put(`/sites/${site}/settings`, {
       activeEditionVersion: activeEditionVersion.value,
       defaultSiteVersion: defaultSiteVersion.value,
+      breadcrumbMode: breadcrumbMode.value,
+      blocksGap: blocksGap.value,
       cmsConfig: { previewUrl: previewUrl.value, googleAnalyticsId: googleAnalyticsId.value },
     })
     toast.add({ title: "Configurações guardadas.", color: "success" })
@@ -170,6 +176,80 @@ async function createVersion() {
         <p class="text-xs text-gray-500 mt-2">
           URL onde o site corre localmente. Usado no painel de preview em tempo real.
         </p>
+      </UCard>
+
+      <!-- Breadcrumbs card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-map" class="w-4 h-4 text-gray-400" />
+            <span class="text-sm font-semibold text-white">Breadcrumbs</span>
+          </div>
+        </template>
+        <UFormField label="Comportamento dos breadcrumbs">
+          <div class="flex flex-col gap-2 mt-1">
+            <label
+              v-for="opt in [
+                { value: 'complete',     label: 'Completo',          desc: 'Início › Serviços › Design' },
+                { value: 'parents-only', label: 'Só os pais',        desc: 'Início › Serviços (sem a página atual)' },
+                { value: 'hidden',       label: 'Desligado',         desc: 'Breadcrumbs não são exibidos' },
+              ]"
+              :key="opt.value"
+              class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
+              :class="breadcrumbMode === opt.value
+                ? 'border-primary-500/50 bg-primary-500/5'
+                : 'border-gray-800 hover:border-gray-700'"
+              @click="breadcrumbMode = opt.value"
+            >
+              <div class="w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                :class="breadcrumbMode === opt.value ? 'border-primary-400' : 'border-gray-600'">
+                <div v-if="breadcrumbMode === opt.value" class="w-2 h-2 rounded-full bg-primary-400" />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-white">{{ opt.label }}</p>
+                <p class="text-xs text-gray-500 mt-0.5 font-mono">{{ opt.desc }}</p>
+              </div>
+            </label>
+          </div>
+        </UFormField>
+      </UCard>
+
+      <!-- Blocks gap card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-arrows-up-down" class="w-4 h-4 text-gray-400" />
+            <span class="text-sm font-semibold text-white">Espaçamento entre blocos</span>
+          </div>
+        </template>
+        <UFormField label="Espaço vertical entre cada bloco de conteúdo">
+          <div class="flex flex-col gap-2 mt-1">
+            <label
+              v-for="opt in [
+                { value: 'none', label: 'Nenhum',      desc: '0 px  — blocos colados' },
+                { value: 'sm',   label: 'Pequeno',     desc: '12 px' },
+                { value: 'md',   label: 'Médio',       desc: '28 px  — padrão' },
+                { value: 'lg',   label: 'Grande',      desc: '48 px' },
+                { value: 'xl',   label: 'Extra-largo', desc: '80 px' },
+              ]"
+              :key="opt.value"
+              class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
+              :class="blocksGap === opt.value
+                ? 'border-primary-500/50 bg-primary-500/5'
+                : 'border-gray-800 hover:border-gray-700'"
+              @click="blocksGap = opt.value"
+            >
+              <div class="w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                :class="blocksGap === opt.value ? 'border-primary-400' : 'border-gray-600'">
+                <div v-if="blocksGap === opt.value" class="w-2 h-2 rounded-full bg-primary-400" />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-white">{{ opt.label }}</p>
+                <p class="text-xs text-gray-500 mt-0.5 font-mono">{{ opt.desc }}</p>
+              </div>
+            </label>
+          </div>
+        </UFormField>
       </UCard>
 
       <!-- Google Analytics card -->

@@ -1,8 +1,7 @@
 import { Elysia, t } from "elysia"
 import { jwt } from "@elysiajs/jwt"
 import { readUsers, writeUsers, hashPassword, sanitizeUser } from "../lib/users"
-
-const JWT_SECRET = process.env.JWT_SECRET || "sirius_cms_dev_secret_change_in_production"
+import { JWT_SECRET } from "../lib/config"
 
 async function getAuthedAdmin(jwt: any, token: string | undefined) {
   if (!token) return null
@@ -40,6 +39,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
         passwordHash: await hashPassword(body.password),
         role: body.role,
         sites: [user.site],
+        email: body.email || undefined,
       }
       users.push(newUser)
       await writeUsers(user.site, { users })
@@ -50,6 +50,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
         username: t.String({ minLength: 2 }),
         password: t.String({ minLength: 6 }),
         role: t.Union([t.Literal("admin"), t.Literal("editor"), t.Literal("viewer")]),
+        email: t.Optional(t.String()),
       }),
     }
   )
@@ -68,6 +69,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
         users[idx].passwordHash = await hashPassword((body as any).password)
       }
       if ((body as any).role) users[idx].role = (body as any).role
+      if ("email" in (body as any)) users[idx].email = (body as any).email || undefined
 
       await writeUsers(user.site, { users })
       return { success: true, user: sanitizeUser(users[idx]) }

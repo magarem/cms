@@ -33,6 +33,7 @@ const saving = ref(false)
 
 const form = ref({
   username: "",
+  email: "",
   password: "",
   role: "editor" as "admin" | "editor" | "viewer",
 })
@@ -42,13 +43,13 @@ const modalTitle = computed(() => isEdit.value ? "Editar usuário" : "Novo usuá
 
 function openCreate() {
   editingUser.value = null
-  form.value = { username: "", password: "", role: "editor" }
+  form.value = { username: "", email: "", password: "", role: "editor" }
   showModal.value = true
 }
 
 function openEdit(user: any) {
   editingUser.value = user
-  form.value = { username: user.username, password: "", role: user.role }
+  form.value = { username: user.username, email: user.email || "", password: "", role: user.role }
   showModal.value = true
 }
 
@@ -56,13 +57,14 @@ async function submitForm() {
   saving.value = true
   try {
     if (isEdit.value) {
-      const payload: any = { role: form.value.role }
+      const payload: any = { role: form.value.role, email: form.value.email }
       if (form.value.password) payload.password = form.value.password
       await api.put(`/users/${editingUser.value.id}`, payload)
       toast.add({ title: "Usuário atualizado.", color: "success" })
     } else {
       await api.post("/users", {
         username: form.value.username,
+        email: form.value.email,
         password: form.value.password,
         role: form.value.role,
       })
@@ -119,7 +121,7 @@ async function submitDelete() {
 
   <!-- Content -->
   <div class="flex-1 overflow-auto p-6">
-    <div class="max-w-2xl">
+    <div class="max-w-3xl">
       <div v-if="users.length === 0" class="text-center text-gray-600 py-16 text-sm">
         Nenhum usuário encontrado.
       </div>
@@ -129,6 +131,7 @@ async function submitDelete() {
           <thead>
             <tr class="border-b border-gray-800 bg-gray-900/60 text-left">
               <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuário</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
               <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Função</th>
               <th class="px-4 py-3 w-20" />
             </tr>
@@ -146,6 +149,10 @@ async function submitDelete() {
                   </div>
                   <span class="font-medium text-white">{{ user.username }}</span>
                 </div>
+              </td>
+              <td class="px-4 py-3">
+                <span v-if="user.email" class="text-xs text-gray-400">{{ user.email }}</span>
+                <span v-else class="text-xs text-gray-700">—</span>
               </td>
               <td class="px-4 py-3">
                 <UBadge :color="ROLE_COLOR[user.role] || 'neutral'" variant="subtle" size="xs">
@@ -190,6 +197,15 @@ async function submitDelete() {
             placeholder="username"
             autofocus
             class="w-full font-mono"
+          />
+        </UFormField>
+
+        <UFormField label="Email">
+          <UInput
+            v-model="form.email"
+            type="email"
+            placeholder="email@exemplo.com"
+            class="w-full"
           />
         </UFormField>
 
