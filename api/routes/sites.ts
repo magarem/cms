@@ -3,6 +3,7 @@ import { jwt } from "@elysiajs/jwt"
 import { readdir, writeFile, mkdir, rm, readFile, rename as renameNode, cp, appendFile } from "node:fs/promises"
 import { existsSync, createReadStream } from "node:fs"
 import { join, extname, dirname, basename } from "node:path"
+import sharp from "sharp"
 import { createInterface } from "node:readline"
 import { createHash } from "node:crypto"
 import {
@@ -25,6 +26,9 @@ import {
   copyMedia,
   parseContent,
   serializeContent,
+  saveRevision,
+  listRevisions,
+  getRevision,
 } from "../lib/content"
 import {
   getModel,
@@ -33,8 +37,11 @@ import {
   defaultCollectionItemTemplate,
   resolveDefaultModel,
 } from "../lib/models"
+import { JWT_SECRET } from "../lib/config"
 
-const JWT_SECRET = process.env.JWT_SECRET || "sirius_cms_dev_secret_change_in_production"
+function isLegacyBackupDir(name: string): boolean {
+  return /backup-\d{10,}/.test(name)
+}
 
 async function getUser(jwt: any, token: string | undefined, expectedSite?: string) {
   if (!token) return null
@@ -90,7 +97,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     if (existsSync(dataRoot)) {
       const items = await readdir(dataRoot, { withFileTypes: true })
       siteVersions = items
-        .filter((i) => i.isDirectory() && !i.name.startsWith("_") && !i.name.startsWith("."))
+        .filter((i) => i.isDirectory() && !i.name.startsWith("_") && !i.name.startsWith(".") && !isLegacyBackupDir(i.name))
         .map((i) => i.name)
     }
 
@@ -176,6 +183,23 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
       const version = getActiveVersion(settings)
       const pagePath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
 
+      // Snapshot current content before overwriting
+      const existing = await resolvePageFile(params.site, version, pagePath)
+      if (existing) {
+        if (query.silent !== "true") {
+          // Explicit save — always create a revision
+          await saveRevision(params.site, version, pagePath, existing.data, user.username)
+        } else {
+          // Auto-save — checkpoint only if last revision is >5 minutes old
+          const revisions = await listRevisions(params.site, version, pagePath)
+          const lastRev = revisions[0]
+          const fiveMinAgo = Date.now() - 5 * 60 * 1000
+          if (!lastRev || new Date(lastRev.savedAt).getTime() < fiveMinAgo) {
+            await saveRevision(params.site, version, pagePath, existing.data, user.username)
+          }
+        }
+      }
+
       await writePage(params.site, version, pagePath, body)
       return { success: true }
     },
@@ -241,6 +265,56 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     const pagePath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
 
     await deletePage(params.site, version, pagePath)
+    return { success: true }
+  })
+
+  // ── Page revision list ───────────────────────────────────────────
+  .get("/:site/page/revisions", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const settings = await getSiteSettings(params.site)
+    const version = getActiveVersion(settings)
+    const pagePath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
+
+    const revisions = await listRevisions(params.site, version, pagePath)
+    return { success: true, revisions }
+  })
+
+  // ── Page revision detail ─────────────────────────────────────────
+  .get("/:site/page/revisions/:revId", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const settings = await getSiteSettings(params.site)
+    const version = getActiveVersion(settings)
+    const pagePath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
+
+    const revision = await getRevision(params.site, version, pagePath, params.revId)
+    if (!revision) { set.status = 404; return { error: "Revisão não encontrada." } }
+    return { success: true, revision }
+  })
+
+  // ── Restore page revision ────────────────────────────────────────
+  .post("/:site/page/revisions/:revId/restore", async ({ params, query, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site) as any
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+    if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
+
+    const settings = await getSiteSettings(params.site)
+    const version = getActiveVersion(settings)
+    const pagePath = (query.path as string || "").replace(/^\/+|\/+$/g, "")
+
+    const revision = await getRevision(params.site, version, pagePath, params.revId)
+    if (!revision) { set.status = 404; return { error: "Revisão não encontrada." } }
+
+    // Save current state before restoring (so the restore itself is undoable)
+    const current = await resolvePageFile(params.site, version, pagePath)
+    if (current) {
+      await saveRevision(params.site, version, pagePath, current.data, user.username)
+    }
+
+    await writePage(params.site, version, pagePath, revision.data)
     return { success: true }
   })
 
@@ -707,9 +781,39 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
 
       const targetDir = join(SITES_ROOT, params.site, version, (uploadPath || "").replace(/^\/+/, ""))
       await mkdir(targetDir, { recursive: true })
-      await Bun.write(join(targetDir, file.name), file)
 
-      return { success: true, name: file.name }
+      const isImage = file.type.startsWith("image/") && !file.type.includes("svg")
+      let outBuffer: Buffer | Uint8Array
+      let outName = file.name
+
+      if (isImage) {
+        const raw = Buffer.from(await file.arrayBuffer())
+        const isPng = file.type === "image/png"
+        let img = sharp(raw).rotate() // auto-orient from EXIF
+          .resize({ width: 1500, height: 800, fit: "inside", withoutEnlargement: true })
+
+        const MAX_BYTES = 2 * 1024 * 1024 // WebP is ~30% smaller, allow 2 MB
+        if (isPng) {
+          // Keep PNG to preserve transparency (logos, cutouts)
+          outBuffer = await img.png({ compressionLevel: 8 }).toBuffer()
+          outName = file.name.replace(/\.[^.]+$/, ".png")
+        } else {
+          // Convert to WebP; step down quality until under 2 MB
+          let quality = 85
+          let buf: Buffer
+          do {
+            buf = await img.clone().webp({ quality }).toBuffer()
+            quality -= 15
+          } while (buf.byteLength > MAX_BYTES && quality > 10)
+          outBuffer = buf
+          outName = file.name.replace(/\.[^.]+$/, ".webp")
+        }
+      } else {
+        outBuffer = Buffer.from(await file.arrayBuffer())
+      }
+
+      await Bun.write(join(targetDir, outName), outBuffer)
+      return { success: true, name: outName }
     },
     { body: t.Object({ file: t.File(), path: t.Optional(t.String()) }) }
   )

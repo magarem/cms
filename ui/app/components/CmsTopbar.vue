@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ site: string }>()
+defineProps<{ site: string; hidePublish?: boolean }>()
 
 const { user, logout } = useAuth()
 
@@ -37,8 +37,8 @@ const publishMenuItems = computed(() => [[
       <slot name="actions" />
     </div>
 
-    <!-- Publish button (admin only) -->
-    <UButtonGroup v-if="user?.role === 'admin' && cmsPublish">
+    <!-- Publish button (admin only) — hidden when the page provides its own -->
+    <UButtonGroup v-if="!hidePublish && user?.role === 'admin' && cmsPublish">
       <UButton
         icon="i-heroicons-rocket-launch"
         size="sm"

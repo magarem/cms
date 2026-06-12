@@ -8,6 +8,24 @@ export const SITES_ROOT =
   process.env.SIRIUS_STORAGE_ROOT ??
   join(import.meta.dir, "..", "..", "..", "storage")
 
+// In-process async mutex keyed by an arbitrary string.
+// Concurrent writes to the SAME key are serialised; different keys run in parallel.
+const fileLocks = new Map<string, Promise<void>>()
+
+export async function withFileLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const prev = fileLocks.get(key) ?? Promise.resolve()
+  let release!: () => void
+  const barrier = new Promise<void>(resolve => { release = resolve })
+  fileLocks.set(key, barrier)
+  await prev
+  try {
+    return await fn()
+  } finally {
+    release()
+    if (fileLocks.get(key) === barrier) fileLocks.delete(key)
+  }
+}
+
 export async function parseContent(content: string, ext: string): Promise<any> {
   if (ext === ".json") return JSON.parse(content)
   if (ext === ".yml" || ext === ".yaml") return yaml.load(content) || {}
@@ -33,7 +51,7 @@ export async function getSiteSettings(site: string) {
 
 export async function saveSiteSettings(site: string, settings: any) {
   const path = join(SITES_ROOT, site, "_settings.json")
-  await writeFile(path, JSON.stringify(settings, null, 2))
+  return withFileLock(path, () => writeFile(path, JSON.stringify(settings, null, 2)))
 }
 
 export function getActiveVersion(settings: any): string {
@@ -73,28 +91,30 @@ export async function writePage(
   pagePath: string,
   data: any
 ): Promise<void> {
-  const dataDir = join(SITES_ROOT, site, version)
   const clean = pagePath.replace(/^\/+|\/+$/g, "")
-
-  const existing = await resolvePageFile(site, version, clean)
-  let targetPath: string
-  let ext: string
-
-  if (existing) {
-    targetPath = existing.filePath
-    ext = existing.ext
-  } else {
-    targetPath = join(dataDir, clean, "_index.yml")
-    ext = ".yml"
-  }
-
-  await mkdir(dirname(targetPath), { recursive: true })
-  await writeFile(targetPath, serializeContent(data, ext))
+  const lockKey = `page:${site}:${version}:${clean}`
+  return withFileLock(lockKey, async () => {
+    const dataDir = join(SITES_ROOT, site, version)
+    const existing = await resolvePageFile(site, version, clean)
+    let targetPath: string
+    let ext: string
+    if (existing) {
+      targetPath = existing.filePath
+      ext = existing.ext
+    } else {
+      targetPath = join(dataDir, clean, "_index.yml")
+      ext = ".yml"
+    }
+    await mkdir(dirname(targetPath), { recursive: true })
+    await writeFile(targetPath, serializeContent(data, ext))
+  })
 }
 
 export async function deletePage(site: string, version: string, pagePath: string): Promise<void> {
   const existing = await resolvePageFile(site, version, pagePath)
-  if (existing) await rm(existing.filePath)
+  if (!existing) return
+  const dirPath = dirname(existing.filePath)
+  await rm(dirPath, { recursive: true, force: true })
 }
 
 export async function buildTree(site: string, version: string, currentPath = ""): Promise<any[]> {
@@ -106,8 +126,11 @@ export async function buildTree(site: string, version: string, currentPath = "")
   const entries = await readdir(dirPath, { withFileTypes: true })
   const items: any[] = []
 
+  const RESERVED_DIRS = new Set(["media"])
+
   for (const entry of entries) {
     if (entry.name.startsWith("_") || entry.name.startsWith(".")) continue
+    if (!currentPath && RESERVED_DIRS.has(entry.name)) continue
 
     const fullSlug = currentPath ? `${currentPath}/${entry.name}` : entry.name
 
@@ -258,9 +281,13 @@ export async function saveCollectionOrder(
   collectionPath: string,
   order: string[]
 ): Promise<void> {
-  const dirPath = join(SITES_ROOT, site, version, collectionPath.replace(/^\/+/, ""))
-  await mkdir(dirPath, { recursive: true })
-  await writeFile(join(dirPath, "_order.yml"), serializeContent({ order }, ".yml"), "utf-8")
+  const clean = collectionPath.replace(/^\/+/, "")
+  const dirPath = join(SITES_ROOT, site, version, clean)
+  const orderFile = join(dirPath, "_order.yml")
+  return withFileLock(orderFile, async () => {
+    await mkdir(dirPath, { recursive: true })
+    await writeFile(orderFile, serializeContent({ order }, ".yml"), "utf-8")
+  })
 }
 
 // Insert/move `movedName` before or after `referenceName` in folder's _order.yml.
@@ -276,38 +303,43 @@ export async function applyOrderInFolder(
 ): Promise<void> {
   const cleanPath = folderPath.replace(/^\/+|\/+$/g, "")
   const dirPath = join(SITES_ROOT, site, version, cleanPath)
-  if (!existsSync(dirPath)) return
+  const orderFile = join(dirPath, "_order.yml")
 
-  let order: string[] = []
-  for (const f of ["_order.yml", "_order.json"]) {
-    const orderFile = join(dirPath, f)
-    if (existsSync(orderFile)) {
-      const raw = await readFile(orderFile, "utf-8")
-      const meta = await parseContent(raw, extname(f))
-      order = Array.isArray(meta.order) ? meta.order : []
-      break
+  return withFileLock(orderFile, async () => {
+    if (!existsSync(dirPath)) return
+
+    let order: string[] = []
+    for (const f of ["_order.yml", "_order.json"]) {
+      const candidate = join(dirPath, f)
+      if (existsSync(candidate)) {
+        const raw = await readFile(candidate, "utf-8")
+        const meta = await parseContent(raw, extname(f))
+        order = Array.isArray(meta.order) ? meta.order : []
+        break
+      }
     }
-  }
 
-  if (order.length === 0) {
-    const entries = await readdir(dirPath, { withFileTypes: true })
-    order = entries
-      .filter(e => !e.name.startsWith("_") && !e.name.startsWith(".") && e.isDirectory())
-      .map(e => e.name)
-  }
+    if (order.length === 0) {
+      const entries = await readdir(dirPath, { withFileTypes: true })
+      order = entries
+        .filter(e => !e.name.startsWith("_") && !e.name.startsWith(".") && e.isDirectory())
+        .map(e => e.name)
+    }
 
-  if (!order.includes(movedName)) order.push(movedName)
+    if (!order.includes(movedName)) order.push(movedName)
 
-  const filtered = order.filter(n => n !== movedName)
-  const refIdx = filtered.indexOf(referenceName)
-  if (refIdx >= 0) {
-    const insertAt = position === "before" ? refIdx : refIdx + 1
-    filtered.splice(insertAt, 0, movedName)
-  } else {
-    filtered.push(movedName)
-  }
+    const filtered = order.filter(n => n !== movedName)
+    const refIdx = filtered.indexOf(referenceName)
+    if (refIdx >= 0) {
+      const insertAt = position === "before" ? refIdx : refIdx + 1
+      filtered.splice(insertAt, 0, movedName)
+    } else {
+      filtered.push(movedName)
+    }
 
-  await saveCollectionOrder(site, version, cleanPath, filtered)
+    await mkdir(dirPath, { recursive: true })
+    await writeFile(orderFile, serializeContent({ order: filtered }, ".yml"), "utf-8")
+  })
 }
 
 export async function deleteCollectionItem(
@@ -397,4 +429,84 @@ export async function copyMedia(site: string, version: string, srcPath: string):
   let n = 2
   while (existsSync(dest)) dest = join(dirname(src), `${base}_copy${n++}${ext}`)
   await copyFile(src, dest)
+}
+
+// ── Revision history ────────────────────────────────────────────────
+
+const MAX_REVISIONS = 20
+
+function revisionsDir(site: string, version: string, pagePath: string): string {
+  return join(SITES_ROOT, site, version, pagePath.replace(/^\/+|\/+$/g, ""), "_revisions")
+}
+
+export interface RevisionMeta {
+  id: string
+  savedAt: string
+  savedBy: string
+  size: number
+}
+
+export interface Revision extends RevisionMeta {
+  data: Record<string, any>
+}
+
+export async function saveRevision(
+  site: string,
+  version: string,
+  pagePath: string,
+  data: Record<string, any>,
+  savedBy: string
+): Promise<void> {
+  const dir = revisionsDir(site, version, pagePath)
+  await mkdir(dir, { recursive: true })
+
+  const id = `rev-${Date.now()}`
+  const revision: Revision = {
+    id,
+    savedAt: new Date().toISOString(),
+    savedBy,
+    size: JSON.stringify(data).length,
+    data,
+  }
+
+  await writeFile(join(dir, `${id}.json`), JSON.stringify(revision))
+
+  // Keep only the most recent MAX_REVISIONS
+  const files = (await readdir(dir)).filter(f => f.endsWith(".json")).sort()
+  if (files.length > MAX_REVISIONS) {
+    for (const f of files.slice(0, files.length - MAX_REVISIONS)) {
+      await rm(join(dir, f), { force: true })
+    }
+  }
+}
+
+export async function listRevisions(
+  site: string,
+  version: string,
+  pagePath: string
+): Promise<RevisionMeta[]> {
+  const dir = revisionsDir(site, version, pagePath)
+  if (!existsSync(dir)) return []
+
+  const files = (await readdir(dir)).filter(f => f.endsWith(".json")).sort().reverse()
+  const result: RevisionMeta[] = []
+  for (const f of files) {
+    try {
+      const raw = JSON.parse(await readFile(join(dir, f), "utf-8")) as Revision
+      result.push({ id: raw.id, savedAt: raw.savedAt, savedBy: raw.savedBy, size: raw.size })
+    } catch {}
+  }
+  return result
+}
+
+export async function getRevision(
+  site: string,
+  version: string,
+  pagePath: string,
+  id: string
+): Promise<Revision | null> {
+  const safeId = id.replace(/[^a-z0-9-]/gi, "")
+  const filePath = join(revisionsDir(site, version, pagePath), `${safeId}.json`)
+  if (!existsSync(filePath)) return null
+  return JSON.parse(await readFile(filePath, "utf-8"))
 }
