@@ -3638,7 +3638,7 @@
         {
           "name": "promoText",
           "label": "Passo 3 — texto promocional (abaixo da caixa de preços)",
-          "type": "textarea",
+          "type": "markdown",
           "default": ""
         },
         {
