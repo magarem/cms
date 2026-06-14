@@ -192,9 +192,9 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
   // ── Portal link (admin helper) ────────────────────────────
   .get("/:id/portal-link", async ({ params, cookie: { cms_token }, jwt, set }) => {
     if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
-    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
-    const token  = signClientToken(params.id)
-    return { success: true, url: `${uiBase}/portal/${params.id}?token=${token}` }
+    const portalBase = (process.env.PORTAL_URL || "http://localhost:3003").replace(/\/$/, "")
+    const token      = signClientToken(params.id)
+    return { success: true, url: `${portalBase}/${params.id}?token=${token}` }
   })
 
   .post("/:id/invoices/:invoiceId/send-whatsapp", async ({ params, cookie: { cms_token }, jwt, set }) => {
@@ -205,10 +205,10 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     const invoices = await readJson<any[]>(invoicesPath(params.id), [])
     const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
     if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
-    const vendor = await readJson<any>(VENDOR_FILE, {})
-    const token  = signClientToken(params.id)
-    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
-    const link   = `${uiBase}/portal/${params.id}?token=${token}`
+    const vendor     = await readJson<any>(VENDOR_FILE, {})
+    const token      = signClientToken(params.id)
+    const portalBase = (process.env.PORTAL_URL || "http://localhost:3003").replace(/\/$/, "")
+    const link       = `${portalBase}/${params.id}?token=${token}`
     await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice, link })
     return { success: true }
   })
@@ -222,9 +222,9 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
     if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
     const vendor = await readJson<any>(VENDOR_FILE, {})
-    const token  = signClientToken(params.id)
-    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
-    const portalLink = `${uiBase}/portal/${params.id}?token=${token}`
+    const token      = signClientToken(params.id)
+    const portalBase = (process.env.PORTAL_URL || "http://localhost:3003").replace(/\/$/, "")
+    const portalLink = `${portalBase}/${params.id}?token=${token}`
     await sendInvoiceEmail({ to: profile.email, vendor, client: profile, invoice, portalLink })
     return { success: true }
   })

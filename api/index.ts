@@ -11,14 +11,19 @@ import { productsRoutes } from "./routes/products"
 import { settingsRoutes } from "./routes/settings"
 import { publicRoutes } from "./routes/public"
 
-const PORT = Number(process.env.PORT || 3002)
-const UI_ORIGIN = process.env.CMS_UI_URL || "http://localhost:3001"
-const IS_PROD = process.env.NODE_ENV === "production"
+const PORT       = Number(process.env.PORT || 3002)
+const UI_ORIGIN  = process.env.CMS_UI_URL  || "http://localhost:3001"
+const PORTAL_ORIGIN = process.env.PORTAL_URL || "http://localhost:3003"
+const IS_PROD    = process.env.NODE_ENV === "production"
+
+const allowedOrigins = IS_PROD
+  ? [UI_ORIGIN, PORTAL_ORIGIN]
+  : [UI_ORIGIN, PORTAL_ORIGIN, /^http:\/\/localhost:\d+$/]
 
 const app = new Elysia()
   .use(
     cors({
-      origin: IS_PROD ? UI_ORIGIN : [UI_ORIGIN, /^http:\/\/localhost:\d+$/],
+      origin: allowedOrigins,
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

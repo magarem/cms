@@ -237,3 +237,67 @@ export async function sendInvoiceEmail(opts: {
     html,
   })
 }
+
+export async function sendPortalAccessEmail(opts: {
+  to: string
+  clientName: string
+  vendor: { name?: string; email?: string }
+  link: string
+}) {
+  const vendorName = opts.vendor.name || "Seu fornecedor"
+  const fromEmail  = FROM_EMAIL.replace(/^[^<]*/, `${vendorName} `)
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+<tr><td align="center">
+<table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+
+  <tr>
+    <td style="padding:32px 32px 24px;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:13px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#111;">${vendorName}</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:32px;">
+      <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;color:#111;">Acesso à sua área</h1>
+      <p style="margin:0 0 8px;color:#555;font-size:14px;line-height:1.6;">
+        Olá, <strong style="color:#111;">${opts.clientName}</strong>!
+      </p>
+      <p style="margin:0 0 28px;color:#555;font-size:14px;line-height:1.6;">
+        Clique no botão abaixo para aceder à sua área de cliente e consultar as suas faturas.
+      </p>
+      <a href="${opts.link}"
+         style="display:inline-block;background:#111;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">
+        Aceder à minha área →
+      </a>
+      <p style="margin:24px 0 0;color:#aaa;font-size:12px;line-height:1.6;">
+        Se não solicitou este acesso, pode ignorar este email.
+        O link é permanente — guarde-o para futuras consultas.
+      </p>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:16px 32px;border-top:1px solid #f0f0f0;background:#fafafa;">
+      <p style="margin:0;font-size:11px;color:#bbb;text-align:center;">${vendorName} — ${new Date().getFullYear()}</p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
+
+  await resend({
+    from:     fromEmail,
+    to:       opts.to,
+    reply_to: opts.vendor.email || undefined,
+    subject:  `Acesso à sua área de cliente — ${vendorName}`,
+    html,
+  })
+}
