@@ -9,6 +9,7 @@ import { randomUUID } from "node:crypto"
 import { sendInvoiceEmail, sendPortalAccessEmail } from "../lib/email"
 import { sendInvoiceWhatsApp } from "../lib/whatsapp"
 import { signClientToken } from "../lib/invoice-token"
+import { createPaymentLink } from "../lib/pagbank"
 
 const SIRIUS_DIR   = join(SITES_ROOT, "_sirius")
 const CLIENTS_DIR  = join(SIRIUS_DIR, "clients")
@@ -321,6 +322,49 @@ export const controlRoutes = new Elysia({ prefix: "/control" })
     const link       = `${portalBase}/${params.id}?token=${token}`
     await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice, link })
     return { success: true }
+  })
+
+  // ── Generate PagBank payment link ────────────────────────
+  .post("/clients/:id/invoices/:invoiceId/generate-payment-link", async ({ params, cookie: { control_token }, jwt, set }) => {
+    if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
+    const profile  = await readJson<any>(profilePath(params.id), null)
+    if (!profile) { set.status = 404; return { error: "Cliente não encontrado." } }
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    const idx      = invoices.findIndex(i => i.id === params.invoiceId)
+    if (idx === -1) { set.status = 404; return { error: "Fatura não encontrada." } }
+    const invoice  = invoices[idx]
+    const apiBase  = (process.env.CONTROL_URL || "https://cms.siriusstudio.site").replace(/\/$/, "")
+    const { id: pagbankId, url: paymentUrl } = await createPaymentLink({
+      referenceId:     `${params.id}|${params.invoiceId}`,
+      name:            invoice.description,
+      amountBRL:       invoice.total,
+      dueDate:         invoice.dueDate,
+      notificationUrl: `${apiBase}/control/webhooks/pagbank`,
+    })
+    invoices[idx] = { ...invoice, pagbankId, paymentUrl }
+    await writeJson(invoicesPath(params.id), invoices)
+    return { success: true, invoice: invoices[idx], paymentUrl }
+  })
+
+  // ── PagBank webhook (public, no auth) ─────────────────────
+  .post("/webhooks/pagbank", async ({ body }: { body: any }) => {
+    try {
+      const referenceId: string = body?.data?.reference_id || body?.reference_id || ""
+      if (!referenceId.includes("|")) return { received: true }
+      const [clientId, invoiceId] = referenceId.split("|")
+      const event: string = body?.event || ""
+      const isPaid = event.includes("PAID") || event.includes("COMPLETE")
+      if (!isPaid) return { received: true }
+      const invoices = await readJson<any[]>(invoicesPath(clientId), [])
+      const idx      = invoices.findIndex(i => i.id === invoiceId)
+      if (idx === -1) return { received: true }
+      invoices[idx] = { ...invoices[idx], status: "paid", paidAt: new Date().toISOString() }
+      await writeJson(invoicesPath(clientId), invoices)
+      console.log(`[pagbank] invoice ${invoiceId} marked paid via webhook`)
+    } catch (e) {
+      console.error("[pagbank] webhook error", e)
+    }
+    return { received: true }
   })
 
   // ── Support ───────────────────────────────────────────────
