@@ -7,6 +7,7 @@ import { SITES_ROOT } from "../lib/content"
 import { JWT_SECRET } from "../lib/config"
 import { randomUUID } from "node:crypto"
 import { sendInvoiceEmail } from "../lib/email"
+import { sendInvoiceWhatsApp, getZapiStatus } from "../lib/whatsapp"
 
 const VENDOR_FILE = join(SITES_ROOT, "_sirius", "vendor.json")
 
@@ -184,6 +185,19 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
     const invoices = (await readJson<any[]>(invoicesPath(params.id), [])).filter(i => i.id !== params.invoiceId)
     await writeJson(invoicesPath(params.id), invoices)
+    return { success: true }
+  })
+
+  .post("/:id/invoices/:invoiceId/send-whatsapp", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const profile = await readJson<any>(profilePath(params.id), null)
+    if (!profile)       { set.status = 404; return { error: "Cliente não encontrado." } }
+    if (!profile.phone) { set.status = 400; return { error: "Cliente sem telefone cadastrado." } }
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
+    if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
+    const vendor = await readJson<any>(VENDOR_FILE, {})
+    await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice })
     return { success: true }
   })
 

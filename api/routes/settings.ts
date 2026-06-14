@@ -5,6 +5,7 @@ import { existsSync } from "node:fs"
 import { join, extname } from "node:path"
 import { SITES_ROOT } from "../lib/content"
 import { JWT_SECRET } from "../lib/config"
+import { getZapiStatus } from "../lib/whatsapp"
 
 const SIRIUS_DIR   = join(SITES_ROOT, "_sirius")
 const VENDOR_FILE  = join(SIRIUS_DIR, "vendor.json")
@@ -54,6 +55,17 @@ export const settingsRoutes = new Elysia({ prefix: "/admin/settings" })
       website: t.Optional(t.String()),
       taxId:   t.Optional(t.String()),
     })
+  })
+
+  // WhatsApp connection status
+  .get("/whatsapp/status", async ({ cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    try {
+      const status = await getZapiStatus()
+      return { success: true, status }
+    } catch (e: any) {
+      return { success: false, error: e.message }
+    }
   })
 
   // Upload vendor logo

@@ -27,6 +27,24 @@ const uploading   = ref(false)
 const isDragging  = ref(false)
 const fileInput   = ref<HTMLInputElement | null>(null)
 
+// ── WhatsApp status ───────────────────────────────────────
+const waStatus      = ref<any>(null)
+const waLoading     = ref(false)
+
+async function checkWaStatus() {
+  waLoading.value = true
+  try {
+    const res = await api.get<{ success: boolean; status: any; error?: string }>("/admin/settings/whatsapp/status")
+    waStatus.value = res
+  } catch (e: any) {
+    waStatus.value = { success: false, error: e.data?.error || "Erro de conexão" }
+  } finally {
+    waLoading.value = false
+  }
+}
+
+const waConnected = computed(() => waStatus.value?.status?.connected === true)
+
 watch(data, (d) => {
   if (d?.vendor) {
     form.value = {
@@ -239,6 +257,47 @@ async function save() {
             Salvar configurações
           </UButton>
         </div>
+
+        <!-- WhatsApp section -->
+        <section class="pt-4 border-t border-gray-800">
+          <h2 class="text-sm font-semibold text-gray-300 mb-1 flex items-center gap-2">
+            <UIcon name="i-simple-icons-whatsapp" class="w-4 h-4 text-green-400" />
+            WhatsApp — Z-API
+          </h2>
+          <p class="text-xs text-gray-500 mb-4">
+            Configure as variáveis de ambiente <code class="text-gray-400 bg-gray-800 px-1 rounded">ZAPI_INSTANCE_ID</code>,
+            <code class="text-gray-400 bg-gray-800 px-1 rounded">ZAPI_TOKEN</code> e
+            <code class="text-gray-400 bg-gray-800 px-1 rounded">ZAPI_CLIENT_TOKEN</code>
+            no servidor para ativar o envio real de faturas via WhatsApp.
+            Crie a instância em <span class="text-primary-400">z-api.io</span> e escaneie o QR code lá.
+          </p>
+
+          <div class="flex items-center gap-3">
+            <UButton
+              icon="i-heroicons-signal"
+              size="sm"
+              color="neutral"
+              variant="outline"
+              :loading="waLoading"
+              @click="checkWaStatus"
+            >
+              Verificar conexão
+            </UButton>
+
+            <div v-if="waStatus" class="flex items-center gap-2 text-sm">
+              <div
+                class="w-2 h-2 rounded-full flex-shrink-0"
+                :class="waConnected ? 'bg-green-400' : 'bg-red-400'"
+              />
+              <span :class="waConnected ? 'text-green-400' : 'text-red-400'">
+                {{ waConnected ? 'Conectado' : (waStatus.error || 'Desconectado') }}
+              </span>
+              <span v-if="waStatus.status?.phone" class="text-gray-500 text-xs">
+                · {{ waStatus.status.phone }}
+              </span>
+            </div>
+          </div>
+        </section>
 
       </div>
     </div>

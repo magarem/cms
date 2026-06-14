@@ -240,10 +240,26 @@ function buildInvoiceText(inv: any) {
   return lines.join("\n")
 }
 
-function sendByWhatsApp(inv: any) {
-  const phone = (client.value?.phone || "").replace(/\D/g, "")
-  if (!phone) { toast.add({ title: "Cliente sem telefone cadastrado.", color: "warning" }); return }
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(buildInvoiceText(inv))}`, "_blank")
+const sendingWaId = ref<string | null>(null)
+
+async function sendByWhatsApp(inv: any) {
+  if (!client.value?.phone) { toast.add({ title: "Cliente sem telefone cadastrado.", color: "warning" }); return }
+  sendingWaId.value = inv.id
+  try {
+    await api.post(`/admin/clients/${id}/invoices/${inv.id}/send-whatsapp`)
+    toast.add({ title: "Fatura enviada via WhatsApp.", color: "success" })
+  } catch (e: any) {
+    // Fallback to wa.me link if Z-API not configured
+    const msg = e.data?.error || ""
+    if (msg.includes("não configurad")) {
+      const phone = (client.value.phone || "").replace(/\D/g, "")
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(buildInvoiceText(inv))}`, "_blank")
+    } else {
+      toast.add({ title: msg || "Erro ao enviar WhatsApp.", color: "error" })
+    }
+  } finally {
+    sendingWaId.value = null
+  }
 }
 
 const sendingEmailId = ref<string | null>(null)
@@ -744,6 +760,7 @@ const TABS = [
                       variant="ghost"
                       title="Enviar por WhatsApp"
                       class="hover:text-green-400"
+                      :loading="sendingWaId === inv.id"
                       @click="sendByWhatsApp(inv)"
                     />
                     <UButton

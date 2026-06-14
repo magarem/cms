@@ -108,9 +108,9 @@ export async function sendInvoiceEmail(opts: {
   }
   const status = STATUS[opts.invoice.status] || { label: opts.invoice.status, color: "#374151" }
 
-  const v         = opts.vendor
+  const v          = opts.vendor
   const vendorName = v.name || "Fornecedor"
-  const fromEmail  = v.email ? `${vendorName} <${v.email}>` : FROM_EMAIL
+  const fromEmail  = FROM_EMAIL.replace(/^[^<]*/, `${vendorName} `)
 
   const logoBlock = v.logo
     ? `<img src="${v.logo}" alt="${vendorName}" style="height:44px;max-width:180px;object-fit:contain;display:block;margin-bottom:6px;">`
@@ -218,9 +218,10 @@ export async function sendInvoiceEmail(opts: {
 </html>`
 
   await resend({
-    from:    fromEmail,
-    to:      opts.to,
-    subject: `Fatura — ${opts.invoice.description}`,
+    from:     fromEmail,
+    to:       opts.to,
+    reply_to: v.email || undefined,
+    subject:  `Fatura — ${opts.invoice.description}`,
     html,
   })
 }
