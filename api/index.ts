@@ -10,15 +10,17 @@ import { clientsRoutes } from "./routes/clients"
 import { productsRoutes } from "./routes/products"
 import { settingsRoutes } from "./routes/settings"
 import { publicRoutes } from "./routes/public"
+import { controlRoutes } from "./routes/control"
 
-const PORT       = Number(process.env.PORT || 3002)
-const UI_ORIGIN  = process.env.CMS_UI_URL  || "http://localhost:3001"
-const PORTAL_ORIGIN = process.env.PORTAL_URL || "http://localhost:3003"
-const IS_PROD    = process.env.NODE_ENV === "production"
+const PORT           = Number(process.env.PORT || 3002)
+const UI_ORIGIN      = process.env.CMS_UI_URL   || "http://localhost:3001"
+const PORTAL_ORIGIN  = process.env.PORTAL_URL   || "http://localhost:3003"
+const CONTROL_ORIGIN = process.env.CONTROL_URL  || "http://localhost:3004"
+const IS_PROD        = process.env.NODE_ENV === "production"
 
 const allowedOrigins = IS_PROD
-  ? [UI_ORIGIN, PORTAL_ORIGIN]
-  : [UI_ORIGIN, PORTAL_ORIGIN, /^http:\/\/localhost:\d+$/]
+  ? [UI_ORIGIN, PORTAL_ORIGIN, CONTROL_ORIGIN]
+  : [UI_ORIGIN, PORTAL_ORIGIN, CONTROL_ORIGIN, /^http:\/\/localhost:\d+$/]
 
 const app = new Elysia()
   .use(
@@ -40,6 +42,7 @@ const app = new Elysia()
   .use(productsRoutes)
   .use(settingsRoutes)
   .use(publicRoutes)
+  .use(controlRoutes)
   .listen(PORT)
 
 console.log(`🚀 Sirius CMS API running at http://localhost:${PORT}`)
