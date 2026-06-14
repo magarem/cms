@@ -10,8 +10,10 @@ import { sendInvoiceEmail, sendPortalAccessEmail } from "../lib/email"
 import { sendInvoiceWhatsApp } from "../lib/whatsapp"
 import { signClientToken } from "../lib/invoice-token"
 
-const CLIENTS_DIR  = join(SITES_ROOT, "_sirius", "clients")
-const VENDOR_FILE  = join(SITES_ROOT, "_sirius", "vendor.json")
+const SIRIUS_DIR   = join(SITES_ROOT, "_sirius")
+const CLIENTS_DIR  = join(SIRIUS_DIR, "clients")
+const VENDOR_FILE  = join(SIRIUS_DIR, "vendor.json")
+const PRODUCTS_FILE = join(SIRIUS_DIR, "products.json")
 
 const CONTROL_USERNAME = process.env.CONTROL_USERNAME || "admin"
 const CONTROL_PASSWORD = process.env.CONTROL_PASSWORD || "changeme"
@@ -76,6 +78,57 @@ export const controlRoutes = new Elysia({ prefix: "/control" })
       const sites = entries.filter(e => e.isDirectory() && !e.name.startsWith("_")).map(e => e.name)
       return { success: true, sites }
     } catch { return { success: true, sites: [] } }
+  })
+
+  // ── Products / Services ───────────────────────────────────
+  .get("/products", async ({ cookie: { control_token }, jwt, set }) => {
+    if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
+    const products = await readJson<any[]>(PRODUCTS_FILE, [])
+    return { success: true, products }
+  })
+
+  .post("/products", async ({ body, cookie: { control_token }, jwt, set }) => {
+    if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
+    await mkdir(SIRIUS_DIR, { recursive: true })
+    const products = await readJson<any[]>(PRODUCTS_FILE, [])
+    const product = { id: `prod-${randomUUID().slice(0, 8)}`, ...body, active: true, createdAt: new Date().toISOString() }
+    products.push(product)
+    await writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2))
+    return { success: true, product }
+  }, {
+    body: t.Object({
+      type:        t.Union([t.Literal("product"), t.Literal("service")]),
+      name:        t.String(),
+      description: t.Optional(t.String()),
+      price:       t.Number(),
+      unit:        t.Optional(t.String()),
+    })
+  })
+
+  .put("/products/:id", async ({ params, body, cookie: { control_token }, jwt, set }) => {
+    if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
+    const products = await readJson<any[]>(PRODUCTS_FILE, [])
+    const idx = products.findIndex(p => p.id === params.id)
+    if (idx === -1) { set.status = 404; return { error: "Produto não encontrado." } }
+    products[idx] = { ...products[idx], ...body }
+    await writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2))
+    return { success: true, product: products[idx] }
+  }, {
+    body: t.Object({
+      type:        t.Optional(t.Union([t.Literal("product"), t.Literal("service")])),
+      name:        t.Optional(t.String()),
+      description: t.Optional(t.String()),
+      price:       t.Optional(t.Number()),
+      unit:        t.Optional(t.String()),
+      active:      t.Optional(t.Boolean()),
+    })
+  })
+
+  .delete("/products/:id", async ({ params, cookie: { control_token }, jwt, set }) => {
+    if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
+    const products = (await readJson<any[]>(PRODUCTS_FILE, [])).filter(p => p.id !== params.id)
+    await writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2))
+    return { success: true }
   })
 
   // ── List clients ──────────────────────────────────────────
