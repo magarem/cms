@@ -3,14 +3,17 @@ const { user, logout } = useAuth()
 const route = useRoute()
 
 const navItems = [
-  { label: "Sites",    icon: "i-heroicons-globe-alt",       to: `/${user.value?.site || 'login'}`, prefix: null },
-  { label: "Clientes", icon: "i-heroicons-building-office", to: "/clients",                         prefix: "/clients" },
-  { label: "Produtos", icon: "i-heroicons-cube",            to: "/products",                        prefix: "/products" },
+  { label: "Sites",         icon: "i-heroicons-globe-alt",          to: `/${user.value?.site || 'login'}`, prefix: null },
+  { label: "Clientes",      icon: "i-heroicons-building-office",    to: "/clients",                         prefix: "/clients" },
+  { label: "Produtos",      icon: "i-heroicons-cube",               to: "/products",                        prefix: "/products" },
+  { label: "Configurações", icon: "i-heroicons-cog-6-tooth",        to: "/settings",                        prefix: "/settings" },
 ]
+
+const FIXED_PREFIXES = ["/clients", "/products", "/settings"]
 
 function isActive(item: typeof navItems[0]) {
   if (item.prefix) return route.path.startsWith(item.prefix)
-  return !route.path.startsWith("/clients") && !route.path.startsWith("/products")
+  return !FIXED_PREFIXES.some(p => route.path.startsWith(p))
 }
 </script>
 

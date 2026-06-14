@@ -22,6 +22,14 @@ const { data: sitesData } = await useAsyncData(
   { server: false }
 )
 
+// ── Vendor settings (for PDF header) ─────────────────────
+const { data: vendorData } = await useAsyncData(
+  "vendor-for-pdf",
+  () => api.get<{ vendor: any }>("/admin/settings/vendor"),
+  { server: false }
+)
+const vendor = computed(() => vendorData.value?.vendor || {})
+
 // ── Products / services catalog ───────────────────────────
 const { data: productsData } = await useAsyncData(
   "products-for-invoice",
@@ -247,6 +255,7 @@ function sendByEmail(inv: any) {
 }
 
 function exportPDF(inv: any) {
+  const v = vendor.value
   const statusClass: Record<string, string> = {
     paid: "status-paid", pending: "status-pending", overdue: "status-overdue", cancelled: "status-cancelled",
   }
@@ -256,6 +265,17 @@ function exportPDF(inv: any) {
       <td class="amount">${fmtMoney(item.amount)}</td>
     </tr>`).join("")
 
+  const vendorHeader = v.logo
+    ? `<img src="${v.logo}" alt="${v.name || ''}" style="height:48px;max-width:200px;object-fit:contain;display:block;margin-bottom:8px">`
+    : `<div class="brand-name">${v.name || "Empresa"}</div>`
+
+  const vendorContact = [
+    v.address,
+    [v.phone, v.email].filter(Boolean).join("  ·  "),
+    v.website,
+    v.taxId ? `CNPJ/CPF: ${v.taxId}` : "",
+  ].filter(Boolean).map(l => `<div>${l}</div>`).join("")
+
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -264,14 +284,14 @@ function exportPDF(inv: any) {
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:"Helvetica Neue",Arial,sans-serif;color:#111;background:#fff;padding:48px;font-size:14px;line-height:1.6}
-  .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px}
-  .brand{font-size:18px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
-  .brand small{display:block;font-size:9px;font-weight:600;letter-spacing:.28em;color:#888;margin-top:2px}
-  .inv-ref{text-align:right}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px}
+  .vendor-contact{font-size:11px;color:#888;margin-top:6px;line-height:1.6}
+  .brand-name{font-size:20px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#111}
+  .inv-ref{text-align:right;flex-shrink:0;margin-left:32px}
   .inv-ref .tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888}
-  .inv-ref .num{font-size:22px;font-weight:800;color:#111}
-  h1{font-size:26px;font-weight:800;margin-bottom:32px;color:#111}
-  .meta{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px;background:#f5f5f5;border-radius:8px;margin-bottom:40px}
+  .inv-ref .num{font-size:22px;font-weight:800;color:#111;white-space:nowrap}
+  h1{font-size:24px;font-weight:800;margin-bottom:28px;color:#111}
+  .meta{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:22px;background:#f5f5f5;border-radius:8px;margin-bottom:36px}
   .meta-block .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:4px}
   .meta-block .val{font-weight:700;color:#111}
   .meta-block .sub{color:#555;font-size:13px}
@@ -293,13 +313,16 @@ function exportPDF(inv: any) {
   .total-box{text-align:right}
   .total-box .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888}
   .total-box .val{font-size:28px;font-weight:900;color:#111;margin-top:2px}
-  .footer{margin-top:64px;padding-top:20px;border-top:1px solid #e5e5e5;display:flex;justify-content:space-between;color:#aaa;font-size:11px}
+  .footer{margin-top:56px;padding-top:18px;border-top:1px solid #e5e5e5;display:flex;justify-content:space-between;color:#bbb;font-size:11px}
   @media print{body{padding:28px}@page{margin:.8cm;size:A4}}
 </style>
 </head>
 <body>
 <div class="top">
-  <div class="brand">Sirius<small>CMS Studio</small></div>
+  <div>
+    ${vendorHeader}
+    <div class="vendor-contact">${vendorContact}</div>
+  </div>
   <div class="inv-ref">
     <div class="tag">Fatura</div>
     <div class="num">#${inv.id}</div>
@@ -312,13 +335,13 @@ function exportPDF(inv: any) {
   <div class="meta-block">
     <div class="lbl">Cliente</div>
     <div class="val">${client.value?.name || "—"}</div>
-    ${client.value?.email ? `<div class="sub">${client.value.email}</div>` : ""}
-    ${client.value?.phone ? `<div class="sub">${client.value.phone}</div>` : ""}
+    ${client.value?.email   ? `<div class="sub">${client.value.email}</div>`   : ""}
+    ${client.value?.phone   ? `<div class="sub">${client.value.phone}</div>`   : ""}
     ${client.value?.address ? `<div class="sub">${client.value.address}</div>` : ""}
   </div>
   <div class="meta-block meta-right">
     <div class="lbl">Status</div>
-    <div><span class="badge ${statusClass[inv.status] || ''}">${STATUS_INVOICE[inv.status]?.label || inv.status}</span></div>
+    <div><span class="badge ${statusClass[inv.status] || ""}">${STATUS_INVOICE[inv.status]?.label || inv.status}</span></div>
     <div style="margin-top:12px">
       <div class="lbl">Emitida em</div>
       <div class="val" style="font-size:13px;font-weight:600">${fmtDate(inv.createdAt)}</div>
@@ -341,7 +364,7 @@ function exportPDF(inv: any) {
 </div>
 
 <div class="footer">
-  <div>Sirius CMS Studio — ${new Date().getFullYear()}</div>
+  <div>${v.name || ""}${v.name && new Date().getFullYear() ? " — " : ""}${new Date().getFullYear()}</div>
   <div>${inv.id}</div>
 </div>
 
