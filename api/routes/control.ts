@@ -83,7 +83,12 @@ export const controlRoutes = new Elysia({ prefix: "/control" })
     if (!await requireControl(jwt, control_token?.value, set)) return { error: "Sem acesso." }
     await ensureClientsDir()
     try {
-      const files = (await readdir(CLIENTS_DIR)).filter(f => f.endsWith(".json") && !f.includes("-"))
+      const files = (await readdir(CLIENTS_DIR)).filter(f =>
+        f.endsWith(".json") &&
+        !f.endsWith("-invoices.json") &&
+        !f.endsWith("-sites.json") &&
+        !f.endsWith("-support.json")
+      )
       const clients = await Promise.all(files.map(f => readJson<any>(join(CLIENTS_DIR, f), {})))
       return { success: true, clients: clients.filter(c => c.id) }
     } catch { return { success: true, clients: [] } }
