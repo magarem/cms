@@ -1,0 +1,249 @@
+import { Elysia, t } from "elysia"
+import { jwt } from "@elysiajs/jwt"
+import { readFile, writeFile, mkdir, rm } from "node:fs/promises"
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+import { SITES_ROOT } from "../lib/content"
+import { JWT_SECRET } from "../lib/config"
+import { randomUUID } from "node:crypto"
+
+const CLIENTS_DIR = join(SITES_ROOT, "_sirius", "clients")
+
+async function ensureClientsDir() {
+  await mkdir(CLIENTS_DIR, { recursive: true })
+}
+
+async function readJson<T>(path: string, fallback: T): Promise<T> {
+  try {
+    return JSON.parse(await readFile(path, "utf-8")) as T
+  } catch {
+    return fallback
+  }
+}
+
+async function writeJson(path: string, data: unknown) {
+  await writeFile(path, JSON.stringify(data, null, 2))
+}
+
+function profilePath(id: string)  { return join(CLIENTS_DIR, `${id}.json`) }
+function sitesPath(id: string)    { return join(CLIENTS_DIR, `${id}-sites.json`) }
+function invoicesPath(id: string) { return join(CLIENTS_DIR, `${id}-invoices.json`) }
+function supportPath(id: string)  { return join(CLIENTS_DIR, `${id}-support.json`) }
+
+async function requireRoot(jwt: any, token: string | undefined, set: any) {
+  if (!token) { set.status = 401; return null }
+  const user = await jwt.verify(token) as any
+  if (!user) { set.status = 401; return null }
+  const isRoot = (user.sites as string[])?.includes("*")
+  if (!isRoot) { set.status = 403; return null }
+  return user
+}
+
+export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
+  .use(jwt({ name: "jwt", secret: JWT_SECRET }))
+
+  // ── List all clients ──────────────────────────────────────
+  .get("/", async ({ cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    await ensureClientsDir()
+    const { readdir } = await import("node:fs/promises")
+    const files = (await readdir(CLIENTS_DIR)).filter(f => f.endsWith(".json") && !f.includes("-"))
+    const clients = await Promise.all(files.map(f => readJson<any>(join(CLIENTS_DIR, f), {})))
+    return { success: true, clients: clients.filter(c => c.id) }
+  })
+
+  // ── Create client ─────────────────────────────────────────
+  .post("/", async ({ body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    await ensureClientsDir()
+    const id = `client-${Date.now()}`
+    const profile = { id, ...body, createdAt: new Date().toISOString() }
+    await writeJson(profilePath(id), profile)
+    await writeJson(sitesPath(id), [])
+    await writeJson(invoicesPath(id), [])
+    await writeJson(supportPath(id), [])
+    return { success: true, client: profile }
+  }, {
+    body: t.Object({
+      name:    t.String(),
+      email:   t.Optional(t.String()),
+      phone:   t.Optional(t.String()),
+      address: t.Optional(t.String()),
+      notes:   t.Optional(t.String()),
+    })
+  })
+
+  // ── Get client ────────────────────────────────────────────
+  .get("/:id", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const profile  = await readJson<any>(profilePath(params.id), null)
+    if (!profile) { set.status = 404; return { error: "Cliente não encontrado." } }
+    const sites    = await readJson<string[]>(sitesPath(params.id), [])
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    const support  = await readJson<any[]>(supportPath(params.id), [])
+    return { success: true, client: { ...profile, sites, invoices, support } }
+  })
+
+  // ── Update client profile ─────────────────────────────────
+  .put("/:id", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const profile = await readJson<any>(profilePath(params.id), null)
+    if (!profile) { set.status = 404; return { error: "Cliente não encontrado." } }
+    const updated = { ...profile, ...body, id: params.id }
+    await writeJson(profilePath(params.id), updated)
+    return { success: true, client: updated }
+  }, {
+    body: t.Object({
+      name:    t.Optional(t.String()),
+      email:   t.Optional(t.String()),
+      phone:   t.Optional(t.String()),
+      address: t.Optional(t.String()),
+      notes:   t.Optional(t.String()),
+    })
+  })
+
+  // ── Delete client ─────────────────────────────────────────
+  .delete("/:id", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    for (const f of [profilePath(params.id), sitesPath(params.id), invoicesPath(params.id), supportPath(params.id)]) {
+      if (existsSync(f)) await rm(f)
+    }
+    return { success: true }
+  })
+
+  // ── Sites ─────────────────────────────────────────────────
+  .get("/:id/sites", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const sites = await readJson<string[]>(sitesPath(params.id), [])
+    return { success: true, sites }
+  })
+
+  .post("/:id/sites", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const sites = await readJson<string[]>(sitesPath(params.id), [])
+    if (!sites.includes(body.siteId)) sites.push(body.siteId)
+    await writeJson(sitesPath(params.id), sites)
+    return { success: true, sites }
+  }, { body: t.Object({ siteId: t.String() }) })
+
+  .delete("/:id/sites/:siteId", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const sites = (await readJson<string[]>(sitesPath(params.id), [])).filter(s => s !== params.siteId)
+    await writeJson(sitesPath(params.id), sites)
+    return { success: true, sites }
+  })
+
+  // ── Invoices ──────────────────────────────────────────────
+  .get("/:id/invoices", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    return { success: true, invoices }
+  })
+
+  .post("/:id/invoices", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    const invoice = { id: `inv-${randomUUID().slice(0, 8)}`, ...body, createdAt: new Date().toISOString() }
+    invoices.unshift(invoice)
+    await writeJson(invoicesPath(params.id), invoices)
+    return { success: true, invoice }
+  }, {
+    body: t.Object({
+      description: t.String(),
+      items:       t.Array(t.Object({ label: t.String(), amount: t.Number() })),
+      total:       t.Number(),
+      status:      t.Union([t.Literal("pending"), t.Literal("paid"), t.Literal("overdue"), t.Literal("cancelled")]),
+      dueDate:     t.Optional(t.String()),
+      paidAt:      t.Optional(t.String()),
+    })
+  })
+
+  .put("/:id/invoices/:invoiceId", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const invoices = await readJson<any[]>(invoicesPath(params.id), [])
+    const idx = invoices.findIndex(i => i.id === params.invoiceId)
+    if (idx === -1) { set.status = 404; return { error: "Fatura não encontrada." } }
+    invoices[idx] = { ...invoices[idx], ...body }
+    await writeJson(invoicesPath(params.id), invoices)
+    return { success: true, invoice: invoices[idx] }
+  }, {
+    body: t.Object({
+      description: t.Optional(t.String()),
+      items:       t.Optional(t.Array(t.Object({ label: t.String(), amount: t.Number() }))),
+      total:       t.Optional(t.Number()),
+      status:      t.Optional(t.Union([t.Literal("pending"), t.Literal("paid"), t.Literal("overdue"), t.Literal("cancelled")])),
+      dueDate:     t.Optional(t.String()),
+      paidAt:      t.Optional(t.String()),
+    })
+  })
+
+  .delete("/:id/invoices/:invoiceId", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const invoices = (await readJson<any[]>(invoicesPath(params.id), [])).filter(i => i.id !== params.invoiceId)
+    await writeJson(invoicesPath(params.id), invoices)
+    return { success: true }
+  })
+
+  // ── Support ───────────────────────────────────────────────
+  .get("/:id/support", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const tickets = await readJson<any[]>(supportPath(params.id), [])
+    return { success: true, tickets }
+  })
+
+  .post("/:id/support", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const tickets = await readJson<any[]>(supportPath(params.id), [])
+    const ticket = {
+      id: `tkt-${randomUUID().slice(0, 8)}`,
+      subject: body.subject,
+      status: "open" as const,
+      createdAt: new Date().toISOString(),
+      messages: body.message ? [{ from: "admin", text: body.message, date: new Date().toISOString() }] : [],
+    }
+    tickets.unshift(ticket)
+    await writeJson(supportPath(params.id), tickets)
+    return { success: true, ticket }
+  }, {
+    body: t.Object({
+      subject: t.String(),
+      message: t.Optional(t.String()),
+    })
+  })
+
+  .post("/:id/support/:ticketId/reply", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const tickets = await readJson<any[]>(supportPath(params.id), [])
+    const ticket = tickets.find(t => t.id === params.ticketId)
+    if (!ticket) { set.status = 404; return { error: "Ticket não encontrado." } }
+    ticket.messages.push({ from: body.from || "admin", text: body.text, date: new Date().toISOString() })
+    await writeJson(supportPath(params.id), tickets)
+    return { success: true, ticket }
+  }, {
+    body: t.Object({
+      text: t.String(),
+      from: t.Optional(t.Union([t.Literal("admin"), t.Literal("client")])),
+    })
+  })
+
+  .put("/:id/support/:ticketId", async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const tickets = await readJson<any[]>(supportPath(params.id), [])
+    const idx = tickets.findIndex(t => t.id === params.ticketId)
+    if (idx === -1) { set.status = 404; return { error: "Ticket não encontrado." } }
+    tickets[idx] = { ...tickets[idx], ...body }
+    await writeJson(supportPath(params.id), tickets)
+    return { success: true, ticket: tickets[idx] }
+  }, {
+    body: t.Object({
+      status: t.Optional(t.Union([t.Literal("open"), t.Literal("in_progress"), t.Literal("resolved"), t.Literal("closed")])),
+      subject: t.Optional(t.String()),
+    })
+  })
+
+  .delete("/:id/support/:ticketId", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const tickets = (await readJson<any[]>(supportPath(params.id), [])).filter(t => t.id !== params.ticketId)
+    await writeJson(supportPath(params.id), tickets)
+    return { success: true }
+  })

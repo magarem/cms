@@ -11,10 +11,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@iconify-json/simple-icons": "^1.2.86",
     "@nuxt/ui": "^3.0.2",
     "nuxt": "^4.4.2",
     "vue": "^3.5.32",
-    "vue-router": "^4.5.1",
-    "vue-draggable-plus": "^0.6.0"
+    "vue-draggable-plus": "^0.6.0",
+    "vue-router": "^4.5.1"
   }
 }

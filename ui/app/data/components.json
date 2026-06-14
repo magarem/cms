@@ -1640,10 +1640,24 @@
         },
         {
           "name": "image",
-          "label": "Imagem do logo",
+          "label": "Imagem do logo (fallback)",
           "type": "image",
           "default": "",
-          "description": "Substitui o logo de texto quando definido"
+          "description": "Usada quando não há versão para o modo atual"
+        },
+        {
+          "name": "imageDark",
+          "label": "Logo — modo escuro",
+          "type": "image",
+          "default": "",
+          "description": "Exibida quando o tema do site está em modo escuro"
+        },
+        {
+          "name": "imageLight",
+          "label": "Logo — modo claro",
+          "type": "image",
+          "default": "",
+          "description": "Exibida quando o tema do site está em modo claro"
         },
         {
           "name": "logoPadding",
