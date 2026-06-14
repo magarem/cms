@@ -8,6 +8,7 @@ import { JWT_SECRET } from "../lib/config"
 import { randomUUID } from "node:crypto"
 import { sendInvoiceEmail } from "../lib/email"
 import { sendInvoiceWhatsApp, getZapiStatus } from "../lib/whatsapp"
+import { signInvoiceToken } from "../lib/invoice-token"
 
 const VENDOR_FILE = join(SITES_ROOT, "_sirius", "vendor.json")
 
@@ -197,7 +198,10 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
     if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
     const vendor = await readJson<any>(VENDOR_FILE, {})
-    await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice })
+    const token  = signInvoiceToken(params.id, params.invoiceId)
+    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
+    const link   = `${uiBase}/invoice/${params.id}/${params.invoiceId}?token=${token}`
+    await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice, link })
     return { success: true }
   })
 

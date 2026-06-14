@@ -33,40 +33,29 @@ export async function sendInvoiceWhatsApp(opts: {
   invoice: {
     id: string
     description: string
-    items: { label: string; amount: number }[]
     total: number
-    status: string
     dueDate?: string
-    paidAt?: string
   }
+  link?: string
 }) {
-  const fmt  = (n: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
-  const fmtD = (iso?: string) => iso ? new Date(iso).toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" }) : ""
+  const fmt = (n: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
+  const fmtD = (iso?: string) => iso ? new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) : ""
 
-  const STATUS: Record<string, string> = {
-    paid: "✅ Pago", pending: "🕐 Pendente", overdue: "⚠️ Vencida", cancelled: "❌ Cancelada",
-  }
-
-  const itemLines = (opts.invoice.items || [])
-    .filter(i => i.label)
-    .map(i => `  • ${i.label}: ${fmt(i.amount)}`)
-    .join("\n")
+  const vendorName = opts.vendor.name || "Sua fatura"
 
   const lines = [
-    `*${opts.vendor.name || "Fatura"}*`,
-    `Olá, ${opts.client.name}!`,
-    "",
-    `📋 *${opts.invoice.description}*`,
-    "",
-    itemLines,
-    "",
-    `*Total: ${fmt(opts.invoice.total)}*`,
+    `Olá, *${opts.client.name}*! 👋`,
+    ``,
+    `Você recebeu uma fatura de *${vendorName}*.`,
+    ``,
+    `📋 ${opts.invoice.description}`,
+    `💰 *${fmt(opts.invoice.total)}*`,
     opts.invoice.dueDate ? `📅 Vencimento: ${fmtD(opts.invoice.dueDate)}` : "",
-    opts.invoice.paidAt  ? `✅ Pago em: ${fmtD(opts.invoice.paidAt)}`     : "",
-    `Status: ${STATUS[opts.invoice.status] || opts.invoice.status}`,
-    "",
-    `_Ref: #${opts.invoice.id}_`,
-  ].filter(l => l !== "").join("\n")
+    ``,
+    opts.link
+      ? `👉 Ver fatura: ${opts.link}`
+      : `_Ref: #${opts.invoice.id}_`,
+  ].filter(l => l !== undefined && l !== null).join("\n")
 
   await zapiPost("/send-text", {
     phone:   sanitizePhone(opts.phone),
