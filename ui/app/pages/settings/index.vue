@@ -1,8 +1,10 @@
 <script setup lang="ts">
 definePageMeta({ layout: "root" })
 
-const api   = useApi()
-const toast = useToast()
+const api    = useApi()
+const toast  = useToast()
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase as string
 
 const { data, refresh } = await useAsyncData(
   "vendor-settings",
@@ -20,7 +22,10 @@ const form = ref({
   taxId:   "",
 })
 
-const saving = ref(false)
+const saving      = ref(false)
+const uploading   = ref(false)
+const isDragging  = ref(false)
+const fileInput   = ref<HTMLInputElement | null>(null)
 
 watch(data, (d) => {
   if (d?.vendor) {
@@ -36,6 +41,49 @@ watch(data, (d) => {
   }
 }, { immediate: true })
 
+// ── Logo upload ───────────────────────────────────────────
+async function uploadFile(file: File) {
+  if (!file.type.startsWith("image/")) {
+    toast.add({ title: "Apenas imagens são aceites.", color: "warning" })
+    return
+  }
+  uploading.value = true
+  try {
+    const fd = new FormData()
+    fd.append("file", file)
+    const res = await fetch(`${apiBase}/admin/settings/vendor/upload`, {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+    })
+    if (!res.ok) throw new Error("Upload falhou")
+    const { file: filename } = await res.json()
+    form.value.logo = `${apiBase}/admin/settings/vendor/media?file=${filename}`
+    toast.add({ title: "Logo enviado.", color: "success" })
+  } catch {
+    toast.add({ title: "Erro ao enviar imagem.", color: "error" })
+  } finally {
+    uploading.value = false
+  }
+}
+
+function onFileChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) uploadFile(file)
+}
+
+function onDrop(e: DragEvent) {
+  isDragging.value = false
+  const file = e.dataTransfer?.files?.[0]
+  if (file) uploadFile(file)
+}
+
+function removeLogo() {
+  form.value.logo = ""
+  if (fileInput.value) fileInput.value.value = ""
+}
+
+// ── Save ──────────────────────────────────────────────────
 async function save() {
   saving.value = true
   try {
@@ -63,26 +111,77 @@ async function save() {
     <div class="flex-1 overflow-auto p-6">
       <div class="max-w-2xl space-y-8">
 
-        <!-- Vendor form -->
         <section>
           <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
             <UIcon name="i-heroicons-building-storefront" class="w-4 h-4 text-primary-400" />
             Dados do fornecedor / empresa
           </h2>
 
-          <div class="space-y-4">
-            <UFormField label="Nome da empresa">
-              <UInput v-model="form.name" placeholder="Ex: Sirius Studio" class="w-full" />
-            </UFormField>
+          <div class="space-y-5">
 
-            <UFormField label="Logo (URL da imagem)">
-              <div class="space-y-2">
-                <UInput v-model="form.logo" placeholder="https://… ou caminho de mídia do CMS" class="w-full" />
-                <div v-if="form.logo" class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-gray-800">
-                  <img :src="form.logo" alt="Logo preview" class="h-10 object-contain max-w-[160px]" @error="($event.target as HTMLImageElement).style.display='none'" />
-                  <span class="text-xs text-gray-500">Pré-visualização do logo</span>
+            <!-- Logo upload zone -->
+            <UFormField label="Logo da empresa">
+              <div class="space-y-3">
+                <!-- Current logo -->
+                <div v-if="form.logo" class="flex items-center gap-4 p-4 bg-gray-900 border border-gray-700 rounded-xl">
+                  <img
+                    :src="form.logo"
+                    alt="Logo"
+                    class="h-12 max-w-[180px] object-contain"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm text-gray-300 font-medium">Logo atual</p>
+                    <p class="text-xs text-gray-600 truncate mt-0.5">{{ form.logo }}</p>
+                  </div>
+                  <UButton
+                    icon="i-heroicons-trash"
+                    size="xs"
+                    color="error"
+                    variant="ghost"
+                    title="Remover logo"
+                    @click="removeLogo"
+                  />
+                </div>
+
+                <!-- Drop zone -->
+                <div
+                  class="relative border-2 border-dashed rounded-xl transition-colors cursor-pointer"
+                  :class="isDragging
+                    ? 'border-primary-500 bg-primary-500/5'
+                    : 'border-gray-700 hover:border-gray-500 bg-gray-900/40'"
+                  @click="fileInput?.click()"
+                  @dragover.prevent="isDragging = true"
+                  @dragleave="isDragging = false"
+                  @drop.prevent="onDrop"
+                >
+                  <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
+                    <div v-if="uploading" class="flex flex-col items-center gap-2">
+                      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-primary-400 animate-spin" />
+                      <p class="text-sm text-gray-400">A enviar…</p>
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-2">
+                      <UIcon name="i-heroicons-arrow-up-tray" class="w-8 h-8 text-gray-500" />
+                      <p class="text-sm text-gray-400">
+                        <span class="text-primary-400 font-medium">Clique para escolher</span>
+                        ou arraste a imagem aqui
+                      </p>
+                      <p class="text-xs text-gray-600">PNG, JPG, SVG, WebP — máx. 5 MB</p>
+                    </div>
+                  </div>
+                  <input
+                    ref="fileInput"
+                    type="file"
+                    accept="image/*"
+                    class="absolute inset-0 opacity-0 cursor-pointer"
+                    @change="onFileChange"
+                    @click.stop
+                  />
                 </div>
               </div>
+            </UFormField>
+
+            <UFormField label="Nome da empresa">
+              <UInput v-model="form.name" placeholder="Ex: Maga Web Tec" class="w-full" />
             </UFormField>
 
             <UFormField label="Endereço completo">
@@ -109,28 +208,25 @@ async function save() {
           </div>
         </section>
 
-        <!-- PDF preview card -->
+        <!-- PDF preview -->
         <section v-if="form.name || form.logo">
           <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
             <UIcon name="i-heroicons-document-text" class="w-4 h-4 text-primary-400" />
             Como aparecerá nas faturas
           </h2>
           <div class="bg-white rounded-xl p-6 text-gray-900 border border-gray-200 shadow-sm">
-            <div class="flex items-start justify-between">
+            <div class="flex items-start justify-between gap-6">
               <div>
-                <img v-if="form.logo" :src="form.logo" alt="Logo" class="h-10 object-contain mb-2 max-w-[200px]" />
-                <div v-else class="font-black text-lg tracking-widest uppercase">{{ form.name || "Empresa" }}</div>
-                <div class="text-xs text-gray-500 space-y-0.5 mt-1">
+                <img v-if="form.logo" :src="form.logo" alt="Logo" class="h-10 max-w-[200px] object-contain mb-2" />
+                <div v-else class="font-black text-xl tracking-widest uppercase text-gray-900">{{ form.name }}</div>
+                <div class="text-xs text-gray-500 mt-1 space-y-0.5">
                   <div v-if="form.address">{{ form.address }}</div>
-                  <div v-if="form.phone || form.email" class="flex gap-3">
-                    <span v-if="form.phone">{{ form.phone }}</span>
-                    <span v-if="form.email">{{ form.email }}</span>
-                  </div>
+                  <div v-if="form.phone || form.email">{{ [form.phone, form.email].filter(Boolean).join("  ·  ") }}</div>
                   <div v-if="form.website">{{ form.website }}</div>
                   <div v-if="form.taxId" class="text-gray-400">{{ form.taxId }}</div>
                 </div>
               </div>
-              <div class="text-right">
+              <div class="text-right flex-shrink-0">
                 <div class="text-xs text-gray-400 uppercase tracking-widest">Fatura</div>
                 <div class="text-2xl font-black text-gray-800">#inv-00000</div>
               </div>

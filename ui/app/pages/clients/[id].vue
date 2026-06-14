@@ -246,12 +246,19 @@ function sendByWhatsApp(inv: any) {
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(buildInvoiceText(inv))}`, "_blank")
 }
 
-function sendByEmail(inv: any) {
-  const email = client.value?.email
-  if (!email) { toast.add({ title: "Cliente sem email cadastrado.", color: "warning" }); return }
-  const subject = encodeURIComponent(`Fatura — ${inv.description}`)
-  const body    = encodeURIComponent(buildInvoiceText(inv).replace(/\*/g, ""))
-  window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+const sendingEmailId = ref<string | null>(null)
+
+async function sendByEmail(inv: any) {
+  if (!client.value?.email) { toast.add({ title: "Cliente sem email cadastrado.", color: "warning" }); return }
+  sendingEmailId.value = inv.id
+  try {
+    await api.post(`/admin/clients/${id}/invoices/${inv.id}/send-email`)
+    toast.add({ title: `Fatura enviada para ${client.value.email}`, color: "success" })
+  } catch (e: any) {
+    toast.add({ title: e.data?.error || "Erro ao enviar email.", color: "error" })
+  } finally {
+    sendingEmailId.value = null
+  }
 }
 
 function exportPDF(inv: any) {
@@ -727,6 +734,7 @@ const TABS = [
                       color="neutral"
                       variant="ghost"
                       title="Enviar por email"
+                      :loading="sendingEmailId === inv.id"
                       @click="sendByEmail(inv)"
                     />
                     <UButton

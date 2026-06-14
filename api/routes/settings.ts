@@ -1,12 +1,14 @@
 import { Elysia, t } from "elysia"
 import { jwt } from "@elysiajs/jwt"
 import { readFile, writeFile, mkdir } from "node:fs/promises"
-import { join } from "node:path"
+import { existsSync } from "node:fs"
+import { join, extname } from "node:path"
 import { SITES_ROOT } from "../lib/content"
 import { JWT_SECRET } from "../lib/config"
 
-const SIRIUS_DIR  = join(SITES_ROOT, "_sirius")
-const VENDOR_FILE = join(SIRIUS_DIR, "vendor.json")
+const SIRIUS_DIR   = join(SITES_ROOT, "_sirius")
+const VENDOR_FILE  = join(SIRIUS_DIR, "vendor.json")
+const VENDOR_MEDIA = join(SIRIUS_DIR, "media")
 
 async function readVendor() {
   try { return JSON.parse(await readFile(VENDOR_FILE, "utf-8")) } catch { return {} }
@@ -22,6 +24,15 @@ async function requireRoot(jwt: any, token: string | undefined, set: any) {
 
 export const settingsRoutes = new Elysia({ prefix: "/admin/settings" })
   .use(jwt({ name: "jwt", secret: JWT_SECRET }))
+
+  // Public: serve vendor media (no auth — needed so logos load in PDFs/emails)
+  .get("/vendor/media", async ({ query, set }) => {
+    const file = (query.file as string || "").replace(/\.\./g, "")
+    if (!file) { set.status = 400; return { error: "file param required" } }
+    const filePath = join(VENDOR_MEDIA, file)
+    if (!existsSync(filePath)) { set.status = 404; return { error: "Ficheiro não encontrado." } }
+    return Bun.file(filePath)
+  })
 
   .get("/vendor", async ({ cookie: { cms_token }, jwt, set }) => {
     if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
@@ -43,4 +54,20 @@ export const settingsRoutes = new Elysia({ prefix: "/admin/settings" })
       website: t.Optional(t.String()),
       taxId:   t.Optional(t.String()),
     })
+  })
+
+  // Upload vendor logo
+  .post("/vendor/upload", async ({ body, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    await mkdir(VENDOR_MEDIA, { recursive: true })
+
+    const { file } = body as { file: File }
+    const ext     = extname(file.name).toLowerCase() || ".png"
+    const outName = `logo-${Date.now()}${ext}`
+    const outPath = join(VENDOR_MEDIA, outName)
+
+    await Bun.write(outPath, Buffer.from(await file.arrayBuffer()))
+    return { success: true, file: outName }
+  }, {
+    body: t.Object({ file: t.File() })
   })
