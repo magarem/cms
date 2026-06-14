@@ -8,7 +8,7 @@ import { JWT_SECRET } from "../lib/config"
 import { randomUUID } from "node:crypto"
 import { sendInvoiceEmail } from "../lib/email"
 import { sendInvoiceWhatsApp, getZapiStatus } from "../lib/whatsapp"
-import { signInvoiceToken } from "../lib/invoice-token"
+import { signClientToken } from "../lib/invoice-token"
 
 const VENDOR_FILE = join(SITES_ROOT, "_sirius", "vendor.json")
 
@@ -189,6 +189,14 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     return { success: true }
   })
 
+  // ── Portal link (admin helper) ────────────────────────────
+  .get("/:id/portal-link", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
+    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
+    const token  = signClientToken(params.id)
+    return { success: true, url: `${uiBase}/portal/${params.id}?token=${token}` }
+  })
+
   .post("/:id/invoices/:invoiceId/send-whatsapp", async ({ params, cookie: { cms_token }, jwt, set }) => {
     if (!await requireRoot(jwt, cms_token?.value, set)) return { error: "Sem acesso." }
     const profile = await readJson<any>(profilePath(params.id), null)
@@ -198,9 +206,9 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
     if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
     const vendor = await readJson<any>(VENDOR_FILE, {})
-    const token  = signInvoiceToken(params.id, params.invoiceId)
+    const token  = signClientToken(params.id)
     const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
-    const link   = `${uiBase}/invoice/${params.id}/${params.invoiceId}?token=${token}`
+    const link   = `${uiBase}/portal/${params.id}?token=${token}`
     await sendInvoiceWhatsApp({ phone: profile.phone, vendor, client: profile, invoice, link })
     return { success: true }
   })
@@ -214,7 +222,10 @@ export const clientsRoutes = new Elysia({ prefix: "/admin/clients" })
     const invoice  = invoices.find((i: any) => i.id === params.invoiceId)
     if (!invoice) { set.status = 404; return { error: "Fatura não encontrada." } }
     const vendor = await readJson<any>(VENDOR_FILE, {})
-    await sendInvoiceEmail({ to: profile.email, vendor, client: profile, invoice })
+    const token  = signClientToken(params.id)
+    const uiBase = (process.env.CMS_UI_URL || "http://localhost:3001").replace(/\/$/, "")
+    const portalLink = `${uiBase}/portal/${params.id}?token=${token}`
+    await sendInvoiceEmail({ to: profile.email, vendor, client: profile, invoice, portalLink })
     return { success: true }
   })
 

@@ -96,6 +96,7 @@ export async function sendInvoiceEmail(opts: {
   vendor: { name?: string; logo?: string; address?: string; phone?: string; email?: string; website?: string; taxId?: string }
   client: { name: string }
   invoice: { id: string; description: string; items: { label: string; amount: number }[]; total: number; status: string; dueDate?: string; paidAt?: string; createdAt: string }
+  portalLink?: string
 }) {
   const fmt  = (n: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
   const fmtD = (iso?: string) => iso ? new Date(iso).toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" }) : ""
@@ -203,6 +204,17 @@ export async function sendInvoiceEmail(opts: {
 
     </td>
   </tr>
+
+  ${opts.portalLink ? `
+  <!-- CTA portal -->
+  <tr>
+    <td style="padding:0 32px 28px;text-align:center;">
+      <a href="${opts.portalLink}"
+         style="display:inline-block;background:#111;color:#fff;padding:13px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.02em;">
+        Acessar minha área do cliente →
+      </a>
+    </td>
+  </tr>` : ""}
 
   <!-- Footer -->
   <tr>

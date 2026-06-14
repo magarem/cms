@@ -468,6 +468,38 @@ function initials(name: string) {
   return (name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()
 }
 
+// ── Portal link ───────────────────────────────────────────
+const portalLink   = ref<string | null>(null)
+const loadingPortal = ref(false)
+
+async function copyPortalLink() {
+  loadingPortal.value = true
+  try {
+    const res = await api.get<{ success: boolean; url: string }>(`/admin/clients/${id}/portal-link`)
+    portalLink.value = res.url
+    await navigator.clipboard.writeText(res.url)
+    toast.add({ title: "Link copiado!", description: "Link da área do cliente copiado para a área de transferência.", color: "success" })
+  } catch (e: any) {
+    toast.add({ title: e.data?.error || "Erro ao gerar link.", color: "error" })
+  } finally {
+    loadingPortal.value = false
+  }
+}
+
+async function openPortal() {
+  if (portalLink.value) { window.open(portalLink.value, "_blank"); return }
+  loadingPortal.value = true
+  try {
+    const res = await api.get<{ success: boolean; url: string }>(`/admin/clients/${id}/portal-link`)
+    portalLink.value = res.url
+    window.open(res.url, "_blank")
+  } catch (e: any) {
+    toast.add({ title: e.data?.error || "Erro ao gerar link.", color: "error" })
+  } finally {
+    loadingPortal.value = false
+  }
+}
+
 const TABS = [
   { key: "dados",   label: "Dados",    icon: "i-heroicons-user" },
   { key: "sites",   label: "Sites",    icon: "i-heroicons-globe-alt" },
@@ -506,7 +538,7 @@ const TABS = [
           </p>
         </div>
 
-        <!-- Quick stats -->
+        <!-- Quick stats + portal -->
         <div class="ml-auto flex items-center gap-6 text-center">
           <div>
             <div class="text-lg font-bold text-white">{{ clientSites.length }}</div>
@@ -525,6 +557,29 @@ const TABS = [
               {{ tickets.filter((t: any) => t.status === 'open').length }}
             </div>
             <div class="text-[10px] text-gray-500 uppercase tracking-wider">Suporte aberto</div>
+          </div>
+          <!-- Portal link actions -->
+          <div class="border-l border-gray-700 pl-6 flex items-center gap-2">
+            <UTooltip text="Abrir área do cliente">
+              <UButton
+                icon="i-heroicons-arrow-top-right-on-square"
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                :loading="loadingPortal"
+                @click="openPortal"
+              />
+            </UTooltip>
+            <UTooltip text="Copiar link da área do cliente">
+              <UButton
+                icon="i-heroicons-link"
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                :loading="loadingPortal"
+                @click="copyPortalLink"
+              />
+            </UTooltip>
           </div>
         </div>
       </div>
