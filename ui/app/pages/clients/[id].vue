@@ -242,10 +242,115 @@ function sendByEmail(inv: any) {
   const email = client.value?.email
   if (!email) { toast.add({ title: "Cliente sem email cadastrado.", color: "warning" }); return }
   const subject = encodeURIComponent(`Fatura — ${inv.description}`)
-  const body    = encodeURIComponent(
-    buildInvoiceText(inv).replace(/\*/g, "")
-  )
+  const body    = encodeURIComponent(buildInvoiceText(inv).replace(/\*/g, ""))
   window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+}
+
+function exportPDF(inv: any) {
+  const statusClass: Record<string, string> = {
+    paid: "status-paid", pending: "status-pending", overdue: "status-overdue", cancelled: "status-cancelled",
+  }
+  const rows = (inv.items || []).map((item: any) => `
+    <tr>
+      <td>${item.label}</td>
+      <td class="amount">${fmtMoney(item.amount)}</td>
+    </tr>`).join("")
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Fatura ${inv.id}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Helvetica Neue",Arial,sans-serif;color:#111;background:#fff;padding:48px;font-size:14px;line-height:1.6}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px}
+  .brand{font-size:18px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+  .brand small{display:block;font-size:9px;font-weight:600;letter-spacing:.28em;color:#888;margin-top:2px}
+  .inv-ref{text-align:right}
+  .inv-ref .tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888}
+  .inv-ref .num{font-size:22px;font-weight:800;color:#111}
+  h1{font-size:26px;font-weight:800;margin-bottom:32px;color:#111}
+  .meta{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px;background:#f5f5f5;border-radius:8px;margin-bottom:40px}
+  .meta-block .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:4px}
+  .meta-block .val{font-weight:700;color:#111}
+  .meta-block .sub{color:#555;font-size:13px}
+  .meta-right{text-align:right}
+  .badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .status-paid{background:#d1fae5;color:#065f46}
+  .status-pending{background:#fef3c7;color:#92400e}
+  .status-overdue{background:#fee2e2;color:#991b1b}
+  .status-cancelled{background:#f3f4f6;color:#6b7280}
+  table{width:100%;border-collapse:collapse;margin-bottom:0}
+  thead tr{border-bottom:2px solid #111}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;padding:10px 0;text-align:left}
+  th.amount,td.amount{text-align:right}
+  tbody tr{border-bottom:1px solid #e5e5e5}
+  tbody tr:last-child{border-bottom:none}
+  td{padding:13px 0;color:#222}
+  td.amount{font-weight:600}
+  .totals{margin-top:16px;padding-top:16px;border-top:2px solid #111;display:flex;justify-content:flex-end}
+  .total-box{text-align:right}
+  .total-box .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888}
+  .total-box .val{font-size:28px;font-weight:900;color:#111;margin-top:2px}
+  .footer{margin-top:64px;padding-top:20px;border-top:1px solid #e5e5e5;display:flex;justify-content:space-between;color:#aaa;font-size:11px}
+  @media print{body{padding:28px}@page{margin:.8cm;size:A4}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">Sirius<small>CMS Studio</small></div>
+  <div class="inv-ref">
+    <div class="tag">Fatura</div>
+    <div class="num">#${inv.id}</div>
+  </div>
+</div>
+
+<h1>${inv.description}</h1>
+
+<div class="meta">
+  <div class="meta-block">
+    <div class="lbl">Cliente</div>
+    <div class="val">${client.value?.name || "—"}</div>
+    ${client.value?.email ? `<div class="sub">${client.value.email}</div>` : ""}
+    ${client.value?.phone ? `<div class="sub">${client.value.phone}</div>` : ""}
+    ${client.value?.address ? `<div class="sub">${client.value.address}</div>` : ""}
+  </div>
+  <div class="meta-block meta-right">
+    <div class="lbl">Status</div>
+    <div><span class="badge ${statusClass[inv.status] || ''}">${STATUS_INVOICE[inv.status]?.label || inv.status}</span></div>
+    <div style="margin-top:12px">
+      <div class="lbl">Emitida em</div>
+      <div class="val" style="font-size:13px;font-weight:600">${fmtDate(inv.createdAt)}</div>
+    </div>
+    ${inv.dueDate ? `<div style="margin-top:8px"><div class="lbl">Vencimento</div><div class="val" style="font-size:13px;font-weight:600">${fmtDate(inv.dueDate)}</div></div>` : ""}
+    ${inv.paidAt  ? `<div style="margin-top:8px"><div class="lbl">Pago em</div><div class="val" style="font-size:13px;font-weight:600">${fmtDate(inv.paidAt)}</div></div>`  : ""}
+  </div>
+</div>
+
+<table>
+  <thead><tr><th>Descrição</th><th class="amount">Valor</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+
+<div class="totals">
+  <div class="total-box">
+    <div class="lbl">Total</div>
+    <div class="val">${fmtMoney(inv.total)}</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>Sirius CMS Studio — ${new Date().getFullYear()}</div>
+  <div>${inv.id}</div>
+</div>
+
+<script>window.onload=()=>{window.print()}<\/script>
+</body>
+</html>`
+
+  const w = window.open("", "_blank", "width=860,height=1100")
+  if (w) { w.document.write(html); w.document.close() }
 }
 
 const totalPaid    = computed(() => invoices.value.filter((i: any) => i.status === "paid").reduce((s: number, i: any) => s + i.total, 0))
@@ -584,6 +689,14 @@ const TABS = [
                       variant="ghost"
                       title="Marcar como pago"
                       @click="markPaid(inv)"
+                    />
+                    <UButton
+                      icon="i-heroicons-arrow-down-tray"
+                      size="xs"
+                      color="neutral"
+                      variant="ghost"
+                      title="Exportar PDF"
+                      @click="exportPDF(inv)"
                     />
                     <UButton
                       icon="i-heroicons-envelope"
