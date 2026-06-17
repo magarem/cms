@@ -47,9 +47,11 @@ export async function startServer(): Promise<ServerHandle> {
 
   // Use full path so it works in non-interactive SSH sessions where ~/.bun/bin isn't in $PATH
   const bunBin = process.execPath  // the bun binary that's running this test
+  // Explicitly set to empty to prevent Bun from loading it from .env
+  const testEnv = { ...process.env, SIRIUS_STORAGE_ROOT: testRoot, PORT: String(port), NODE_ENV: "test", ANTHROPIC_API_KEY: "" }
   const proc = Bun.spawn([bunBin, "index.ts"], {
     cwd: API_DIR,
-    env: { ...process.env, SIRIUS_STORAGE_ROOT: testRoot, PORT: String(port), NODE_ENV: "test" },
+    env: testEnv,
     stdout: "ignore",
     stderr: "ignore",
   })

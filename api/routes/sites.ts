@@ -623,7 +623,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
     if (user.role !== "admin") { set.status = 403; return { error: "Apenas admins podem criar versões." } }
 
     const b = body as { name: string; from?: string }
-    const cleanName = b.name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "")
+    const cleanName = b.name.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
     if (!cleanName) { set.status = 400; return { error: "Nome de versão inválido." } }
     if (cleanName === "production") { set.status = 400; return { error: "O nome 'production' é reservado." } }
 
