@@ -186,6 +186,16 @@ function isActive(item: { to: string; exact?: boolean }) {
           Global
         </NuxtLink>
         <NuxtLink
+          :to="`/${site}/design`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/design`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-swatch" class="w-4 h-4 flex-shrink-0" />
+          Design
+        </NuxtLink>
+        <NuxtLink
           :to="`/${site}/settings`"
           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
           :class="$route.path.startsWith(`/${site}/settings`)

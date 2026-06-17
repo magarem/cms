@@ -38,6 +38,7 @@ import {
   resolveDefaultModel,
 } from "../lib/models"
 import { JWT_SECRET } from "../lib/config"
+import { BUILT_IN_PRESETS } from "../lib/theme"
 
 function isLegacyBackupDir(name: string): boolean {
   return /backup-\d{10,}/.test(name)
@@ -156,6 +157,67 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
         cmsConfig:            t.Optional(t.Any()),
       })
     }
+  )
+
+  // ── Design read ───────────────────────────────────────────
+  // Reads from defaultSiteVersion (live) so the editor shows what's actually on the site.
+  .get("/:site/design", async ({ params, cookie: { cms_token }, jwt, set }) => {
+    const user = await getUser(jwt, cms_token?.value, params.site)
+    if (!user) { set.status = 401; return { error: "Não autenticado." } }
+
+    const settings = await getSiteSettings(params.site)
+    const liveVersion = settings.defaultSiteVersion || getActiveVersion(settings)
+    const themeFile = join(SITES_ROOT, params.site, liveVersion, "_global", "theme.json")
+
+    let theme: any = null
+    if (existsSync(themeFile)) theme = JSON.parse(await readFile(themeFile, "utf-8"))
+
+    return {
+      success: true,
+      presets: BUILT_IN_PRESETS,
+      theme,
+      activePreset: settings.design?.activePreset ?? "basic",
+    }
+  })
+
+  // ── Design write ──────────────────────────────────────────
+  // Theme is a design setting, not versioned content — writes to both the live version
+  // (defaultSiteVersion) and the editing version so changes appear immediately on the site.
+  .put(
+    "/:site/design",
+    async ({ params, body, cookie: { cms_token }, jwt, set }) => {
+      const user = await getUser(jwt, cms_token?.value, params.site) as any
+      if (!user) { set.status = 401; return { error: "Não autenticado." } }
+      if (user.role === "viewer") { set.status = 403; return { error: "Sem permissão." } }
+
+      const { activePreset, theme } = body as { activePreset: string; theme: any }
+
+      const settings = await getSiteSettings(params.site)
+      const editingVersion = getActiveVersion(settings)
+      const liveVersion    = settings.defaultSiteVersion || editingVersion
+      const themeJson      = JSON.stringify(theme, null, 2)
+
+      // Always write to the live (public) version so the site reflects immediately
+      const liveDir = join(SITES_ROOT, params.site, liveVersion, "_global")
+      await mkdir(liveDir, { recursive: true })
+      await writeFile(join(liveDir, "theme.json"), themeJson)
+
+      // Also write to the editing version if it differs (keeps preview consistent)
+      if (editingVersion !== liveVersion) {
+        const editDir = join(SITES_ROOT, params.site, editingVersion, "_global")
+        await mkdir(editDir, { recursive: true })
+        await writeFile(join(editDir, "theme.json"), themeJson)
+      }
+
+      await saveSiteSettings(params.site, {
+        ...settings,
+        design: { activePreset },
+        lastUpdated: new Date().toISOString(),
+      })
+
+      return { success: true }
+    },
+    { body: t.Object({ activePreset: t.String(), theme: t.Any() }) }
   )
 
   // ── Page read ──────────────────────────────────────────────
