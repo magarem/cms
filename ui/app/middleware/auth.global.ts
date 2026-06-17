@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path === "/login" || to.path === "/reset-password") return
+  if (to.path === "/login" || to.path === "/reset-password" || to.path === "/magic-login") return
 
   const { user, ready, fetchMe, logout } = useAuth()
 

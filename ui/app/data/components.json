@@ -4074,6 +4074,140 @@
           ]
         }
       ]
+    },
+    {
+      "name": "FeatureGrid",
+      "file": "components/FeatureGrid.vue",
+      "category": "block",
+      "description": "Grelha de funcionalidades / vantagens com ícone, título e descrição. Suporta variantes cards, minimal e ícone à esquerda.",
+      "props": [
+        { "name": "title",       "label": "Título",             "type": "text",     "default": "Porque nos escolher" },
+        { "name": "subtitle",    "label": "Subtítulo / badge",  "type": "text",     "default": "Vantagens" },
+        { "name": "description", "label": "Descrição",          "type": "textarea", "default": "" },
+        {
+          "name": "columns", "label": "Colunas", "type": "select", "default": "3",
+          "options": [
+            { "value": "2", "label": "2 colunas" },
+            { "value": "3", "label": "3 colunas" },
+            { "value": "4", "label": "4 colunas" }
+          ]
+        },
+        {
+          "name": "variant", "label": "Estilo", "type": "select", "default": "cards",
+          "options": [
+            { "value": "cards",     "label": "Cards com bordas" },
+            { "value": "minimal",   "label": "Minimal (ícone circular)" },
+            { "value": "icon-left", "label": "Ícone à esquerda" }
+          ]
+        },
+        {
+          "name": "background", "label": "Fundo", "type": "select", "default": "default",
+          "options": [
+            { "value": "default", "label": "Padrão" },
+            { "value": "muted",   "label": "Suave" }
+          ]
+        },
+        {
+          "name": "items", "label": "Itens", "type": "array", "default": [],
+          "itemSchema": [
+            { "name": "icon",        "label": "Ícone PrimeIcons (ex: pi-bolt)", "type": "text",     "default": "pi-star" },
+            { "name": "title",       "label": "Título",                          "type": "text",     "default": "" },
+            { "name": "description", "label": "Descrição",                       "type": "textarea", "default": "" },
+            { "name": "badge",       "label": "Etiqueta (opcional)",             "type": "text",     "default": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Team",
+      "file": "components/Team.vue",
+      "category": "block",
+      "description": "Apresentação da equipa com foto, nome, cargo, bio e links sociais. Variantes cards, minimal e lista.",
+      "props": [
+        { "name": "title",       "label": "Título",            "type": "text",     "default": "Conheça a nossa equipa" },
+        { "name": "subtitle",    "label": "Subtítulo / badge", "type": "text",     "default": "Equipa" },
+        { "name": "description", "label": "Descrição",         "type": "textarea", "default": "" },
+        {
+          "name": "columns", "label": "Colunas", "type": "select", "default": "3",
+          "options": [
+            { "value": "2", "label": "2 colunas" },
+            { "value": "3", "label": "3 colunas" },
+            { "value": "4", "label": "4 colunas" }
+          ]
+        },
+        {
+          "name": "variant", "label": "Estilo", "type": "select", "default": "cards",
+          "options": [
+            { "value": "cards",   "label": "Cards" },
+            { "value": "minimal", "label": "Minimal" },
+            { "value": "list",    "label": "Lista" }
+          ]
+        },
+        {
+          "name": "background", "label": "Fundo", "type": "select", "default": "default",
+          "options": [
+            { "value": "default", "label": "Padrão" },
+            { "value": "muted",   "label": "Suave" }
+          ]
+        },
+        { "name": "showSocial", "label": "Mostrar redes sociais", "type": "toggle", "default": true },
+        { "name": "showBio",    "label": "Mostrar bio",           "type": "toggle", "default": true },
+        {
+          "name": "members", "label": "Membros", "type": "array", "default": [],
+          "itemSchema": [
+            { "name": "name",      "label": "Nome",       "type": "text",     "default": "" },
+            { "name": "role",      "label": "Cargo",      "type": "text",     "default": "" },
+            { "name": "bio",       "label": "Bio",        "type": "textarea", "default": "" },
+            { "name": "avatar",    "label": "Foto",       "type": "image",    "default": "" },
+            { "name": "email",     "label": "Email",      "type": "text",     "default": "" },
+            { "name": "linkedin",  "label": "LinkedIn",   "type": "url",      "default": "" },
+            { "name": "instagram", "label": "Instagram",  "type": "url",      "default": "" },
+            { "name": "twitter",   "label": "Twitter/X",  "type": "url",      "default": "" },
+            { "name": "facebook",  "label": "Facebook",   "type": "url",      "default": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StatsBar",
+      "file": "components/StatsBar.vue",
+      "category": "block",
+      "description": "Barra de estatísticas animada com contadores. Ideal para destacar números-chave como clientes, anos de experiência, projetos, etc.",
+      "props": [
+        { "name": "title",    "label": "Título (opcional)",   "type": "text", "default": "" },
+        { "name": "subtitle", "label": "Subtítulo / badge",   "type": "text", "default": "" },
+        {
+          "name": "variant", "label": "Estilo", "type": "select", "default": "horizontal",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal (linha)" },
+            { "value": "centered",   "label": "Cards centrados" },
+            { "value": "minimal",    "label": "Minimal (só números)" }
+          ]
+        },
+        {
+          "name": "background", "label": "Fundo", "type": "select", "default": "muted",
+          "options": [
+            { "value": "default", "label": "Padrão" },
+            { "value": "muted",   "label": "Suave" },
+            { "value": "primary", "label": "Cor primária" },
+            { "value": "dark",    "label": "Escuro" }
+          ]
+        },
+        { "name": "dividers", "label": "Divisores entre itens", "type": "toggle",  "default": true },
+        { "name": "animate",  "label": "Animar contadores",     "type": "toggle",  "default": true },
+        { "name": "duration", "label": "Duração animação (ms)", "type": "number",  "default": 2000 },
+        {
+          "name": "items", "label": "Estatísticas", "type": "array", "default": [],
+          "itemSchema": [
+            { "name": "value",       "label": "Valor (número)", "type": "text",     "default": "0" },
+            { "name": "prefix",      "label": "Prefixo (ex: €)", "type": "text",    "default": "" },
+            { "name": "suffix",      "label": "Sufixo (ex: +, %)", "type": "text",  "default": "" },
+            { "name": "label",       "label": "Etiqueta",        "type": "text",    "default": "" },
+            { "name": "description", "label": "Sub-descrição",   "type": "text",    "default": "" },
+            { "name": "icon",        "label": "Ícone PrimeIcons (ex: pi-users)", "type": "text", "default": "" }
+          ]
+        }
+      ]
     }
   ]
 }

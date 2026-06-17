@@ -1,11 +1,13 @@
 import { Elysia, t } from "elysia"
 import { jwt } from "@elysiajs/jwt"
 import { existsSync } from "node:fs"
+import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { findUser, verifyPassword, sanitizeUser, readUsers, writeUsers, hashPassword } from "../lib/users"
 import { SITES_ROOT } from "../lib/content"
 import { JWT_SECRET } from "../lib/config"
 import { sendPasswordResetEmail } from "../lib/email"
+import { verifyCmsMagicToken } from "../lib/invoice-token"
 
 const COOKIE_SAMESITE  = (process.env.COOKIE_SAMESITE || "lax") as "lax" | "strict" | "none"
 const COOKIE_SECURE    = process.env.COOKIE_SECURE === "true" || COOKIE_SAMESITE === "none"
@@ -153,3 +155,38 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       }),
     }
   )
+
+  // Exchange a CMS magic token (from the client portal) for a real session cookie
+  .post("/cms-magic", async ({ body, jwt, cookie: { cms_token }, set }) => {
+    const result = verifyCmsMagicToken(body.token)
+    if (!result) { set.status = 403; return { error: "Token inválido ou expirado." } }
+
+    const { clientId, siteId } = result
+    const CLIENTS_DIR = join(SITES_ROOT, "_sirius", "clients")
+    let clientName = "Cliente"
+    try {
+      const profile = JSON.parse(await readFile(join(CLIENTS_DIR, `${clientId}.json`), "utf-8"))
+      clientName = profile.name || clientName
+    } catch {}
+
+    const token = await jwt.sign({
+      id:       clientId,
+      username: clientName,
+      role:     "editor",
+      sites:    [siteId],
+      site:     siteId,
+    })
+
+    cms_token.set({
+      value:    token,
+      httpOnly: true,
+      maxAge:   60 * 60 * 24 * 7,
+      path:     "/",
+      sameSite: COOKIE_SAMESITE,
+      secure:   COOKIE_SECURE,
+    })
+
+    return { success: true, site: siteId }
+  }, {
+    body: t.Object({ token: t.String() }),
+  })

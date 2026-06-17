@@ -7,7 +7,7 @@ const toast = useToast()
 const site = route.params.site as string
 
 const { data: usersData, refresh } = await useAsyncData(
-  "users-list",
+  `users-list-${site}`,
   () => api.get<{ success: boolean; users: any[] }>("/users"),
   { server: false }
 )

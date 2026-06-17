@@ -129,6 +129,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
       if (b.defaultSiteVersion !== undefined) updates.defaultSiteVersion = b.defaultSiteVersion
       if (b.breadcrumbMode !== undefined) updates.breadcrumbMode = b.breadcrumbMode
       if (b.blocksGap      !== undefined) updates.blocksGap      = b.blocksGap
+      if (b.siteUrl        !== undefined) updates.siteUrl        = b.siteUrl
 
       if (Object.keys(updates).length) {
         await saveSiteSettings(params.site, {
@@ -151,6 +152,7 @@ export const sitesRoutes = new Elysia({ prefix: "/sites" })
         defaultSiteVersion:   t.Optional(t.String()),
         breadcrumbMode:       t.Optional(t.String()),
         blocksGap:            t.Optional(t.String()),
+        siteUrl:              t.Optional(t.String()),
         cmsConfig:            t.Optional(t.Any()),
       })
     }

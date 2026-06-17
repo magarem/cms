@@ -20,6 +20,7 @@ const { data, error } = await useFetch<{
     dueDate?: string
     paidAt?: string
     createdAt: string
+    paymentUrl?: string
   }
   vendor: {
     name?: string
@@ -158,6 +159,27 @@ const STATUS_CLASS: Record<string, string> = {
             </tr>
           </tfoot>
         </table>
+      </div>
+
+      <!-- Pay button -->
+      <div
+        v-if="data.invoice.paymentUrl && data.invoice.status !== 'paid' && data.invoice.status !== 'cancelled'"
+        class="px-8 pb-8 flex justify-center"
+      >
+        <a
+          :href="data.invoice.paymentUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90 active:opacity-80"
+          style="background-color: #009ee3;"
+        >
+          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M40 16H8C5.79 16 4 17.79 4 20V36C4 38.21 5.79 40 8 40H40C42.21 40 44 38.21 44 36V20C44 17.79 42.21 16 40 16Z" fill="white" fill-opacity="0.3"/>
+            <path d="M4 22H44V28H4V22Z" fill="white" fill-opacity="0.5"/>
+            <rect x="8" y="32" width="8" height="4" rx="1" fill="white"/>
+          </svg>
+          Pagar com Mercado Pago
+        </a>
       </div>
 
       <!-- Footer -->

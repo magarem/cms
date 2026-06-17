@@ -11,6 +11,7 @@ const { data, refresh } = await useAsyncData(`settings-page-${site}`, () =>
   { server: false }
 )
 
+const siteUrl              = ref("")
 const previewUrl           = ref("")
 const googleAnalyticsId    = ref("")
 const siteVersions         = ref<string[]>(["v1"])
@@ -23,6 +24,7 @@ const editableVersions = computed(() => siteVersions.value.filter(v => v !== "pr
 
 watch(data, (val) => {
   if (!val) return
+  siteUrl.value              = val.settings?.siteUrl      || ""
   previewUrl.value           = val.cmsConfig?.previewUrl || ""
   googleAnalyticsId.value    = val.cmsConfig?.googleAnalyticsId || ""
   siteVersions.value         = val.settings?.siteVersions || ["v1"]
@@ -43,6 +45,7 @@ async function save() {
       defaultSiteVersion: defaultSiteVersion.value,
       breadcrumbMode: breadcrumbMode.value,
       blocksGap: blocksGap.value,
+      siteUrl: siteUrl.value,
       cmsConfig: { previewUrl: previewUrl.value, googleAnalyticsId: googleAnalyticsId.value },
     })
     toast.add({ title: "Configurações guardadas.", color: "success" })
@@ -158,6 +161,24 @@ async function createVersion() {
             </UFormField>
           </div>
         </div>
+      </UCard>
+
+      <!-- Public URL card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <span class="text-sm font-semibold text-white">URL pública</span>
+        </template>
+        <UFormField label="URL do site em produção">
+          <UInput
+            v-model="siteUrl"
+            placeholder="https://meusite.com"
+            class="w-full"
+            icon="i-heroicons-globe-alt"
+          />
+        </UFormField>
+        <p class="text-xs text-gray-500 mt-2">
+          URL onde o site está publicado. Aparece no portal do cliente como link "Visitar website".
+        </p>
       </UCard>
 
       <!-- Preview URL card -->

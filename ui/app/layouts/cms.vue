@@ -85,19 +85,16 @@ const sidebarOpen = ref(true)
 // ── Nav ───────────────────────────────────────────────────
 const navItems = computed(() => {
   const base  = `/${site.value}`
-  const items = [
-    { label: "Dashboard",     icon: "i-heroicons-home",                   to: base, exact: true },
-    { label: "Estatísticas",  icon: "i-heroicons-chart-bar",              to: `${base}/stats` },
-    { label: "Modelos",       icon: "i-heroicons-rectangle-group",        to: `${base}/models` },
-    { label: "Global",        icon: "i-heroicons-cog-6-tooth",            to: `${base}/global` },
-    { label: "Configurações", icon: "i-heroicons-adjustments-horizontal", to: `${base}/settings` },
-    { label: "Newsletter",    icon: "i-heroicons-envelope",               to: `${base}/newsletter` },
-    { label: "Inscrições",   icon: "i-heroicons-clipboard-document-list", to: `${base}/inscricoes` },
-    { label: "Backups",      icon: "i-heroicons-archive-box",             to: `${base}/backups` },
+  return [
+    { label: "Dashboard",     icon: "i-heroicons-home",                    to: base,               exact: true },
+    { label: "Global",        icon: "i-heroicons-cog-6-tooth",             to: `${base}/global` },
+    { label: "Configurações", icon: "i-heroicons-adjustments-horizontal",  to: `${base}/settings` },
+    { label: "Estatísticas",  icon: "i-heroicons-chart-bar",               to: `${base}/stats` },
+    { label: "Modelos",       icon: "i-heroicons-rectangle-group",         to: `${base}/models` },
+    { label: "Newsletter",    icon: "i-heroicons-envelope",                to: `${base}/newsletter` },
+    { label: "Inscrições",    icon: "i-heroicons-clipboard-document-list", to: `${base}/inscricoes` },
+    { label: "Backups",       icon: "i-heroicons-archive-box",             to: `${base}/backups` },
   ]
-  if (user.value?.role === "admin")
-    items.push({ label: "Usuários", icon: "i-heroicons-users", to: `${base}/users`, exact: false })
-  return items
 })
 
 function isActive(item: { to: string; exact?: boolean }) {
@@ -156,12 +153,112 @@ function isActive(item: { to: string; exact?: boolean }) {
         </div>
       </div>
 
-      <!-- Page tree — only when open -->
-      <nav v-if="sidebarOpen" class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+      <!-- Nav — scrollable, full menu in requested order -->
+      <nav v-if="sidebarOpen" class="flex-1 overflow-y-auto py-2 px-2 min-h-0">
+        <!-- Dashboard -->
+        <NuxtLink
+          :to="`/${site}`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path === `/${site}`
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-home" class="w-4 h-4 flex-shrink-0" />
+          Dashboard
+        </NuxtLink>
+
+        <!-- Páginas -->
+        <div class="mt-3 mb-1 px-3">
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-600">Páginas</span>
+        </div>
         <PageTreeSidebar :site="site" :key="`${site}-${activeVersion}`" />
 
-        <div class="my-3 border-t border-gray-800" />
+        <!-- Settings & tools -->
+        <div class="border-t border-gray-800 my-2" />
+        <NuxtLink
+          :to="`/${site}/global`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/global`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4 flex-shrink-0" />
+          Global
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/settings`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/settings`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-adjustments-horizontal" class="w-4 h-4 flex-shrink-0" />
+          Configurações
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/stats`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/stats`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-chart-bar" class="w-4 h-4 flex-shrink-0" />
+          Estatísticas
+        </NuxtLink>
+        <NuxtLink
+          v-if="user?.role === 'admin'"
+          :to="`/${site}/users`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/users`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-users" class="w-4 h-4 flex-shrink-0" />
+          Utilizadores
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/models`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/models`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-rectangle-group" class="w-4 h-4 flex-shrink-0" />
+          Modelos
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/newsletter`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/newsletter`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-envelope" class="w-4 h-4 flex-shrink-0" />
+          Newsletter
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/inscricoes`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/inscricoes`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-clipboard-document-list" class="w-4 h-4 flex-shrink-0" />
+          Inscrições
+        </NuxtLink>
+        <NuxtLink
+          :to="`/${site}/backups`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/backups`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-archive-box" class="w-4 h-4 flex-shrink-0" />
+          Backups
+        </NuxtLink>
 
+        <!-- Media & Assistente -->
+        <div class="border-t border-gray-800 my-2" />
         <NuxtLink
           :to="`/${site}/media`"
           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
@@ -172,7 +269,6 @@ function isActive(item: { to: string; exact?: boolean }) {
           <UIcon name="i-heroicons-photo" class="w-4 h-4 flex-shrink-0" />
           Media
         </NuxtLink>
-
         <NuxtLink
           :to="`/${site}/assistant`"
           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
@@ -184,21 +280,6 @@ function isActive(item: { to: string; exact?: boolean }) {
             <path d="M10 2 L11.5 8.5 L18 10 L11.5 11.5 L10 18 L8.5 11.5 L2 10 L8.5 8.5 Z" fill="currentColor" />
           </svg>
           Assistente
-        </NuxtLink>
-
-        <div class="my-3 border-t border-gray-800" />
-
-        <NuxtLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
-          :class="isActive(item)
-            ? 'bg-primary-500/20 text-primary-400 font-medium'
-            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
-        >
-          <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
-          {{ item.label }}
         </NuxtLink>
       </nav>
     </aside>
