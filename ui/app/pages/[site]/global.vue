@@ -182,29 +182,11 @@ async function save() {
   </CmsTopbar>
 
   <!-- Body -->
-  <div class="flex-1 flex overflow-hidden">
-    <!-- Key list -->
-    <aside class="w-48 flex-shrink-0 border-r border-gray-800 bg-gray-900 p-3 space-y-1">
-      <button
-        v-for="key in globalKeys"
-        :key="key"
-        class="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors"
-        :class="activeKey === key ? 'bg-primary-500/20 text-primary-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'"
-        @click="activeKey = key"
-      >
-        {{ key }}
-      </button>
-      <div v-if="!globalKeys.length && !pending" class="text-xs text-gray-600 px-3 py-2">
-        Nenhum ficheiro global
-      </div>
-      <div v-if="pending" class="flex justify-center py-4">
-        <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 animate-spin text-gray-600" />
-      </div>
-    </aside>
-
-    <!-- Editor -->
-    <div class="flex-1 overflow-y-auto p-6">
-      <div v-if="activeKey && editData">
+  <div class="flex-1 overflow-y-auto p-6">
+    <div v-if="pending" class="flex justify-center py-20">
+      <UIcon name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin text-gray-600" />
+    </div>
+    <div v-else-if="activeKey && editData">
 
         <!-- Block-based global keys: style panel + block editor -->
         <template v-if="Array.isArray(editData.blocks)">
@@ -273,9 +255,8 @@ async function save() {
 
         <PropForm v-else v-model="editData" />
       </div>
-      <div v-else class="flex items-center justify-center py-20 text-gray-600 text-sm">
-        Selecione um ficheiro à esquerda
-      </div>
+    <div v-else class="flex items-center justify-center py-20 text-gray-600 text-sm">
+      Selecione uma secção no menu lateral
     </div>
   </div>
 </template>

@@ -80,7 +80,27 @@ provide("cmsPublish", {
 // ── Expose role flag to any descendant (BlockEditor, etc.) ─
 provide("cmsIsAdmin", computed(() => user.value?.role === "admin"))
 
-const sidebarOpen = ref(true)
+const sidebarOpen  = ref(true)
+const pagesOpen    = ref(true)
+const globalOpen   = ref(true)
+
+// ── Unread messages count ─────────────────────────────────
+const unreadCount = ref(0)
+
+async function fetchUnread() {
+  try {
+    const res = await api.get<{ unread: number }>(`/sites/${site.value}/messages`)
+    unreadCount.value = res.unread ?? 0
+  } catch {
+    // silently ignore
+  }
+}
+
+onMounted(() => {
+  fetchUnread()
+  const timer = setInterval(fetchUnread, 60_000)
+  onUnmounted(() => clearInterval(timer))
+})
 
 // ── Nav ───────────────────────────────────────────────────
 const navItems = computed(() => {
@@ -168,23 +188,54 @@ function isActive(item: { to: string; exact?: boolean }) {
         </NuxtLink>
 
         <!-- Páginas -->
-        <div class="mt-3 mb-1 px-3">
-          <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-600">Páginas</span>
-        </div>
-        <PageTreeSidebar :site="site" :key="`${site}-${activeVersion}`" />
+        <button
+          class="mt-2 w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-gray-400 hover:text-white hover:bg-gray-800"
+          @click="pagesOpen = !pagesOpen"
+        >
+          <UIcon name="i-heroicons-document-text" class="w-4 h-4 flex-shrink-0" />
+          <span class="flex-1 text-left">Páginas</span>
+          <UIcon :name="pagesOpen ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'" class="w-3 h-3" />
+        </button>
+        <PageTreeSidebar v-if="pagesOpen" :site="site" :key="`${site}-${activeVersion}`" />
 
         <!-- Settings & tools -->
         <div class="border-t border-gray-800 my-2" />
-        <NuxtLink
-          :to="`/${site}/global`"
-          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+
+        <!-- Global group (expandable) -->
+        <button
+          class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
           :class="$route.path.startsWith(`/${site}/global`)
-            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            ? 'text-primary-400 font-medium'
             : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+          @click="globalOpen = !globalOpen"
         >
           <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4 flex-shrink-0" />
-          Global
-        </NuxtLink>
+          <span class="flex-1 text-left">Global</span>
+          <UIcon :name="globalOpen ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'" class="w-3 h-3" />
+        </button>
+        <div v-if="globalOpen" class="ml-4 border-l border-gray-800 pl-2 mb-1">
+          <NuxtLink
+            :to="`/${site}/global?section=topbar`"
+            class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors"
+            :class="$route.query.section === 'topbar' && $route.path.startsWith(`/${site}/global`)
+              ? 'text-primary-400 font-medium'
+              : 'text-gray-500 hover:text-white hover:bg-gray-800'"
+          >
+            <UIcon name="i-heroicons-bars-3" class="w-3.5 h-3.5 flex-shrink-0" />
+            Topo
+          </NuxtLink>
+          <NuxtLink
+            :to="`/${site}/global?section=footer`"
+            class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors"
+            :class="$route.query.section === 'footer' && $route.path.startsWith(`/${site}/global`)
+              ? 'text-primary-400 font-medium'
+              : 'text-gray-500 hover:text-white hover:bg-gray-800'"
+          >
+            <UIcon name="i-heroicons-minus" class="w-3.5 h-3.5 flex-shrink-0" />
+            Rodapé
+          </NuxtLink>
+        </div>
+
         <NuxtLink
           :to="`/${site}/design`"
           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
@@ -216,6 +267,20 @@ function isActive(item: { to: string; exact?: boolean }) {
           Estatísticas
         </NuxtLink>
         <NuxtLink
+          :to="`/${site}/mensagens`"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
+          :class="$route.path.startsWith(`/${site}/mensagens`)
+            ? 'bg-primary-500/20 text-primary-400 font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+        >
+          <UIcon name="i-heroicons-inbox" class="w-4 h-4 flex-shrink-0" />
+          <span class="flex-1">Mensagens</span>
+          <span
+            v-if="unreadCount > 0"
+            class="ml-auto text-[10px] bg-primary-500 text-white rounded-full px-1.5 py-0.5 font-bold"
+          >{{ unreadCount }}</span>
+        </NuxtLink>
+        <NuxtLink
           v-if="user?.role === 'admin'"
           :to="`/${site}/users`"
           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors"
@@ -224,7 +289,7 @@ function isActive(item: { to: string; exact?: boolean }) {
             : 'text-gray-400 hover:text-white hover:bg-gray-800'"
         >
           <UIcon name="i-heroicons-users" class="w-4 h-4 flex-shrink-0" />
-          Utilizadores
+          Usuários
         </NuxtLink>
         <NuxtLink
           :to="`/${site}/models`"

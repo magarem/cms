@@ -11,6 +11,7 @@ import { productsRoutes } from "./routes/products"
 import { settingsRoutes } from "./routes/settings"
 import { publicRoutes } from "./routes/public"
 import { controlRoutes } from "./routes/control"
+import { messagesRoutes } from "./routes/messages"
 
 const PORT           = Number(process.env.PORT || 3002)
 const UI_ORIGIN      = process.env.CMS_UI_URL   || "http://localhost:3001"
@@ -43,6 +44,7 @@ const app = new Elysia()
   .use(settingsRoutes)
   .use(publicRoutes)
   .use(controlRoutes)
+  .use(messagesRoutes)
   .listen(PORT)
 
 console.log(`🚀 Sirius CMS API running at http://localhost:${PORT}`)

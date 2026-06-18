@@ -14,6 +14,9 @@ const { data, refresh } = await useAsyncData(`settings-page-${site}`, () =>
 const siteUrl              = ref("")
 const previewUrl           = ref("")
 const googleAnalyticsId    = ref("")
+const whatsappNumber          = ref("")
+const instagramAccessToken    = ref("")
+const schemaType              = ref("WebSite")
 const siteVersions         = ref<string[]>(["v1"])
 const activeEditionVersion = ref("v1")
 const defaultSiteVersion   = ref("v1")
@@ -27,6 +30,9 @@ watch(data, (val) => {
   siteUrl.value              = val.settings?.siteUrl      || ""
   previewUrl.value           = val.cmsConfig?.previewUrl || ""
   googleAnalyticsId.value    = val.cmsConfig?.googleAnalyticsId || ""
+  whatsappNumber.value          = val.cmsConfig?.whatsappNumber       || ""
+  instagramAccessToken.value    = val.cmsConfig?.instagramAccessToken || ""
+  schemaType.value              = val.cmsConfig?.schemaType           || "WebSite"
   siteVersions.value         = val.settings?.siteVersions || ["v1"]
   activeEditionVersion.value = val.settings?.activeEditionVersion || "v1"
   defaultSiteVersion.value   = val.settings?.defaultSiteVersion || "v1"
@@ -46,7 +52,7 @@ async function save() {
       breadcrumbMode: breadcrumbMode.value,
       blocksGap: blocksGap.value,
       siteUrl: siteUrl.value,
-      cmsConfig: { previewUrl: previewUrl.value, googleAnalyticsId: googleAnalyticsId.value },
+      cmsConfig: { previewUrl: previewUrl.value, googleAnalyticsId: googleAnalyticsId.value, whatsappNumber: whatsappNumber.value, instagramAccessToken: instagramAccessToken.value, schemaType: schemaType.value },
     })
     toast.add({ title: "Configurações guardadas.", color: "success" })
     await refresh()
@@ -273,6 +279,33 @@ async function createVersion() {
         </UFormField>
       </UCard>
 
+      <!-- Schema.org card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-code-bracket" class="w-4 h-4 text-gray-400" />
+            <span class="text-sm font-semibold text-white">Schema.org (SEO estruturado)</span>
+          </div>
+        </template>
+        <UFormField label="Tipo de negócio (homepage)">
+          <USelect
+            v-model="schemaType"
+            :options="[
+              { label: 'WebSite (genérico)', value: 'WebSite' },
+              { label: 'LodgingBusiness (hospedagem)', value: 'LodgingBusiness' },
+              { label: 'BedAndBreakfast (pousada / B&B)', value: 'BedAndBreakfast' },
+              { label: 'Hotel', value: 'Hotel' },
+              { label: 'Restaurant (restaurante)', value: 'Restaurant' },
+              { label: 'LocalBusiness (negócio local)', value: 'LocalBusiness' },
+            ]"
+            class="w-full"
+          />
+        </UFormField>
+        <p class="text-xs text-gray-500 mt-2">
+          Define o tipo de Schema.org emitido na página inicial para motores de busca.
+        </p>
+      </UCard>
+
       <!-- Google Analytics card -->
       <UCard class="bg-gray-900 border-gray-800">
         <template #header>
@@ -297,6 +330,61 @@ async function createVersion() {
         <p class="text-xs text-gray-500 mt-2">
           O ID de medição encontra-se em Google Analytics → Admin → Fluxos de dados.
           Deixe vazio para desativar o tracking.
+        </p>
+      </UCard>
+
+      <!-- Instagram card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs><linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/><stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs>
+              <rect width="24" height="24" rx="6" fill="url(#ig-grad)"/>
+              <circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.8" fill="none"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+            </svg>
+            <span class="text-sm font-semibold text-white">Instagram</span>
+            <UBadge v-if="instagramAccessToken" color="success" variant="subtle" size="xs">Activo</UBadge>
+            <UBadge v-else color="neutral" variant="subtle" size="xs">Inactivo</UBadge>
+          </div>
+        </template>
+        <UFormField label="Access Token (Instagram Graph API)">
+          <UInput
+            v-model="instagramAccessToken"
+            placeholder="IGQVJx..."
+            type="password"
+            class="w-full font-mono"
+            icon="i-heroicons-key"
+          />
+        </UFormField>
+        <p class="text-xs text-gray-500 mt-2">
+          Crie uma app no Facebook Developers → Instagram Basic Display → gere um token de longa duração. Activa o bloco InstagramFeed no site.
+        </p>
+      </UCard>
+
+      <!-- WhatsApp card -->
+      <UCard class="bg-gray-900 border-gray-800">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#25D366" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.117 1.523 5.845L.057 23.882a.5.5 0 0 0 .61.61l6.037-1.466A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 0 1-5.189-1.453l-.37-.22-3.838.932.95-3.838-.242-.384A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+            <span class="text-sm font-semibold text-white">WhatsApp</span>
+            <UBadge v-if="whatsappNumber" color="success" variant="subtle" size="xs">Activo</UBadge>
+            <UBadge v-else color="neutral" variant="subtle" size="xs">Inactivo</UBadge>
+          </div>
+        </template>
+        <UFormField label="Número (com DDI, ex: 5511999999999)">
+          <UInput
+            v-model="whatsappNumber"
+            placeholder="5573999999999"
+            class="w-full font-mono"
+            icon="i-heroicons-phone"
+          />
+        </UFormField>
+        <p class="text-xs text-gray-500 mt-2">
+          Apenas dígitos, com código do país e DDD. Activa o botão flutuante de WhatsApp no site.
         </p>
       </UCard>
 

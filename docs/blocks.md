@@ -702,6 +702,127 @@ Content block with title, subtitle, image gallery, and rich-text body.
 
 ---
 
+### AccommodationsGrid (`AccommodationsGrid`)
+
+Room and suite grid for boutique hotels and pousadas — photo carousel per card, amenities with icons, highlight price, and a WhatsApp or external booking button.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | "" | Section title. |
+| `subtitle` | text | "" | |
+| `cWidth` | select | `content` | `site` / `content` / `copy`. |
+| `rooms` | array | `[]` | See item shape below. |
+
+`rooms` item: `{ name, description, images (image-array), amenities (string list), priceFrom, currency (ISO code, e.g. `BRL`), maxGuests, bedType, size, whatsappNumber, bookingUrl }`.
+
+`bookingUrl` takes priority over `whatsappNumber`. If both are empty the button is hidden.
+
+---
+
+### BookingWidget (`BookingWidget`)
+
+Compact booking bar for boutique hotels — check-in, check-out, and number of guests fields with a single CTA that sends via WhatsApp or an external booking URL.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | "" | Heading above the bar. |
+| `subtitle` | text | "" | |
+| `checkInLabel` | text | `Check-in` | |
+| `checkOutLabel` | text | `Check-out` | |
+| `guestsLabel` | text | `Hóspedes` | |
+| `ctaLabel` | text | `Ver disponibilidade` | |
+| `whatsappNumber` | text | "" | If set, opens WhatsApp with a pre-filled message. |
+| `bookingUrl` | text | "" | External booking URL — takes priority over `whatsappNumber`. |
+| `cWidth` | select | `content` | `site` / `content`. |
+
+---
+
+### ExperienceCards (`ExperienceCards`)
+
+Grid of experience cards with a full-bleed image, gradient overlay, optional PrimeIcons icon, and an optional link — ideal for activities, guided tours, and local attractions.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | "" | Section title. |
+| `subtitle` | text | "" | |
+| `cols` | select | `3` | Number of columns (1–6). |
+| `cWidth` | select | `content` | `site` / `content`. |
+| `experiences` | array | `[]` | See item shape below. |
+
+`experiences` item: `{ title, description, image (image), icon (PrimeIcons class, e.g. `pi-sun`), link (internal path or full URL) }`.
+
+---
+
+### InstagramFeed (`InstagramFeed`)
+
+Instagram feed — shows the most recent posts via Instagram Graph API with a hover overlay and caption. Requires an access token configured in CMS Settings → Instagram.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | `Instagram` | Section title. |
+| `subtitle` | text | "" | |
+| `username` | text | "" | Display handle (e.g. `@pousada`). Not used for the API call — cosmetic only. |
+| `limit` | select | `9` | Number of posts to show (3 / 6 / 9 / 12). |
+| `cols` | select | `3` | Grid columns (2 / 3 / 4). |
+| `cWidth` | select | `content` | `site` / `content`. |
+
+Shows a placeholder card when no token is configured.
+
+---
+
+### MapSection (`MapSection`)
+
+Embedded map section (Google Maps iframe) with title, description, and a list of highlighted points of interest shown beside the map.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | "" | Section title. |
+| `description` | text | "" | Short paragraph next to the map. |
+| `embedUrl` | text | "" | Google Maps embed URL (use "Share → Embed a map" in Google Maps). |
+| `height` | text | `420px` | CSS height of the iframe. |
+| `cWidth` | select | `content` | `site` / `content`. |
+| `highlights` | array | `[]` | See item shape below. |
+
+`highlights` item: `{ name, description, icon (PrimeIcons class, default `pi-map-marker`) }`.
+
+---
+
+### ReservationForm (`ReservationForm`)
+
+Contact / reservation form for boutique hotels and pousadas — configurable check-in/out, guests, and phone fields. Submission can go via WhatsApp, email (Resend), or both.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | `Faça a sua reserva` | |
+| `subtitle` | text | "" | |
+| `description` | text | "" | Short paragraph above the form. |
+| `whatsappNumber` | text | "" | Required for `whatsapp` or `both` submit modes. |
+| `emailTo` | text | "" | Required for `email` or `both` submit modes. |
+| `submitMode` | select | `whatsapp` | `whatsapp` / `email` / `both`. |
+| `showCheckInOut` | toggle | `true` | Show check-in / check-out date fields. |
+| `showGuests` | toggle | `true` | Show number of guests field. |
+| `showPhone` | toggle | `true` | Show phone / WhatsApp field. |
+| `successMessage` | text | `Mensagem enviada! Entraremos em contacto em breve.` | |
+| `cWidth` | select | `content` | `site` / `content`. |
+
+---
+
+### TestimonialsCarousel (`TestimonialsCarousel`)
+
+Guest testimonial carousel — displays one card at a time with a star rating, quote, author name, photo, origin, and date. Configurable autoplay with navigation arrows and dot indicators.
+
+| Field | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | text | "" | Section title. |
+| `subtitle` | text | "" | |
+| `autoplay` | toggle | `true` | Advances automatically. |
+| `cWidth` | select | `content` | `site` / `content`. |
+| `testimonials` | array | `[]` | See item shape below. |
+
+`testimonials` item: `{ text, name, photo (image), origin, date }`.
+
+---
+
 ### VideosShowcase (`VideosShowcase`)
 
 Testimonial-video showcase in a grid (3 per row) or horizontal carousel. File is `components/Depoimentos.vue`.

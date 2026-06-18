@@ -688,7 +688,7 @@
       "name": "AppContainer",
       "file": "components/AppContainer.vue",
       "category": "layout",
-      "description": "Wrapper that controls the max-width of its content. Use it to wrap page sections.",
+      "description": "Contêiner que controla a largura máxima do conteúdo. Use para envolver secções de página.",
       "props": [
         {
           "name": "size",
@@ -716,7 +716,7 @@
       "name": "PageHeader",
       "file": "components/PageHeader.vue",
       "category": "block",
-      "description": "Page or section heading block with optional tag, highlighted word, and subtitle.",
+      "description": "Bloco de título de página ou secção com tag opcional, palavra destacada e subtítulo.",
       "props": [
         {
           "name": "title",
@@ -795,7 +795,7 @@
       "name": "HeroSlideShow",
       "file": "components/HeroSlideShow.vue",
       "category": "block",
-      "description": "Full-screen hero with auto-playing image/video slideshow, gradient overlay, badge, split title, description, and dual CTA buttons.",
+      "description": "Hero de ecrã inteiro com slideshow automático de imagens/vídeos, sobreposição de gradiente, badge, título dividido, descrição e dois botões de CTA.",
       "props": [
         {
           "name": "badge",
@@ -889,7 +889,7 @@
       "name": "CallToAction",
       "file": "components/CallToAction.vue",
       "category": "block",
-      "description": "Call-to-action banner with title, subtitle, and a primary button.",
+      "description": "Banner de chamada à ação com título, subtítulo e botão principal.",
       "props": [
         {
           "name": "config",
@@ -928,7 +928,7 @@
       "name": "MultiImageBanner",
       "file": "components/MultiImageBanner.vue",
       "category": "block",
-      "description": "Photo mosaic banner — first image is the hero, up to 4 smaller images on the side. Opens a lightbox slideshow on click.",
+      "description": "Mosaico fotográfico — a primeira imagem é o destaque, até 4 imagens menores ao lado. Clique abre um slideshow em lightbox.",
       "props": [
         {
           "name": "images",
@@ -983,7 +983,7 @@
       "name": "ChildGrid",
       "file": "components/ChildGrid.vue",
       "category": "block",
-      "description": "Auto-populated grid that reads child folders from a CMS path and renders them as cards. No manual items needed.",
+      "description": "Grelha preenchida automaticamente a partir de subpastas de um caminho CMS — renderiza cada subpasta como cartão. Sem itens manuais.",
       "props": [
         {
           "name": "parentPath",
@@ -1162,7 +1162,7 @@
       "name": "ContentMD",
       "file": "components/ContentMD.vue",
       "category": "block",
-      "description": "Renders a Markdown file from the CMS with optional top image and side images.",
+      "description": "Renderiza um ficheiro Markdown do CMS com imagem superior e imagens laterais opcionais.",
       "props": [
         {
           "name": "pagePath",
@@ -1177,7 +1177,7 @@
       "name": "QuickNavigation",
       "file": "components/QuickNavigation.vue",
       "category": "block",
-      "description": "Row of feature/navigation cards with icon, title, description, and CTA link.",
+      "description": "Linha de cartões de funcionalidades/navegação com ícone, título, descrição e link de CTA.",
       "props": [
         {
           "name": "links",
@@ -1293,7 +1293,7 @@
       "name": "SocialProof",
       "file": "components/SocialProof.vue",
       "category": "block",
-      "description": "Scrolling logo marquee strip for brand/client logos.",
+      "description": "Faixa de logos em movimento contínuo para marcas e clientes parceiros.",
       "props": [
         {
           "name": "title",
@@ -1444,7 +1444,7 @@
       "name": "Sirius-ContactModel1",
       "file": "components/Sirius-ContactModel1.vue",
       "category": "block",
-      "description": "Contact page layout with an info column and a dynamic form builder.",
+      "description": "Layout de página de contacto com coluna de informações e formulário dinâmico configurável.",
       "props": [
         {
           "name": "formTitle",
@@ -1609,7 +1609,7 @@
       "file": "components/SiteHeader.vue",
       "category": "layout",
       "cms_hidden": true,
-      "description": "Main site header/topbar. Config driven by _global/_topbar.json — not a page block.",
+      "description": "Cabeçalho principal do site. Configurado via _global/_topbar.json — não é um bloco de página.",
       "props": [
         {
           "name": "isGlass",
@@ -1623,7 +1623,7 @@
       "name": "SiteHeaderLogo",
       "file": "components/SiteHeaderLogo.vue",
       "category": "layout",
-      "description": "Logo / brand mark — usable standalone in footer or any block area.",
+      "description": "Logo / marca — utilizável de forma independente no rodapé ou em qualquer área de bloco.",
       "props": [
         {
           "name": "brandName",
@@ -1855,7 +1855,7 @@
       "file": "components/SiteHeaderMenu.vue",
       "category": "layout",
       "cms_hidden": false,
-      "description": "Navigation menu inside SiteHeader. Menu items come from _topbar.json.",
+      "description": "Menu de navegação dentro do SiteHeader. Os itens vêm de _topbar.json.",
       "props": [
         {
           "name": "align",
@@ -2037,7 +2037,7 @@
       "name": "ContentBlock",
       "file": "components/ContentBlock.vue",
       "category": "block",
-      "description": "Two-column section with text content on one side and media on the other. Supports badge, title, body text (Markdown), feature icons, image side control, and video (YouTube, Vimeo, or local).",
+      "description": "Secção em duas colunas com texto de um lado e média do outro. Suporta badge, título, corpo em Markdown, ícones de funcionalidades, controlo do lado da imagem e vídeo (YouTube, Vimeo ou local).",
       "props": [
         {
           "name": "badge",
@@ -2116,7 +2116,7 @@
       "name": "Curriculum",
       "file": "components/Curriculum.vue",
       "category": "block",
-      "description": "Numbered module/curriculum grid with an optional CTA banner at the bottom.",
+      "description": "Grelha numerada de módulos/currículo com banner de CTA opcional no rodapé.",
       "props": [
         {
           "name": "title",
@@ -2168,7 +2168,7 @@
       "name": "Instructor",
       "file": "components/Instructor.vue",
       "category": "block",
-      "description": "Instructor/author profile section with photo, bio, credentials list, and an optional footer badge.",
+      "description": "Secção de perfil de instrutor/autor com foto, bio, lista de credenciais e badge de rodapé opcional.",
       "props": [
         {
           "name": "label",
@@ -2231,7 +2231,7 @@
       "file": "components/Menu.vue",
       "category": "layout",
       "cms_hidden": true,
-      "description": "Navigation menu — horizontal or vertical list of links.",
+      "description": "Menu de navegação — lista horizontal ou vertical de ligações.",
       "props": [
         {
           "name": "title",
@@ -2287,7 +2287,7 @@
       "name": "ContactInfo",
       "file": "components/ContactInfo.vue",
       "category": "block",
-      "description": "Contact details: WhatsApp, phone, email, and address with icons.",
+      "description": "Detalhes de contacto: WhatsApp, telefone, email e morada com ícones.",
       "props": [
         {
           "name": "title",
@@ -2341,7 +2341,7 @@
       "name": "NewsletterSubscribe",
       "file": "components/NewsletterSubscribe.vue",
       "category": "layout",
-      "description": "Newsletter subscription box with title, subtitle, and email input.",
+      "description": "Caixa de subscrição de newsletter com título, subtítulo e campo de email.",
       "props": [
         {
           "name": "title",
@@ -2374,7 +2374,7 @@
       "file": "components/FooterLogoBrand.vue",
       "category": "layout",
       "cms_hidden": true,
-      "description": "Footer brand block: site name, slogan, short description and social media icon links.",
+      "description": "Bloco de marca para rodapé: nome do site, slogan, descrição curta e ícones de redes sociais.",
       "props": [
         {
           "name": "logo",
@@ -2474,7 +2474,7 @@
       "name": "SocialLinks",
       "file": "components/SocialLinks.vue",
       "category": "layout",
-      "description": "Social media icon links with title, subtitle, and horizontal/vertical layout.",
+      "description": "Ícones de ligação para redes sociais com título, subtítulo e disposição horizontal ou vertical.",
       "props": [
         {
           "name": "title",
@@ -2586,7 +2586,7 @@
       "name": "Textbox",
       "file": "components/Textbox.vue",
       "category": "block",
-      "description": "Content block with title, subtitle, image gallery, and rich text body.",
+      "description": "Bloco de conteúdo com título, subtítulo, galeria de imagens e corpo em texto rico.",
       "props": [
         {
           "name": "title",
@@ -2669,7 +2669,7 @@
       "name": "Hero",
       "file": "components/Hero.vue",
       "category": "block",
-      "description": "Full-screen hero section with video background, title, description, and dual CTA buttons.",
+      "description": "Secção hero de ecrã inteiro com vídeo de fundo, título, descrição e dois botões de CTA.",
       "props": [
         {
           "name": "badge",
@@ -4081,39 +4081,110 @@
       "category": "block",
       "description": "Grelha de funcionalidades / vantagens com ícone, título e descrição. Suporta variantes cards, minimal e ícone à esquerda.",
       "props": [
-        { "name": "title",       "label": "Título",             "type": "text",     "default": "Porque nos escolher" },
-        { "name": "subtitle",    "label": "Subtítulo / badge",  "type": "text",     "default": "Vantagens" },
-        { "name": "description", "label": "Descrição",          "type": "textarea", "default": "" },
         {
-          "name": "columns", "label": "Colunas", "type": "select", "default": "3",
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": "Porque nos escolher"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": "Vantagens"
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "columns",
+          "label": "Colunas",
+          "type": "select",
+          "default": "3",
           "options": [
-            { "value": "2", "label": "2 colunas" },
-            { "value": "3", "label": "3 colunas" },
-            { "value": "4", "label": "4 colunas" }
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
           ]
         },
         {
-          "name": "variant", "label": "Estilo", "type": "select", "default": "cards",
+          "name": "variant",
+          "label": "Estilo",
+          "type": "select",
+          "default": "cards",
           "options": [
-            { "value": "cards",     "label": "Cards com bordas" },
-            { "value": "minimal",   "label": "Minimal (ícone circular)" },
-            { "value": "icon-left", "label": "Ícone à esquerda" }
+            {
+              "value": "cards",
+              "label": "Cards com bordas"
+            },
+            {
+              "value": "minimal",
+              "label": "Minimal (ícone circular)"
+            },
+            {
+              "value": "icon-left",
+              "label": "Ícone à esquerda"
+            }
           ]
         },
         {
-          "name": "background", "label": "Fundo", "type": "select", "default": "default",
+          "name": "background",
+          "label": "Fundo",
+          "type": "select",
+          "default": "default",
           "options": [
-            { "value": "default", "label": "Padrão" },
-            { "value": "muted",   "label": "Suave" }
+            {
+              "value": "default",
+              "label": "Padrão"
+            },
+            {
+              "value": "muted",
+              "label": "Suave"
+            }
           ]
         },
         {
-          "name": "items", "label": "Itens", "type": "array", "default": [],
+          "name": "items",
+          "label": "Itens",
+          "type": "array",
+          "default": [],
           "itemSchema": [
-            { "name": "icon",        "label": "Ícone PrimeIcons (ex: pi-bolt)", "type": "text",     "default": "pi-star" },
-            { "name": "title",       "label": "Título",                          "type": "text",     "default": "" },
-            { "name": "description", "label": "Descrição",                       "type": "textarea", "default": "" },
-            { "name": "badge",       "label": "Etiqueta (opcional)",             "type": "text",     "default": "" }
+            {
+              "name": "icon",
+              "label": "Ícone PrimeIcons (ex: pi-bolt)",
+              "type": "text",
+              "default": "pi-star"
+            },
+            {
+              "name": "title",
+              "label": "Título",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "badge",
+              "label": "Etiqueta (opcional)",
+              "type": "text",
+              "default": ""
+            }
           ]
         }
       ]
@@ -4124,46 +4195,152 @@
       "category": "block",
       "description": "Apresentação da equipa com foto, nome, cargo, bio e links sociais. Variantes cards, minimal e lista.",
       "props": [
-        { "name": "title",       "label": "Título",            "type": "text",     "default": "Conheça a nossa equipa" },
-        { "name": "subtitle",    "label": "Subtítulo / badge", "type": "text",     "default": "Equipa" },
-        { "name": "description", "label": "Descrição",         "type": "textarea", "default": "" },
         {
-          "name": "columns", "label": "Colunas", "type": "select", "default": "3",
+          "name": "title",
+          "label": "Título",
+          "type": "text",
+          "default": "Conheça a nossa equipa"
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": "Equipa"
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "textarea",
+          "default": ""
+        },
+        {
+          "name": "columns",
+          "label": "Colunas",
+          "type": "select",
+          "default": "3",
           "options": [
-            { "value": "2", "label": "2 colunas" },
-            { "value": "3", "label": "3 colunas" },
-            { "value": "4", "label": "4 colunas" }
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
           ]
         },
         {
-          "name": "variant", "label": "Estilo", "type": "select", "default": "cards",
+          "name": "variant",
+          "label": "Estilo",
+          "type": "select",
+          "default": "cards",
           "options": [
-            { "value": "cards",   "label": "Cards" },
-            { "value": "minimal", "label": "Minimal" },
-            { "value": "list",    "label": "Lista" }
+            {
+              "value": "cards",
+              "label": "Cards"
+            },
+            {
+              "value": "minimal",
+              "label": "Minimal"
+            },
+            {
+              "value": "list",
+              "label": "Lista"
+            }
           ]
         },
         {
-          "name": "background", "label": "Fundo", "type": "select", "default": "default",
+          "name": "background",
+          "label": "Fundo",
+          "type": "select",
+          "default": "default",
           "options": [
-            { "value": "default", "label": "Padrão" },
-            { "value": "muted",   "label": "Suave" }
+            {
+              "value": "default",
+              "label": "Padrão"
+            },
+            {
+              "value": "muted",
+              "label": "Suave"
+            }
           ]
         },
-        { "name": "showSocial", "label": "Mostrar redes sociais", "type": "toggle", "default": true },
-        { "name": "showBio",    "label": "Mostrar bio",           "type": "toggle", "default": true },
         {
-          "name": "members", "label": "Membros", "type": "array", "default": [],
+          "name": "showSocial",
+          "label": "Mostrar redes sociais",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showBio",
+          "label": "Mostrar bio",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "members",
+          "label": "Membros",
+          "type": "array",
+          "default": [],
           "itemSchema": [
-            { "name": "name",      "label": "Nome",       "type": "text",     "default": "" },
-            { "name": "role",      "label": "Cargo",      "type": "text",     "default": "" },
-            { "name": "bio",       "label": "Bio",        "type": "textarea", "default": "" },
-            { "name": "avatar",    "label": "Foto",       "type": "image",    "default": "" },
-            { "name": "email",     "label": "Email",      "type": "text",     "default": "" },
-            { "name": "linkedin",  "label": "LinkedIn",   "type": "url",      "default": "" },
-            { "name": "instagram", "label": "Instagram",  "type": "url",      "default": "" },
-            { "name": "twitter",   "label": "Twitter/X",  "type": "url",      "default": "" },
-            { "name": "facebook",  "label": "Facebook",   "type": "url",      "default": "" }
+            {
+              "name": "name",
+              "label": "Nome",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "role",
+              "label": "Cargo",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "bio",
+              "label": "Bio",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "avatar",
+              "label": "Foto",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "email",
+              "label": "Email",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "linkedin",
+              "label": "LinkedIn",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "instagram",
+              "label": "Instagram",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "twitter",
+              "label": "Twitter/X",
+              "type": "url",
+              "default": ""
+            },
+            {
+              "name": "facebook",
+              "label": "Facebook",
+              "type": "url",
+              "default": ""
+            }
           ]
         }
       ]
@@ -4174,37 +4351,788 @@
       "category": "block",
       "description": "Barra de estatísticas animada com contadores. Ideal para destacar números-chave como clientes, anos de experiência, projetos, etc.",
       "props": [
-        { "name": "title",    "label": "Título (opcional)",   "type": "text", "default": "" },
-        { "name": "subtitle", "label": "Subtítulo / badge",   "type": "text", "default": "" },
         {
-          "name": "variant", "label": "Estilo", "type": "select", "default": "horizontal",
+          "name": "title",
+          "label": "Título (opcional)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "variant",
+          "label": "Estilo",
+          "type": "select",
+          "default": "horizontal",
           "options": [
-            { "value": "horizontal", "label": "Horizontal (linha)" },
-            { "value": "centered",   "label": "Cards centrados" },
-            { "value": "minimal",    "label": "Minimal (só números)" }
+            {
+              "value": "horizontal",
+              "label": "Horizontal (linha)"
+            },
+            {
+              "value": "centered",
+              "label": "Cards centrados"
+            },
+            {
+              "value": "minimal",
+              "label": "Minimal (só números)"
+            }
           ]
         },
         {
-          "name": "background", "label": "Fundo", "type": "select", "default": "muted",
+          "name": "background",
+          "label": "Fundo",
+          "type": "select",
+          "default": "muted",
           "options": [
-            { "value": "default", "label": "Padrão" },
-            { "value": "muted",   "label": "Suave" },
-            { "value": "primary", "label": "Cor primária" },
-            { "value": "dark",    "label": "Escuro" }
+            {
+              "value": "default",
+              "label": "Padrão"
+            },
+            {
+              "value": "muted",
+              "label": "Suave"
+            },
+            {
+              "value": "primary",
+              "label": "Cor primária"
+            },
+            {
+              "value": "dark",
+              "label": "Escuro"
+            }
           ]
         },
-        { "name": "dividers", "label": "Divisores entre itens", "type": "toggle",  "default": true },
-        { "name": "animate",  "label": "Animar contadores",     "type": "toggle",  "default": true },
-        { "name": "duration", "label": "Duração animação (ms)", "type": "number",  "default": 2000 },
         {
-          "name": "items", "label": "Estatísticas", "type": "array", "default": [],
+          "name": "dividers",
+          "label": "Divisores entre itens",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "animate",
+          "label": "Animar contadores",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "duration",
+          "label": "Duração animação (ms)",
+          "type": "number",
+          "default": 2000
+        },
+        {
+          "name": "items",
+          "label": "Estatísticas",
+          "type": "array",
+          "default": [],
           "itemSchema": [
-            { "name": "value",       "label": "Valor (número)", "type": "text",     "default": "0" },
-            { "name": "prefix",      "label": "Prefixo (ex: €)", "type": "text",    "default": "" },
-            { "name": "suffix",      "label": "Sufixo (ex: +, %)", "type": "text",  "default": "" },
-            { "name": "label",       "label": "Etiqueta",        "type": "text",    "default": "" },
-            { "name": "description", "label": "Sub-descrição",   "type": "text",    "default": "" },
-            { "name": "icon",        "label": "Ícone PrimeIcons (ex: pi-users)", "type": "text", "default": "" }
+            {
+              "name": "value",
+              "label": "Valor (número)",
+              "type": "text",
+              "default": "0"
+            },
+            {
+              "name": "prefix",
+              "label": "Prefixo (ex: €)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "suffix",
+              "label": "Sufixo (ex: +, %)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "label",
+              "label": "Etiqueta",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Sub-descrição",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "icon",
+              "label": "Ícone PrimeIcons (ex: pi-users)",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AccommodationsGrid",
+      "file": "components/AccommodationsGrid.vue",
+      "category": "block",
+      "description": "Grelha de quartos e suites para pousadas e hotéis boutique — carrossel de fotos por cartão, comodidades com ícones, preço em destaque e botão de reserva via WhatsApp.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Site (máximo)"
+            },
+            {
+              "value": "content",
+              "label": "Conteúdo (padrão)"
+            },
+            {
+              "value": "copy",
+              "label": "Texto (estreito)"
+            }
+          ]
+        },
+        {
+          "name": "rooms",
+          "label": "Quartos / Suites",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "name",
+              "label": "Nome do quarto",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição",
+              "type": "textarea",
+              "default": ""
+            },
+            {
+              "name": "images",
+              "label": "Fotos (carrossel)",
+              "type": "image-array",
+              "default": []
+            },
+            {
+              "name": "maxGuests",
+              "label": "Capacidade máxima (hóspedes)",
+              "type": "number",
+              "default": 2
+            },
+            {
+              "name": "bedType",
+              "label": "Tipo de cama",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "size",
+              "label": "Área (ex: 42 m²)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "amenities",
+              "label": "Comodidades",
+              "type": "array",
+              "default": [],
+              "itemSchema": [
+                {
+                  "name": "value",
+                  "label": "Comodidade",
+                  "type": "text",
+                  "default": ""
+                }
+              ]
+            },
+            {
+              "name": "priceFrom",
+              "label": "Preço a partir de (apenas o número, ex: 450)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "currency",
+              "label": "Moeda",
+              "type": "select",
+              "default": "BRL",
+              "options": [
+                {
+                  "value": "BRL",
+                  "label": "Real Brasileiro (R$)"
+                },
+                {
+                  "value": "USD",
+                  "label": "Dólar Americano ($)"
+                },
+                {
+                  "value": "EUR",
+                  "label": "Euro (€)"
+                }
+              ]
+            },
+            {
+              "name": "whatsappNumber",
+              "label": "Número WhatsApp (com DDI, ex: 5511999999999)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "bookingUrl",
+              "label": "URL de reserva alternativa (deixar vazio para usar WhatsApp)",
+              "type": "url",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExperienceCards",
+      "file": "components/ExperienceCards.vue",
+      "category": "block",
+      "description": "Grelha de cartões de experiências com imagem full-bleed, gradiente, ícone e link opcional — ideal para actividades, passeios e atrações.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "cols",
+          "label": "Colunas (desktop)",
+          "type": "select",
+          "default": "3",
+          "options": [
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Largura máxima do site"
+            },
+            {
+              "value": "content",
+              "label": "Largura de conteúdo"
+            },
+            {
+              "value": "copy",
+              "label": "Largura de leitura"
+            }
+          ]
+        },
+        {
+          "name": "experiences",
+          "label": "Experiências",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "title",
+              "label": "Nome",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição curta",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "image",
+              "label": "Imagem",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "icon",
+              "label": "Ícone PrimeIcons (ex: pi-sun)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "link",
+              "label": "Link (opcional, URL ou caminho interno)",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MapSection",
+      "file": "components/MapSection.vue",
+      "category": "block",
+      "description": "Secção de mapa incorporado (Google Maps iframe) com título, descrição e lista de pontos de interesse destacados.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "embedUrl",
+          "label": "URL do iframe do Google Maps (embed)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "label": "Altura do mapa (ex: 420px)",
+          "type": "text",
+          "default": "420px"
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Largura máxima do site"
+            },
+            {
+              "value": "content",
+              "label": "Largura de conteúdo"
+            },
+            {
+              "value": "copy",
+              "label": "Largura de leitura"
+            }
+          ]
+        },
+        {
+          "name": "highlights",
+          "label": "Destaques / pontos de interesse",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "name",
+              "label": "Nome do local",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "description",
+              "label": "Descrição curta",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "icon",
+              "label": "Ícone PrimeIcons (ex: pi-map-marker)",
+              "type": "text",
+              "default": "pi-map-marker"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookingWidget",
+      "file": "components/BookingWidget.vue",
+      "category": "block",
+      "description": "Barra de reserva para pousadas e hotéis boutique — campos de check-in, check-out e número de hóspedes, com envio via WhatsApp ou URL de reserva externa.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "checkInLabel",
+          "label": "Etiqueta Check-in",
+          "type": "text",
+          "default": "Check-in"
+        },
+        {
+          "name": "checkOutLabel",
+          "label": "Etiqueta Check-out",
+          "type": "text",
+          "default": "Check-out"
+        },
+        {
+          "name": "guestsLabel",
+          "label": "Etiqueta Hóspedes",
+          "type": "text",
+          "default": "Hóspedes"
+        },
+        {
+          "name": "ctaLabel",
+          "label": "Texto do botão",
+          "type": "text",
+          "default": "Ver disponibilidade"
+        },
+        {
+          "name": "whatsappNumber",
+          "label": "Número WhatsApp (com DDI, ex: 5573999999999)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "bookingUrl",
+          "label": "URL de reserva alternativa (deixar vazio para usar WhatsApp)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Site (máximo)"
+            },
+            {
+              "value": "content",
+              "label": "Conteúdo (padrão)"
+            },
+            {
+              "value": "copy",
+              "label": "Texto (estreito)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TestimonialsCarousel",
+      "file": "components/TestimonialsCarousel.vue",
+      "category": "block",
+      "description": "Carrossel de testemunhos de hóspedes — um cartão de cada vez com avaliação por estrelas, texto, autor e indicadores de ponto. Autoplay configurável e setas de navegação.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtítulo / badge",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "autoplay",
+          "label": "Avanço automático",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Site (máximo)"
+            },
+            {
+              "value": "content",
+              "label": "Conteúdo (padrão)"
+            },
+            {
+              "value": "copy",
+              "label": "Texto (estreito)"
+            }
+          ]
+        },
+        {
+          "name": "testimonials",
+          "label": "Testemunhos",
+          "type": "array",
+          "default": [],
+          "itemSchema": [
+            {
+              "name": "rating",
+              "label": "Avaliação (1–5)",
+              "type": "text",
+              "default": "5"
+            },
+            {
+              "name": "text",
+              "label": "Texto do testemunho",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "name",
+              "label": "Nome do hóspede",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "origin",
+              "label": "Origem (cidade / país)",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "photo",
+              "label": "Foto do hóspede",
+              "type": "image",
+              "default": ""
+            },
+            {
+              "name": "date",
+              "label": "Data (ex: Jan 2025)",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReservationForm",
+      "file": "components/ReservationForm.vue",
+      "category": "block",
+      "description": "Formulário de contacto/reserva para pousadas e hotéis boutique — campos configuráveis de check-in/out, hóspedes e telefone, envio via WhatsApp, email (Resend) ou ambos.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "Faça a sua reserva"
+        },
+        {
+          "name": "subtitle",
+          "label": "Badge / etiqueta acima do título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "label": "Descrição / texto introdutório",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "whatsappNumber",
+          "label": "Número WhatsApp (apenas dígitos com DDI, ex: 5511999999999)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "emailTo",
+          "label": "Email de destino (para envio por email)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "successMessage",
+          "label": "Mensagem de sucesso",
+          "type": "text",
+          "default": "Mensagem enviada! Entraremos em contacto em breve."
+        },
+        {
+          "name": "submitMode",
+          "label": "Modo de envio",
+          "type": "select",
+          "default": "whatsapp",
+          "options": [
+            {
+              "value": "whatsapp",
+              "label": "WhatsApp"
+            },
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "both",
+              "label": "WhatsApp + Email"
+            }
+          ]
+        },
+        {
+          "name": "showCheckInOut",
+          "label": "Mostrar campos de check-in / check-out",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showGuests",
+          "label": "Mostrar campo de número de hóspedes",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "showPhone",
+          "label": "Mostrar campo de telefone",
+          "type": "toggle",
+          "default": true
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Largura máxima do site"
+            },
+            {
+              "value": "content",
+              "label": "Largura de conteúdo"
+            },
+            {
+              "value": "copy",
+              "label": "Largura de leitura"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InstagramFeed",
+      "file": "components/InstagramFeed.vue",
+      "category": "block",
+      "description": "Feed do Instagram — mostra os posts mais recentes via Instagram Graph API. Requer token de acesso configurado nas Definições do site.",
+      "props": [
+        {
+          "name": "title",
+          "label": "Título da secção",
+          "type": "text",
+          "default": "Instagram"
+        },
+        {
+          "name": "subtitle",
+          "label": "Badge / etiqueta acima do título",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "username",
+          "label": "Username do Instagram (sem @)",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "limit",
+          "label": "Número de posts",
+          "type": "select",
+          "default": "9",
+          "options": [
+            {
+              "value": "6",
+              "label": "6 posts"
+            },
+            {
+              "value": "9",
+              "label": "9 posts"
+            },
+            {
+              "value": "12",
+              "label": "12 posts"
+            }
+          ]
+        },
+        {
+          "name": "cols",
+          "label": "Colunas no desktop",
+          "type": "select",
+          "default": "3",
+          "options": [
+            {
+              "value": "2",
+              "label": "2 colunas"
+            },
+            {
+              "value": "3",
+              "label": "3 colunas"
+            },
+            {
+              "value": "4",
+              "label": "4 colunas"
+            }
+          ]
+        },
+        {
+          "name": "cWidth",
+          "label": "Largura do conteúdo",
+          "type": "select",
+          "default": "content",
+          "options": [
+            {
+              "value": "site",
+              "label": "Largura máxima do site"
+            },
+            {
+              "value": "content",
+              "label": "Largura de conteúdo"
+            },
+            {
+              "value": "copy",
+              "label": "Largura de leitura"
+            }
           ]
         }
       ]
